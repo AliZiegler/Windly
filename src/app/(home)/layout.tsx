@@ -1,3 +1,4 @@
+export const runtime = "edge"
 import "@/app/globals.css";
 import { Suspense } from "react";
 import { Ubuntu } from "next/font/google";

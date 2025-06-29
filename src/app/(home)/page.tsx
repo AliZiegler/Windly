@@ -1,3 +1,4 @@
+export const runtime = "edge"
 import Products, { ProductType, CATEGORIES } from "@/app/components/global/Products.ts";
 import Product from "@/app/components/home/Product.tsx";
 
