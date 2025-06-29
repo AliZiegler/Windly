@@ -14,7 +14,7 @@ export default function DiscountFilter() {
     );
     function handleMouseUp() {
         const newParams = minDiscount
-            ? updateSearchParams(searchParams, "discount", minDiscount)
+            ? updateSearchParams(searchParams, "discount", String(minDiscount))
             : updateSearchParams(searchParams, "discount", null);
 
         router.push(`?${newParams}`);

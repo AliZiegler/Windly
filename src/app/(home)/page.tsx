@@ -2,7 +2,7 @@ import Products, { ProductType, CATEGORIES } from "@/app/components/global/Produ
 import Product from "@/app/components/home/Product.tsx";
 
 type PageProps = {
-    searchParams: {
+    searchParams: Promise<{
         sort?: string;
         reverse?: string;
         discount?: string;
@@ -10,7 +10,7 @@ type PageProps = {
         price?: string;
         search?: string;
         category?: string;
-    };
+    }>;
 };
 
 export default async function Page({ searchParams }: PageProps) {

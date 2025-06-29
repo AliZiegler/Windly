@@ -31,7 +31,7 @@ export default function RatingFilter() {
                 count={5}
                 size={40}
                 color2="#FFD700"
-                value={rating}
+                value={Number(rating)}
             />
         </section>
     );

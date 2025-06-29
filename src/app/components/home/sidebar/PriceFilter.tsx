@@ -11,7 +11,7 @@ export default function PriceFilter() {
     );
     const [maxPrice, setMaxPrice] = useState(paramsPrice);
 
-    function handlePriceChange(e) {
+    function handlePriceChange(e: React.ChangeEvent<HTMLInputElement>) {
         const newPrice = e.target.valueAsNumber * 25;
         setMaxPrice(newPrice);
     }
