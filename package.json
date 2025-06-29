@@ -10,6 +10,7 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@cloudflare/next-on-pages": "^1.13.12",
         "@libsql/client": "^0.15.9",
         "@types/react-stars": "^2.2.4",
         "dotenv": "^17.0.0",
