@@ -52,7 +52,7 @@ export const CATEGORIES = [
     "Toys",
     "Video Games",
     "Other",
-] as const;
+];
 
 export const Products: ProductType[] = [
     {
