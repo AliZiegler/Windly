@@ -1,4 +1,5 @@
 import "@/app/globals.css";
+import { Suspense } from "react";
 import { Ubuntu } from "next/font/google";
 import type { Metadata } from "next";
 import Navbar from "@/app/components/global/navbar/Navbar";
@@ -25,7 +26,9 @@ export default function RootLayout({
             <body className="h-screen flex flex-col bg-[#222831] text-[#FCECDD]">
                 <Navbar />
                 <div className="flex">
-                    <Sidebar />
+                    <Suspense fallback={<div className="w-[260px] p-5">Loading filters…</div>}>
+                        <Sidebar />
+                    </Suspense>
                     <main className="flex-1">
                         {children}
                     </main>

@@ -1,4 +1,4 @@
-export function FilterSkeleton() {
+export default function FilterSkeleton() {
     return (
         <section className="animate-pulse">
             <div className="h-4 w-1/2 bg-gray-600 mb-2 rounded"></div>

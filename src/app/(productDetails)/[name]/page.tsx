@@ -13,8 +13,8 @@ export default async function Page(
         params,
         searchParams,
     }: {
-        params: { name: string };
-        searchParams: Record<string, string | string[] | undefined>;
+        params: Promise<{ name: string }>;
+        searchParams: Promise<Record<string, string | string[] | undefined>>;
     }
 ) {
     const { name } = await params;
