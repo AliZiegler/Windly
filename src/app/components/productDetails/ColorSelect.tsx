@@ -4,19 +4,15 @@ import { Fragment } from "react";
 import { Tooltip } from "react-tooltip";
 import Link from "next/link";
 import { ProductType } from "@/app/components/global/Products";
-import { urlString } from "@/app/components/global/Atoms.ts";
+import { urlString } from "@/app/components/global/Atoms";
 
 interface ColorSelectProps {
     product: ProductType;
-    searchParams: string | URLSearchParams;
+    searchParams: URLSearchParams;
 }
 
 export default function ColorSelect({ product, searchParams }: ColorSelectProps) {
-    const baseParams =
-        typeof searchParams === "string"
-            ? new URLSearchParams(searchParams.replace(/^\?/, ""))
-            : new URLSearchParams(searchParams);
-
+    const baseParams = new URLSearchParams(searchParams);
     const firstColor = product.colors[0];
 
     return (
