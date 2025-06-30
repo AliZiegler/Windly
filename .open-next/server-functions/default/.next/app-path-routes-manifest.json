@@ -1,0 +1,6 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/icon.png/route": "/icon.png",
+  "/(home)/page": "/",
+  "/(productDetails)/[name]/page": "/[name]"
+}
