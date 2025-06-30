@@ -1,4 +1,3 @@
-export const runtime = "edge"
 import "@/app/globals.css";
 import Navbar from "@/app/components/global/navbar/Navbar";
 import { Ubuntu } from "next/font/google";

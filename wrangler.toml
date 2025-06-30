@@ -1,14 +1,7 @@
-name = "windly"
-compatibility_date = "2025-06-29"
-compatibility_flags = ["nodejs_compat"]
-
-# This tells Wrangler where to find the built worker file
-main = ".vercel/output/static/_worker.js"
-
-# This tells Wrangler where to find static assets
-[site]
-bucket = ".vercel/output/static"
-
-# Build configuration
-[build]
-command = "bun run build && npx @cloudflare/next-on-pages"
+  main = ".open-next/worker.js"
+  name = "Windly"
+  compatibility_date = "2025-03-25"
+  compatibility_flags = ["nodejs_compat"]
+  [assets]
+  directory = ".open-next/assets"
+  binding = "ASSETS"

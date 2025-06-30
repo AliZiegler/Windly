@@ -1,1 +1,1 @@
-A Next.js project made for practice, its a mess
+A Next.js Online Store made for practice, its a mess
