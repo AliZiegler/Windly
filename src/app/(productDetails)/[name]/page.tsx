@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import data, { ProductType } from "@/app/components/global/Products";
 import { redirect } from "next/navigation";
 import Image from "next/image";
