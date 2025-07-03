@@ -42,7 +42,7 @@ export default function Search({
             return;
         }
 
-        let newParams = updateSearchParams(searchParams, "search", search);
+        let newParams = updateSearchParams(searchParams, "search", urlString(search));
 
         if (category !== "all") {
             newParams = updateSearchParams(newParams, "category", category);
@@ -72,7 +72,8 @@ export default function Search({
             <select
                 name="category"
                 defaultValue={currentCategory}
-                className="w-25 h-[60px] cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="w-25 h-[60px] cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r border-gray-300
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 aria-label="Select category"
             >
                 {categoryOptions}

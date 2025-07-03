@@ -1,6 +1,7 @@
 export const runtime = 'edge';
 import Products, { ProductType, CATEGORIES } from "@/app/components/global/Products.ts";
 import Product from "@/app/components/home/Product.tsx";
+import { reverseUrlString } from "@/app/components/global/Atoms";
 
 type PageProps = {
     searchParams: Promise<{
@@ -52,7 +53,8 @@ export default async function Page({ searchParams }: PageProps) {
             product.discount >= minDiscount &&
             product.rating >= minRating &&
             product.name.toLowerCase().includes(search.toLowerCase()) &&
-            (category === "all" || product.category.toLowerCase() === category || (category === "other" && CATEGORIES.includes(product.category)))
+            (category === "all" || product.category.toLowerCase() === reverseUrlString(category) ||
+                (category === "other" && !CATEGORIES.includes(product.category)))
         );
     }
 
