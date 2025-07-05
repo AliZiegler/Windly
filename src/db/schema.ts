@@ -19,7 +19,7 @@ export const productTable = sqliteTable("product", {
     dimensionsWidth: real().notNull(), // in cm
     dimensionsHeight: real().notNull(), // in cm
 
-    colors: text().notNull(), // JSON string of color objects
+    colors: text().notNull(), // JSON string of color objects each has a colorName and colorHex
 
     sizes: text(), // JSON string of size array
 
@@ -37,7 +37,7 @@ export const productTable = sqliteTable("product", {
     warrantyDuration: int().notNull(), // in months
     warrantyType: text().notNull(),
 
-    about: text().notNull(), // JSON string of about array
+    about: text().notNull(), // JSON string of about array around 5 points and each one considerably long
 });
 
 

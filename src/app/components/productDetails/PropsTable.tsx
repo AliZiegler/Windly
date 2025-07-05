@@ -10,9 +10,9 @@ export default function PropsTable({ p, className }: { p: ProductType, className
                 <tr>
                     <td className="font-bold">Dimensions:</td>
                     <td>
-                        {p.dimensions.length} x {p.dimensions.width} x
+                        {p.dimensionsLength} x {p.dimensionsWidth} x
                         {" "}
-                        {p.dimensions.height} cm
+                        {p.dimensionsHeight} cm
                     </td>
                 </tr>
                 <tr>

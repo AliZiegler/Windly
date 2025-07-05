@@ -1,5 +1,8 @@
 export const runtime = 'edge';
-import data, { ProductType } from "@/app/components/global/Products";
+import { db } from "@/lib/db";
+import { mapRowToProduct } from "@/lib/mappers";
+import { productTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,8 +23,9 @@ export default async function Page(
 ) {
     const { name } = await params;
     const productName = name.replace(/-/g, " ");
+    const rawP = await db.select().from(productTable).where(eq(productTable.name, productName)).limit(1);
+    const p = mapRowToProduct(rawP[0]);
 
-    const p: ProductType | undefined = data.find((prod) => prod.name === productName);
     if (!p) return redirect("/");
     const spRecord = await searchParams;
     const sp = new URLSearchParams();

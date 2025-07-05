@@ -1,9 +1,11 @@
 export const runtime = 'edge';
-import { db } from "@/app/index";
+import { db } from "@/lib/db";
+import { mapRowToProduct } from "@/lib/mappers";
 import { productTable } from "@/db/schema";
-import Products, { ProductType, CATEGORIES } from "@/app/components/global/Products.ts";
+import { CATEGORIES, ProductType } from "@/app/components/global/Products.ts";
 import Product from "@/app/components/home/Product.tsx";
 import { reverseUrlString } from "@/app/components/global/Atoms";
+import { and, gte, lte, like, eq, inArray, not, sql } from "drizzle-orm";
 
 type PageProps = {
     searchParams: Promise<{
@@ -27,48 +29,77 @@ export default async function Page({ searchParams }: PageProps) {
     const search = params.search || "";
     const category = params.category || "all";
 
-    const sortProducts = (
-        products: ProductType[],
-        sortType: string,
-    ): ProductType[] => {
-        const sortedProducts = [...products];
-        switch (sortType) {
-            case "price":
-                return sortedProducts.sort((a, b) => {
-                    const priceA = a.price * (1 - a.discount / 100);
-                    const priceB = b.price * (1 - b.discount / 100);
-                    return priceA - priceB;
-                });
-            case "discount":
-                return sortedProducts.sort((a, b) => b.discount - a.discount);
-            case "rating":
-                return sortedProducts.sort((a, b) => b.rating - a.rating);
-            case "relevance":
-            default:
-                return sortedProducts;
-        }
-    };
+    // Build WHERE conditions
+    const conditions = [];
 
-    function rangeProducts(products: ProductType[]): ProductType[] {
-        return products.filter((product) =>
-            product.price <= maxPrice &&
-            product.discount >= minDiscount &&
-            product.rating >= minRating &&
-            product.name.toLowerCase().includes(search.toLowerCase()) &&
-            (category === "all" || product.category.toLowerCase() === reverseUrlString(category) ||
-                (category === "other" && !CATEGORIES.includes(product.category)))
-        );
+    // Price filter
+    if (maxPrice < 12000) {
+        conditions.push(lte(productTable.price, maxPrice));
     }
 
-    const sortedProducts = reverse === "true"
-        ? sortProducts(Products, sort).reverse()
-        : sortProducts(Products, sort);
+    // Discount filter
+    if (minDiscount > 0) {
+        conditions.push(gte(productTable.discount, minDiscount));
+    }
 
-    const finalProducts = rangeProducts(sortedProducts);
+    // Rating filter
+    if (minRating > 0) {
+        conditions.push(gte(productTable.rating, minRating));
+    }
+
+    // Search filter
+    if (search) {
+        conditions.push(like(productTable.name, `%${search}%`));
+    }
+
+    // Category filter
+    if (category !== "all") {
+        if (category === "other") {
+            // Products NOT in the predefined categories
+            conditions.push(not(inArray(productTable.category, CATEGORIES)));
+        } else {
+            conditions.push(eq(productTable.category, reverseUrlString(category)));
+        }
+    }
+
+    // Build ORDER BY clause
+    let orderBy;
+    switch (sort) {
+        case "price":
+            // Sort by discounted price: price * (1 - discount/100)
+            orderBy = reverse === "true"
+                ? sql`${productTable.price} * (1 - ${productTable.discount} / 100) DESC`
+                : sql`${productTable.price} * (1 - ${productTable.discount} / 100) ASC`;
+            break;
+        case "discount":
+            orderBy = reverse === "true"
+                ? sql`${productTable.discount} ASC`
+                : sql`${productTable.discount} DESC`;
+            break;
+        case "rating":
+            orderBy = reverse === "true"
+                ? sql`${productTable.rating} ASC`
+                : sql`${productTable.rating} DESC`;
+            break;
+        case "relevance":
+        default:
+            orderBy = reverse === "true"
+                ? sql`${productTable.id} DESC`
+                : sql`${productTable.id} ASC`;
+            break;
+    }
+
+    // Execute the optimized query
+    const rawProducts = await db
+        .select()
+        .from(productTable)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(orderBy);
+    const Products = rawProducts.map(mapRowToProduct);
 
     return (
         <main className="flex flex-wrap gap-5 m-7">
-            {finalProducts.map((product: ProductType) => (
+            {Products.map((product: ProductType) => (
                 <Product key={product.id} {...product} />
             ))}
         </main>
