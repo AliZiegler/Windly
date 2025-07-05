@@ -1,4 +1,6 @@
 export const runtime = 'edge';
+import { db } from "@/app/index";
+import { productTable } from "@/db/schema";
 import Products, { ProductType, CATEGORIES } from "@/app/components/global/Products.ts";
 import Product from "@/app/components/home/Product.tsx";
 import { reverseUrlString } from "@/app/components/global/Atoms";
