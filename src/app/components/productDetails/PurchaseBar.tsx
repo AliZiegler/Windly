@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ProductType } from "@/app/components/global/Products";
+import { ProductType } from "@/app/components/global/Types";
 import { salePrice } from "@/app/components/global/Atoms";
 export default function PurchaseBar({ p, className }: { p: ProductType, className?: string }) {
     const formattedPrice = salePrice(p.price, p.discount);

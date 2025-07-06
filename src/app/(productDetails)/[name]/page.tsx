@@ -37,7 +37,7 @@ export default async function Page(
         }
     }
 
-    const aboutList = p.about.map((item) => <li key={item}>{item}</li>);
+    const aboutList = p.about.map((item: string) => <li key={item}>{item}</li>);
     const formattedPrice = salePrice(p.price, p.discount);
 
     return (

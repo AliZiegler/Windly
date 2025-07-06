@@ -1,6 +1,6 @@
 import type { InferSelectModel } from "drizzle-orm";
 import { productTable } from "../db/schema";
-import { ProductType } from "../app/components/global/Products"
+import { ProductType } from "../app/components/global/Types";
 
 type RawProductRow = InferSelectModel<typeof productTable>;
 

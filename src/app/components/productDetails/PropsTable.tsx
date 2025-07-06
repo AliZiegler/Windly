@@ -1,4 +1,4 @@
-import { ProductType } from "@/app/components/global/Products"
+import { ProductType } from "@/app/components/global/Types"
 export default function PropsTable({ p, className }: { p: ProductType, className?: string }) {
     return (
         <table className={className}>

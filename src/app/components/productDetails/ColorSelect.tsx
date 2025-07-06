@@ -3,7 +3,7 @@
 import { Fragment } from "react";
 import { Tooltip } from "react-tooltip";
 import Link from "next/link";
-import { ProductType } from "@/app/components/global/Products";
+import { ProductType } from "@/app/components/global/Types";
 import { urlString } from "@/app/components/global/Atoms";
 
 interface ColorSelectProps {
@@ -17,7 +17,7 @@ export default function ColorSelect({ product, searchParams }: ColorSelectProps)
 
     return (
         <span className="flex gap-2 mt-2">
-            {product.colors.map((color) => {
+            {product.colors.map((color: { colorName: string; colorHex: string }) => {
                 const params = new URLSearchParams(baseParams);
                 if (color.colorName === firstColor.colorName) {
                     params.delete("color");
