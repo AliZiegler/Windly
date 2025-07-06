@@ -32,9 +32,6 @@ export function updateSearchParams(
     return sortedParams.toString();
 }
 export const ORIGINAL_MAX_PRICE = 12000;
-export type searchParamsType = Promise<
-    Record<string, string | string[] | undefined>
->;
 export function spacesToDashes(str: string): string {
     return str.replace(/\s+/g, "-");
 }
@@ -72,3 +69,22 @@ export function salePrice(price: number, discountPercentage: number): string {
     const salePrice = applyDiscount(price, discountPercentage);
     return formatPrice(salePrice);
 }
+export const CATEGORIES = [
+    "All",
+    "Arts & Craft",
+    "Automotive",
+    "Baby",
+    "Beauty & Fashion",
+    "Books",
+    "Computers",
+    "Electronics",
+    "Home & Garden",
+    "Kids",
+    "Movies",
+    "Music",
+    "Sports",
+    "Tools",
+    "Toys",
+    "Video Games",
+    "Other",
+];

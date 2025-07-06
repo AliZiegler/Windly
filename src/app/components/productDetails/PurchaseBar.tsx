@@ -7,7 +7,7 @@ export default function PurchaseBar({ p, className }: { p: ProductType, classNam
         <div className={className}>
             <span className="flex">
                 <h1 className="text-3xl font-extralight">{formattedPrice}{p.discount > 0 && ","}</h1>
-                <b className="text-green-400 inline ml-1.5 mt-2.5 text-xl">{p.discount > 0 && `${p.discount} off!`}</b>
+                <b className="text-green-400 inline ml-1.5 mt-2.5 text-xl">{p.discount > 0 && `${p.discount}% off!`}</b>
             </span>
             <aside className="text-sm text-gray-400">{p.shippingFreeShipping ? "Free Shipping!"
                 : `${p.shippingCost} Shipping & Import Charges to Your Country`}</aside>

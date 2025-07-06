@@ -40,7 +40,7 @@ export default function PriceFilter() {
                 className="w-44 h-3 cursor-pointer"
                 value={maxPrice / 25}
                 onChange={handlePriceChange}
-                onMouseUp={handleMouseUp}
+                onPointerUp={handleMouseUp}
                 min={1}
                 max={ORIGINAL_MAX_PRICE / 25}
             />

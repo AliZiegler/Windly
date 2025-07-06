@@ -28,22 +28,6 @@ export type ProductType = {
     warrantyType: string;
     about: string[]; // long descriptive points, stored as JSON string in DB
 };
-export const CATEGORIES = [
-    "All",
-    "Arts & Craft",
-    "Automotive",
-    "Baby",
-    "Beauty & Fashion",
-    "Books",
-    "Computers",
-    "Electronics",
-    "Home & Garden",
-    "Kids",
-    "Movies",
-    "Music",
-    "Sports",
-    "Tools",
-    "Toys",
-    "Video Games",
-    "Other",
-];
+export type searchParamsType = Promise<
+    Record<string, string | string[] | undefined>
+>;

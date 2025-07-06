@@ -1,10 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { updateSearchParams, urlString } from "@/app/components/global/Atoms";
+import { updateSearchParams, urlString, CATEGORIES } from "@/app/components/global/Atoms";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useMemo } from "react";
-import { CATEGORIES } from "@/app/components/global/Products";
 
 
 type SearchProps = {
