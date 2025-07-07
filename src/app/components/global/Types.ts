@@ -31,3 +31,11 @@ export type ProductType = {
 export type searchParamsType = Promise<
     Record<string, string | string[] | undefined>
 >;
+export type SessionType = {
+    user: {
+        name: string;
+        email: string;
+        image: string;
+    };
+    expires: string;
+};
