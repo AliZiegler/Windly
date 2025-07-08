@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 import { signIn, auth } from "@/auth"
 
 export default async function SignIn() {
@@ -24,13 +25,15 @@ export default async function SignIn() {
                     </button>
                 </form>
             ) : (
-                <Image
-                    src={session.user.image || "/images/placeholder.png"}
-                    alt="user avatar"
-                    width={70}
-                    height={70}
-                    className="cursor-pointer"
-                />
+                <Link href="/account">
+                    <Image
+                        src={session.user.image || "/images/placeholder.png"}
+                        alt="user avatar"
+                        width={65}
+                        height={65}
+                        className="cursor-pointer rounded-full"
+                    />
+                </Link>
             )}
         </span>
     )

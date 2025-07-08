@@ -13,6 +13,7 @@ interface ColorSelectProps {
 
 export default function ColorSelect({ product, searchParams }: ColorSelectProps) {
     const baseParams = new URLSearchParams(searchParams);
+    baseParams.delete("name");
     const firstColor = product.colors[0];
 
     return (
