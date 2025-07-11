@@ -56,12 +56,15 @@ export const userTable = sqliteTable("user", {
         .primaryKey()
         .$defaultFn(() => crypto.randomUUID()),
     name: text("name"),
-    email: text("email").unique(),
+    email: text("email").notNull().unique(),
     emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
     image: text("image"),
+    gender: text("gender"),
+    birthday: text("birthday"),
+    phone: text("phone"),
 })
 
-export const accounts = sqliteTable(
+export const accountTable = sqliteTable(
     "account",
     {
         userId: text("userId")
@@ -81,28 +84,6 @@ export const accounts = sqliteTable(
     (account) => ({
         compoundKey: primaryKey({
             columns: [account.provider, account.providerAccountId],
-        }),
-    })
-)
-
-export const sessions = sqliteTable("session", {
-    sessionToken: text("sessionToken").primaryKey(),
-    userId: text("userId")
-        .notNull()
-        .references(() => userTable.id, { onDelete: "cascade" }),
-    expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
-})
-
-export const verificationTokenTable = sqliteTable(
-    "verificationToken",
-    {
-        identifier: text("identifier").notNull(),
-        token: text("token").notNull(),
-        expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
-    },
-    (verificationToken) => ({
-        compositePk: primaryKey({
-            columns: [verificationToken.identifier, verificationToken.token],
         }),
     })
 )
@@ -129,4 +110,11 @@ export const authenticatorTable = sqliteTable(
         }),
     })
 )
+export const sessionTable = sqliteTable("session", {
+    sessionToken: text("sessionToken").primaryKey(),
+    userId: text("userId")
+        .notNull()
+        .references(() => userTable.id, { onDelete: "cascade" }),
+    expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
+});
 export type SelectProduct = typeof productTable.$inferSelect

@@ -8,6 +8,7 @@ export default async function page() {
     if (!session?.user) {
         return <AutoSignIn />;
     }
+    console.log(session);
     return (
         <div className="w-5xl h-[550px] bg-none  ml-auto mr-auto my-20 flex flex-col gap-5">
             <h1 className="text-2xl">Account Information</h1>
