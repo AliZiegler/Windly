@@ -12,7 +12,9 @@ interface ReactStarsProps {
     half?: boolean;
     edit?: boolean;
     onChange?: (newValue: number) => void;
-    [key: string]: any; // Allow additional props
+    className?: string;
+    style?: React.CSSProperties;
+    // Add other common props as needed
 }
 
 const ReactStars = dynamic(
