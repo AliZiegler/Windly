@@ -62,6 +62,10 @@ export const userTable = sqliteTable("user", {
     gender: text("gender"),
     birthday: text("birthday"),
     phone: text("phone"),
+    address: text(),
+    wishlist: text(),
+    reviews: text(), // [{ id: string,date: string, productId: string, rating: number, review: string}]
+    orders: text(), // [{ id: string, date: string, productId: string, quantity: number, price: number}]
 })
 
 export const accountTable = sqliteTable(
@@ -118,3 +122,4 @@ export const sessionTable = sqliteTable("session", {
     expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
 });
 export type SelectProduct = typeof productTable.$inferSelect
+export type SelectUser = typeof userTable.$inferSelect
