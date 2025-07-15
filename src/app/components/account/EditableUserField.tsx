@@ -4,7 +4,7 @@ import { updateUserField } from "@/app/actions/UserActions";
 
 interface EditableFieldProps {
     label: string;
-    field: 'name' | 'phone' | 'birthday' | 'gender' | 'image';
+    field: 'name' | 'phone' | 'birthday' | 'gender';
     value: string | null;
     className?: string;
     inputType?: 'text' | 'tel' | 'date' | 'email';

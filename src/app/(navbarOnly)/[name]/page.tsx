@@ -2,7 +2,8 @@ export const runtime = 'edge';
 import WriteReview from "@/app/components/productDetails/WriteReview";
 import { db } from "@/lib/db";
 import { mapRowToProduct } from "@/lib/mappers";
-import { productTable } from "@/db/schema";
+import { productTable, userTable } from "@/db/schema";
+import { auth } from "@/auth";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Image from "next/image";
@@ -12,6 +13,7 @@ import { salePrice } from "@/app/components/global/Atoms";
 import ColorSelect from "@/app/components/productDetails/ColorSelect";
 import PropsTable from "@/app/components/productDetails/PropsTable";
 import PurchaseBar from "@/app/components/productDetails/PurchaseBar";
+import Heart from "@/app/components/global/Heart";
 
 export default async function Page(
     {
@@ -41,10 +43,21 @@ export default async function Page(
 
     const aboutList = p.about.map((item: string) => <li key={item}>{item}</li>);
     const formattedPrice = salePrice(p.price, p.discount);
+    const session = await auth();
+    let user = null;
+    let wishlist: string[] = [];
+    let isWishlisted = false;
+
+    if (session?.user?.id) {
+        user = await db.select().from(userTable).where(eq(userTable.id, session.user.id)).then((user) => user[0]);
+        wishlist = JSON.parse(user.wishlist || '[]');
+        isWishlisted = wishlist.includes(String(p.id));
+    }
 
     return (
         <div className="flex flex-col gap-5">
             <div className="flex mt-20 gap-3">
+
                 <Image
                     src="/images/placeholder.png"
                     alt="Placeholder"
@@ -63,6 +76,7 @@ export default async function Page(
                     <span className="flex items-center gap-1">
                         <b className="mt-1.5">{p.rating}</b>
                         <Stars value={p.rating} size={25} edit={false} />
+                        {session && <Heart product={p} size={25} isWishlisted={isWishlisted} className="ml-2 mt-0.5" />}
                     </span>
 
                     <hr />

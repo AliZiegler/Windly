@@ -19,12 +19,13 @@
         "@opennextjs/cloudflare": "^1.5.1",
         "@types/react-stars": "^2.2.4",
         "dotenv": "^17.2.0",
-        "drizzle-orm": "^0.44.2",
+        "drizzle-orm": "^0.44.3",
         "jotai": "^2.12.5",
         "next": "15.3.3",
         "next-auth": "^5.0.0-beta.29",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
+        "react-heart": "^1.0.6",
         "react-router-dom": "^7.6.3",
         "react-stars": "^2.2.5",
         "react-tooltip": "^5.29.1"
@@ -32,7 +33,7 @@
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.1",
         "@tailwindcss/postcss": "^4.1.11",
-        "@types/node": "^20.19.7",
+        "@types/node": "^20.19.8",
         "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",
         "drizzle-kit": "^0.31.4",

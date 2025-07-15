@@ -5,3 +5,6 @@
   [assets]
   directory = ".open-next/assets"
   binding = "ASSETS"
+[env.production.vars]
+NEXTAUTH_URL    = "https://windly.dababy.workers.dev"
+AUTH_TRUST_HOST = "https://windly.dababy.workers.dev"

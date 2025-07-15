@@ -55,17 +55,17 @@ export const userTable = sqliteTable("user", {
     id: text("id")
         .primaryKey()
         .$defaultFn(() => crypto.randomUUID()),
-    name: text("name"),
+    name: text("name").notNull(),
     email: text("email").notNull().unique(),
     emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
     image: text("image"),
     gender: text("gender"),
-    birthday: text("birthday"),
+    birthday: text("birthday"), // use date format: YYYY-MM-DD
     phone: text("phone"),
-    address: text(),
-    wishlist: text(),
-    reviews: text(), // [{ id: string,date: string, productId: string, rating: number, review: string}]
-    orders: text(), // [{ id: string, date: string, productId: string, quantity: number, price: number}]
+    address: text("address"),
+    wishlist: text("wishlist").default("[]"), // JSON array: [productId, productId]
+    reviews: text("reviews").default("[]"), // JSON array: [{ id, date, productId, rating, review }]
+    orders: text("orders").default("[]"), // JSON array: [{ id, date, productId, quantity, price }]
 })
 
 export const accountTable = sqliteTable(
