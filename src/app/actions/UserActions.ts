@@ -66,7 +66,7 @@ export async function updateUserGender(gender: string) {
     return updateUserField('gender', gender);
 }
 
-export async function updateWishlist(productId: string) {
+export async function updateWishlist(productId: number) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
@@ -84,15 +84,14 @@ export async function updateWishlist(productId: string) {
         }
 
         // Convert productId to number if your product table uses integer IDs
-        const productIdAsNumber = parseInt(productId);
-        if (isNaN(productIdAsNumber)) {
+        if (isNaN(productId)) {
             throw new Error("Invalid product ID");
         }
 
         const productExists = await db
             .select({ id: productTable.id })
             .from(productTable)
-            .where(eq(productTable.id, productIdAsNumber))
+            .where(eq(productTable.id, productId))
             .limit(1);
 
         if (productExists.length === 0) {
@@ -100,7 +99,7 @@ export async function updateWishlist(productId: string) {
         }
 
         // Parse the JSON string to get the actual array
-        const currentWishlist: string[] = JSON.parse(users[0].wishlist || "[]");
+        const currentWishlist: number[] = JSON.parse(users[0].wishlist || "[]");
         const wishlist = [...currentWishlist];
 
         // Toggle productId in wishlist array (keep as string in wishlist)
@@ -116,6 +115,7 @@ export async function updateWishlist(productId: string) {
             .update(userTable)
             .set({ wishlist: JSON.stringify(wishlist) })
             .where(eq(userTable.id, session.user.id));
+        revalidatePath("/account/wishlist");
 
         return {
             success: true,

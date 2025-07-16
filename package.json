@@ -15,7 +15,7 @@
     "dependencies": {
         "@auth/drizzle-adapter": "^1.10.0",
         "@cloudflare/next-on-pages": "^1.13.12",
-        "@libsql/client": "^0.15.9",
+        "@libsql/client": "^0.15.10",
         "@opennextjs/cloudflare": "^1.5.1",
         "@types/react-stars": "^2.2.4",
         "dotenv": "^17.2.0",

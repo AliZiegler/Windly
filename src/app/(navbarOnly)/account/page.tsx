@@ -6,11 +6,10 @@ import { userTable } from "@/db/schema";
 import Image from "next/image"
 import EditableUserField from "@/app/components/account/EditableUserField"
 import SignOut from "@/app/components/global/SignOut"
-import AutoSignIn from "@/app/components/global/AutoSignIn"
 export default async function page() {
     const session = await auth();
     if (!session?.user?.id) {
-        return <AutoSignIn />;
+        return <div>Unauthorized</div>;
     }
     const user = await db.select().from(userTable).where(eq(userTable.id, session.user.id)).then((user) => user[0]);
     return (

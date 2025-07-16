@@ -1,10 +1,9 @@
 export const runtime = 'edge';
 import { db } from "@/lib/db";
-import { mapRowToProduct } from "@/lib/mappers";
 import { productTable } from "@/db/schema";
-import { ProductType } from "@/app/components/global/Types.ts";
 import { CATEGORIES } from "@/app/components/global/Atoms.ts";
 import Product from "@/app/components/home/Product.tsx";
+import { DisplayProduct } from "@/app/components/global/Types";
 import { reverseUrlString } from "@/app/components/global/Atoms";
 import { and, gte, lte, like, eq, inArray, not, sql } from "drizzle-orm";
 
@@ -79,16 +78,23 @@ export default async function Page({ searchParams }: PageProps) {
             break;
     }
 
-    const rawProducts = await db
-        .select()
+    const Products = await db
+        .select({
+            id: productTable.id,
+            name: productTable.name,
+            price: productTable.price,
+            discount: productTable.discount,
+            img: productTable.img,
+            description: productTable.description,
+            rating: productTable.rating,
+        })
         .from(productTable)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(orderBy);
-    const Products = rawProducts.map(mapRowToProduct);
 
     return (
         <main className="flex flex-wrap gap-5 m-7">
-            {Products.map((product: ProductType) => (
+            {Products.map((product: DisplayProduct) => (
                 <Product key={product.id} {...product} />
             ))}
         </main>

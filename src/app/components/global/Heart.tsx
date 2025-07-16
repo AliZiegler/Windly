@@ -1,31 +1,26 @@
 'use client';
 import { updateWishlist } from '@/app/actions/UserActions';
-import { SelectProduct } from '@/db/schema';
-import { ProductType } from "@/app/components/global/Types";
 import Heart from "react-heart"
 import { useState, useTransition } from 'react';
 
 type HeartButtonProps = {
-    product: SelectProduct | ProductType;
+    productId: number;
     isWishlisted: boolean;
     size?: number;
     className?: string;
 }
 
-export default function HeartButton({ product, isWishlisted, size = 20, className }: HeartButtonProps) {
+export default function HeartButton({ productId, isWishlisted, size = 20, className = "" }: HeartButtonProps) {
     const [isActive, setIsActive] = useState(isWishlisted);
     const [isPending, startTransition] = useTransition();
 
     const handleClick = () => {
         startTransition(async () => {
             try {
-                // Optimistically update the UI
                 setIsActive(!isActive);
 
-                // Call the server action
-                await updateWishlist(String(product.id));
+                await updateWishlist(productId);
             } catch (error) {
-                // Revert the optimistic update on error
                 setIsActive(isActive);
                 console.error('Failed to update wishlist:', error);
             }
@@ -40,7 +35,7 @@ export default function HeartButton({ product, isWishlisted, size = 20, classNam
         >
             <Heart
                 isActive={isActive}
-                onClick={() => { }} // Heart component handles its own click, but we override with our div
+                onClick={() => { }}
                 animationScale={1.2}
                 animationTrigger="both"
                 animationDuration={0.3}

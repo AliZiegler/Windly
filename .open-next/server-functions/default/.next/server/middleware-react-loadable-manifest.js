@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST='{"app/components/global/ReactStars.tsx -> react-stars":{"id":8543,"files":["static/chunks/543.54a612ec0297e08e.js"]}}';

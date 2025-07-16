@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import Stars from "@/app/components/global/ReactStars.tsx";
 import { urlString, applyDiscount } from "@/app/components/global/Atoms.ts";
-import { ProductType } from "@/app/components/global/Types";
+import { DisplayProduct } from "@/app/components/global/Types";
 
-export default function Product(props: ProductType) {
+export default function Product(props: DisplayProduct) {
 
     const price = Number(props.price);
     const discount = Number(props.discount);

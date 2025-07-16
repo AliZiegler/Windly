@@ -16,7 +16,7 @@ Object.defineProperty = function(o, p, a) {
 
   
   
-  globalThis.openNextDebug = false;globalThis.openNextVersion = "3.6.6";
+  globalThis.openNextDebug = false;globalThis.openNextVersion = "3.7.0";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -500,6 +500,21 @@ var init_pattern_env = __esm({
   }
 });
 
+// node_modules/@opennextjs/aws/dist/overrides/assetResolver/dummy.js
+var dummy_exports = {};
+__export(dummy_exports, {
+  default: () => dummy_default
+});
+var resolver, dummy_default;
+var init_dummy = __esm({
+  "node_modules/@opennextjs/aws/dist/overrides/assetResolver/dummy.js"() {
+    resolver = {
+      name: "dummy"
+    };
+    dummy_default = resolver;
+  }
+});
+
 // node_modules/@opennextjs/aws/dist/utils/stream.js
 import { Readable } from "node:stream";
 function toReadableStream(value, isBase64) {
@@ -649,12 +664,13 @@ function provideNextAfterProvider() {
     globalThis[VERCEL_REQUEST_CONTEXT_SYMBOL] = nextAfterContext;
   }
 }
-function runWithOpenNextRequestContext({ isISRRevalidation, waitUntil }, fn) {
+function runWithOpenNextRequestContext({ isISRRevalidation, waitUntil, requestId = Math.random().toString(36) }, fn) {
   return globalThis.__openNextAls.run({
-    requestId: Math.random().toString(36),
+    requestId,
     pendingPromiseRunner: new DetachedPromiseRunner(),
     isISRRevalidation,
-    waitUntil
+    waitUntil,
+    writtenTags: /* @__PURE__ */ new Set()
   }, async () => {
     provideNextAfterProvider();
     let result;
@@ -695,6 +711,13 @@ async function resolveOriginResolver(originResolver) {
   const m_1 = await Promise.resolve().then(() => (init_pattern_env(), pattern_env_exports));
   return m_1.default;
 }
+async function resolveAssetResolver(assetResolver) {
+  if (typeof assetResolver === "function") {
+    return assetResolver();
+  }
+  const m_1 = await Promise.resolve().then(() => (init_dummy(), dummy_exports));
+  return m_1.default;
+}
 async function resolveProxyRequest(proxyRequest) {
   if (typeof proxyRequest === "function") {
     return proxyRequest();
@@ -725,14 +748,14 @@ globalThis.__dirname ??= "";
 var NEXT_DIR = path.join(__dirname, ".next");
 var OPEN_NEXT_DIR = path.join(__dirname, ".open-next");
 debug({ NEXT_DIR, OPEN_NEXT_DIR });
-var NextConfig = { "env": {}, "webpack": null, "eslint": { "ignoreDuringBuilds": false }, "typescript": { "ignoreBuildErrors": false, "tsconfigPath": "tsconfig.json" }, "distDir": ".next", "cleanDistDir": true, "assetPrefix": "", "cacheMaxMemorySize": 52428800, "configOrigin": "next.config.ts", "useFileSystemPublicRoutes": true, "generateEtags": true, "pageExtensions": ["tsx", "ts", "jsx", "js"], "poweredByHeader": true, "compress": true, "images": { "deviceSizes": [640, 750, 828, 1080, 1200, 1920, 2048, 3840], "imageSizes": [16, 32, 48, 64, 96, 128, 256, 384], "path": "/_next/image", "loader": "default", "loaderFile": "", "domains": [], "disableStaticImages": false, "minimumCacheTTL": 60, "formats": ["image/webp"], "dangerouslyAllowSVG": false, "contentSecurityPolicy": "script-src 'none'; frame-src 'none'; sandbox;", "contentDispositionType": "attachment", "remotePatterns": [], "unoptimized": false }, "devIndicators": { "position": "bottom-left" }, "onDemandEntries": { "maxInactiveAge": 6e4, "pagesBufferLength": 5 }, "amp": { "canonicalBase": "" }, "basePath": "", "sassOptions": {}, "trailingSlash": false, "i18n": null, "productionBrowserSourceMaps": false, "excludeDefaultMomentLocales": true, "serverRuntimeConfig": {}, "publicRuntimeConfig": {}, "reactProductionProfiling": false, "reactStrictMode": null, "reactMaxHeadersLength": 6e3, "httpAgentOptions": { "keepAlive": true }, "logging": {}, "expireTime": 31536e3, "staticPageGenerationTimeout": 60, "output": "standalone", "modularizeImports": { "@mui/icons-material": { "transform": "@mui/icons-material/{{member}}" }, "lodash": { "transform": "lodash/{{member}}" } }, "outputFileTracingRoot": "/home/ali/code/windly", "experimental": { "nodeMiddleware": false, "cacheLife": { "default": { "stale": 300, "revalidate": 900, "expire": 4294967294 }, "seconds": { "stale": 0, "revalidate": 1, "expire": 60 }, "minutes": { "stale": 300, "revalidate": 60, "expire": 3600 }, "hours": { "stale": 300, "revalidate": 3600, "expire": 86400 }, "days": { "stale": 300, "revalidate": 86400, "expire": 604800 }, "weeks": { "stale": 300, "revalidate": 604800, "expire": 2592e3 }, "max": { "stale": 300, "revalidate": 2592e3, "expire": 4294967294 } }, "cacheHandlers": {}, "cssChunking": true, "multiZoneDraftMode": false, "appNavFailHandling": false, "prerenderEarlyExit": true, "serverMinification": true, "serverSourceMaps": false, "linkNoTouchStart": false, "caseSensitiveRoutes": false, "clientSegmentCache": false, "dynamicOnHover": false, "preloadEntriesOnStart": true, "clientRouterFilter": true, "clientRouterFilterRedirects": false, "fetchCacheKeyPrefix": "", "middlewarePrefetch": "flexible", "optimisticClientCache": true, "manualClientBasePath": false, "cpus": 15, "memoryBasedWorkersCount": false, "imgOptConcurrency": null, "imgOptTimeoutInSeconds": 7, "imgOptMaxInputPixels": 268402689, "imgOptSequentialRead": null, "isrFlushToDisk": true, "workerThreads": false, "optimizeCss": false, "nextScriptWorkers": false, "scrollRestoration": false, "externalDir": false, "disableOptimizedLoading": false, "gzipSize": true, "craCompat": false, "esmExternals": true, "fullySpecified": false, "swcTraceProfiling": false, "forceSwcTransforms": false, "largePageDataBytes": 128e3, "typedRoutes": false, "typedEnv": false, "parallelServerCompiles": false, "parallelServerBuildTraces": false, "ppr": false, "authInterrupts": false, "webpackMemoryOptimizations": false, "optimizeServerReact": true, "useEarlyImport": false, "viewTransition": false, "routerBFCache": false, "staleTimes": { "dynamic": 0, "static": 300 }, "serverComponentsHmrCache": true, "staticGenerationMaxConcurrency": 8, "staticGenerationMinPagesPerWorker": 25, "dynamicIO": false, "inlineCss": false, "useCache": false, "optimizePackageImports": ["lucide-react", "date-fns", "lodash-es", "ramda", "antd", "react-bootstrap", "ahooks", "@ant-design/icons", "@headlessui/react", "@headlessui-float/react", "@heroicons/react/20/solid", "@heroicons/react/24/solid", "@heroicons/react/24/outline", "@visx/visx", "@tremor/react", "rxjs", "@mui/material", "@mui/icons-material", "recharts", "react-use", "effect", "@effect/schema", "@effect/platform", "@effect/platform-node", "@effect/platform-browser", "@effect/platform-bun", "@effect/sql", "@effect/sql-mssql", "@effect/sql-mysql2", "@effect/sql-pg", "@effect/sql-squlite-node", "@effect/sql-squlite-bun", "@effect/sql-squlite-wasm", "@effect/sql-squlite-react-native", "@effect/rpc", "@effect/rpc-http", "@effect/typeclass", "@effect/experimental", "@effect/opentelemetry", "@material-ui/core", "@material-ui/icons", "@tabler/icons-react", "mui-core", "react-icons/ai", "react-icons/bi", "react-icons/bs", "react-icons/cg", "react-icons/ci", "react-icons/di", "react-icons/fa", "react-icons/fa6", "react-icons/fc", "react-icons/fi", "react-icons/gi", "react-icons/go", "react-icons/gr", "react-icons/hi", "react-icons/hi2", "react-icons/im", "react-icons/io", "react-icons/io5", "react-icons/lia", "react-icons/lib", "react-icons/lu", "react-icons/md", "react-icons/pi", "react-icons/ri", "react-icons/rx", "react-icons/si", "react-icons/sl", "react-icons/tb", "react-icons/tfi", "react-icons/ti", "react-icons/vsc", "react-icons/wi"], "trustHostHeader": false, "isExperimentalCompile": false }, "htmlLimitedBots": "Mediapartners-Google|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti", "bundlePagesRouterDependencies": false, "configFileName": "next.config.ts", "turbopack": { "root": "/home/ali/code/windly" } };
-var BuildId = "HNOCHT9o5Bv02mqrPbcCg";
-var RoutesManifest = { "basePath": "", "rewrites": { "beforeFiles": [], "afterFiles": [], "fallback": [] }, "redirects": [{ "source": "/:path+/", "destination": "/:path+", "internal": true, "statusCode": 308, "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$" }], "routes": { "static": [{ "page": "/", "regex": "^/(?:/)?$", "routeKeys": {}, "namedRegex": "^/(?:/)?$" }, { "page": "/_not-found", "regex": "^/_not\\-found(?:/)?$", "routeKeys": {}, "namedRegex": "^/_not\\-found(?:/)?$" }, { "page": "/icon.png", "regex": "^/icon\\.png(?:/)?$", "routeKeys": {}, "namedRegex": "^/icon\\.png(?:/)?$" }], "dynamic": [{ "page": "/[name]", "regex": "^/([^/]+?)(?:/)?$", "routeKeys": { "nxtPname": "nxtPname" }, "namedRegex": "^/(?<nxtPname>[^/]+?)(?:/)?$" }], "data": { "static": [], "dynamic": [] } }, "locales": [] };
+var NextConfig = { "env": {}, "webpack": null, "eslint": { "ignoreDuringBuilds": false }, "typescript": { "ignoreBuildErrors": false, "tsconfigPath": "tsconfig.json" }, "distDir": ".next", "cleanDistDir": true, "assetPrefix": "", "cacheMaxMemorySize": 52428800, "configOrigin": "next.config.ts", "useFileSystemPublicRoutes": true, "generateEtags": true, "pageExtensions": ["tsx", "ts", "jsx", "js"], "poweredByHeader": true, "compress": true, "images": { "deviceSizes": [640, 750, 828, 1080, 1200, 1920, 2048, 3840], "imageSizes": [16, 32, 48, 64, 96, 128, 256, 384], "path": "/_next/image", "loader": "default", "loaderFile": "", "domains": [], "disableStaticImages": false, "minimumCacheTTL": 60, "formats": ["image/webp"], "dangerouslyAllowSVG": false, "contentSecurityPolicy": "script-src 'none'; frame-src 'none'; sandbox;", "contentDispositionType": "attachment", "remotePatterns": [{ "protocol": "https", "hostname": "lh3.googleusercontent.com", "port": "", "pathname": "/**" }], "unoptimized": false }, "devIndicators": { "position": "bottom-left" }, "onDemandEntries": { "maxInactiveAge": 6e4, "pagesBufferLength": 5 }, "amp": { "canonicalBase": "" }, "basePath": "", "sassOptions": {}, "trailingSlash": false, "i18n": null, "productionBrowserSourceMaps": false, "excludeDefaultMomentLocales": true, "serverRuntimeConfig": {}, "publicRuntimeConfig": {}, "reactProductionProfiling": false, "reactStrictMode": null, "reactMaxHeadersLength": 6e3, "httpAgentOptions": { "keepAlive": true }, "logging": {}, "expireTime": 31536e3, "staticPageGenerationTimeout": 60, "output": "standalone", "modularizeImports": { "@mui/icons-material": { "transform": "@mui/icons-material/{{member}}" }, "lodash": { "transform": "lodash/{{member}}" } }, "outputFileTracingRoot": "/home/ali/code/windly", "experimental": { "nodeMiddleware": false, "cacheLife": { "default": { "stale": 300, "revalidate": 900, "expire": 4294967294 }, "seconds": { "stale": 0, "revalidate": 1, "expire": 60 }, "minutes": { "stale": 300, "revalidate": 60, "expire": 3600 }, "hours": { "stale": 300, "revalidate": 3600, "expire": 86400 }, "days": { "stale": 300, "revalidate": 86400, "expire": 604800 }, "weeks": { "stale": 300, "revalidate": 604800, "expire": 2592e3 }, "max": { "stale": 300, "revalidate": 2592e3, "expire": 4294967294 } }, "cacheHandlers": {}, "cssChunking": true, "multiZoneDraftMode": false, "appNavFailHandling": false, "prerenderEarlyExit": true, "serverMinification": true, "serverSourceMaps": false, "linkNoTouchStart": false, "caseSensitiveRoutes": false, "clientSegmentCache": false, "dynamicOnHover": false, "preloadEntriesOnStart": true, "clientRouterFilter": true, "clientRouterFilterRedirects": false, "fetchCacheKeyPrefix": "", "middlewarePrefetch": "flexible", "optimisticClientCache": true, "manualClientBasePath": false, "cpus": 15, "memoryBasedWorkersCount": false, "imgOptConcurrency": null, "imgOptTimeoutInSeconds": 7, "imgOptMaxInputPixels": 268402689, "imgOptSequentialRead": null, "isrFlushToDisk": true, "workerThreads": false, "optimizeCss": false, "nextScriptWorkers": false, "scrollRestoration": false, "externalDir": false, "disableOptimizedLoading": false, "gzipSize": true, "craCompat": false, "esmExternals": true, "fullySpecified": false, "swcTraceProfiling": false, "forceSwcTransforms": false, "largePageDataBytes": 128e3, "typedRoutes": false, "typedEnv": false, "parallelServerCompiles": false, "parallelServerBuildTraces": false, "ppr": false, "authInterrupts": false, "webpackMemoryOptimizations": false, "optimizeServerReact": true, "useEarlyImport": false, "viewTransition": false, "routerBFCache": false, "staleTimes": { "dynamic": 0, "static": 300 }, "serverComponentsHmrCache": true, "staticGenerationMaxConcurrency": 8, "staticGenerationMinPagesPerWorker": 25, "dynamicIO": false, "inlineCss": false, "useCache": false, "optimizePackageImports": ["lucide-react", "date-fns", "lodash-es", "ramda", "antd", "react-bootstrap", "ahooks", "@ant-design/icons", "@headlessui/react", "@headlessui-float/react", "@heroicons/react/20/solid", "@heroicons/react/24/solid", "@heroicons/react/24/outline", "@visx/visx", "@tremor/react", "rxjs", "@mui/material", "@mui/icons-material", "recharts", "react-use", "effect", "@effect/schema", "@effect/platform", "@effect/platform-node", "@effect/platform-browser", "@effect/platform-bun", "@effect/sql", "@effect/sql-mssql", "@effect/sql-mysql2", "@effect/sql-pg", "@effect/sql-squlite-node", "@effect/sql-squlite-bun", "@effect/sql-squlite-wasm", "@effect/sql-squlite-react-native", "@effect/rpc", "@effect/rpc-http", "@effect/typeclass", "@effect/experimental", "@effect/opentelemetry", "@material-ui/core", "@material-ui/icons", "@tabler/icons-react", "mui-core", "react-icons/ai", "react-icons/bi", "react-icons/bs", "react-icons/cg", "react-icons/ci", "react-icons/di", "react-icons/fa", "react-icons/fa6", "react-icons/fc", "react-icons/fi", "react-icons/gi", "react-icons/go", "react-icons/gr", "react-icons/hi", "react-icons/hi2", "react-icons/im", "react-icons/io", "react-icons/io5", "react-icons/lia", "react-icons/lib", "react-icons/lu", "react-icons/md", "react-icons/pi", "react-icons/ri", "react-icons/rx", "react-icons/si", "react-icons/sl", "react-icons/tb", "react-icons/tfi", "react-icons/ti", "react-icons/vsc", "react-icons/wi"], "trustHostHeader": false, "isExperimentalCompile": false }, "htmlLimitedBots": "Mediapartners-Google|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti", "bundlePagesRouterDependencies": false, "configFileName": "next.config.ts", "turbopack": { "root": "/home/ali/code/windly" } };
+var BuildId = "MrNyusMMUapcrntte9ZOC";
+var RoutesManifest = { "basePath": "", "rewrites": { "beforeFiles": [], "afterFiles": [], "fallback": [] }, "redirects": [{ "source": "/:path+/", "destination": "/:path+", "internal": true, "statusCode": 308, "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$" }], "routes": { "static": [{ "page": "/", "regex": "^/(?:/)?$", "routeKeys": {}, "namedRegex": "^/(?:/)?$" }, { "page": "/_not-found", "regex": "^/_not\\-found(?:/)?$", "routeKeys": {}, "namedRegex": "^/_not\\-found(?:/)?$" }, { "page": "/account", "regex": "^/account(?:/)?$", "routeKeys": {}, "namedRegex": "^/account(?:/)?$" }, { "page": "/account/reviews", "regex": "^/account/reviews(?:/)?$", "routeKeys": {}, "namedRegex": "^/account/reviews(?:/)?$" }, { "page": "/account/wishlist", "regex": "^/account/wishlist(?:/)?$", "routeKeys": {}, "namedRegex": "^/account/wishlist(?:/)?$" }, { "page": "/icon.png", "regex": "^/icon\\.png(?:/)?$", "routeKeys": {}, "namedRegex": "^/icon\\.png(?:/)?$" }], "dynamic": [{ "page": "/api/auth/[...nextauth]", "regex": "^/api/auth/(.+?)(?:/)?$", "routeKeys": { "nxtPnextauth": "nxtPnextauth" }, "namedRegex": "^/api/auth/(?<nxtPnextauth>.+?)(?:/)?$" }, { "page": "/[name]", "regex": "^/([^/]+?)(?:/)?$", "routeKeys": { "nxtPname": "nxtPname" }, "namedRegex": "^/(?<nxtPname>[^/]+?)(?:/)?$" }], "data": { "static": [], "dynamic": [] } }, "locales": [] };
 var ConfigHeaders = [];
-var PrerenderManifest = { "version": 4, "routes": { "/icon.png": { "initialHeaders": { "cache-control": "public, immutable, no-transform, max-age=31536000", "content-type": "image/png", "x-next-cache-tags": "_N_T_/layout,_N_T_/icon.png/layout,_N_T_/icon.png/route,_N_T_/icon.png" }, "experimentalBypassFor": [{ "type": "header", "key": "Next-Action" }, { "type": "header", "key": "content-type", "value": "multipart/form-data;.*" }], "initialRevalidateSeconds": false, "srcRoute": "/icon.png", "dataRoute": null, "allowHeader": ["host", "x-matched-path", "x-prerender-revalidate", "x-prerender-revalidate-if-generated", "x-next-revalidated-tags", "x-next-revalidate-tag-token"] } }, "dynamicRoutes": {}, "notFoundRoutes": [], "preview": { "previewModeId": "fce8d8f2bc5d4a95772b318e6a38a519", "previewModeSigningKey": "0e2e72c0bb81e10441a79a42cdc7d7e1ce5ee37d811725b12250890af80fe542", "previewModeEncryptionKey": "27fbd4855f05f50f8ccbdcee0fad7f70e8a02338f02a16687865a8d950a74173" } };
-var MiddlewareManifest = { "version": 3, "middleware": {}, "functions": {}, "sortedMiddleware": [] };
-var AppPathRoutesManifest = { "/_not-found/page": "/_not-found", "/icon.png/route": "/icon.png", "/(home)/page": "/", "/(productDetails)/[name]/page": "/[name]" };
-var FunctionsConfigManifest = { "version": 1, "functions": {} };
+var PrerenderManifest = { "version": 4, "routes": { "/icon.png": { "initialHeaders": { "cache-control": "public, immutable, no-transform, max-age=31536000", "content-type": "image/png", "x-next-cache-tags": "_N_T_/layout,_N_T_/icon.png/layout,_N_T_/icon.png/route,_N_T_/icon.png" }, "experimentalBypassFor": [{ "type": "header", "key": "Next-Action" }, { "type": "header", "key": "content-type", "value": "multipart/form-data;.*" }], "initialRevalidateSeconds": false, "srcRoute": "/icon.png", "dataRoute": null, "allowHeader": ["host", "x-matched-path", "x-prerender-revalidate", "x-prerender-revalidate-if-generated", "x-next-revalidated-tags", "x-next-revalidate-tag-token"] } }, "dynamicRoutes": {}, "notFoundRoutes": [], "preview": { "previewModeId": "46acc7936bf7e222348c8712dbdb953c", "previewModeSigningKey": "29d2007801e2730b3f18bbfb26f44219b731b3dff56d63f175c59af101ff53f9", "previewModeEncryptionKey": "d7026dce5e3137ceb292df3de4ae4c5436726a69d475fa92cf385f3c91ffe735" } };
+var MiddlewareManifest = { "version": 3, "middleware": {}, "functions": { "/api/auth/[...nextauth]/route": { "files": ["server/server-reference-manifest.js", "server/app/api/auth/[...nextauth]/route_client-reference-manifest.js", "server/middleware-build-manifest.js", "server/middleware-react-loadable-manifest.js", "server/next-font-manifest.js", "server/interception-route-rewrite-manifest.js", "server/edge-runtime-webpack.js", "server/edge-chunks/639.js", "server/app/api/auth/[...nextauth]/route.js"], "name": "app/api/auth/[...nextauth]/route", "page": "/api/auth/[...nextauth]/route", "matchers": [{ "regexp": "^/api/auth/(?<nextauth>.+?)$", "originalSource": "/api/auth/[...nextauth]" }], "wasm": [], "assets": [], "env": { "__NEXT_BUILD_ID": "MrNyusMMUapcrntte9ZOC", "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "2sChxnnIvGFRediz169Cyz+SChN1YYMxgV4sjQexMVw=", "__NEXT_PREVIEW_MODE_ID": "46acc7936bf7e222348c8712dbdb953c", "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d7026dce5e3137ceb292df3de4ae4c5436726a69d475fa92cf385f3c91ffe735", "__NEXT_PREVIEW_MODE_SIGNING_KEY": "29d2007801e2730b3f18bbfb26f44219b731b3dff56d63f175c59af101ff53f9" } }, "/(home)/page": { "files": ["server/server-reference-manifest.js", "server/app/(home)/page_client-reference-manifest.js", "server/middleware-build-manifest.js", "server/middleware-react-loadable-manifest.js", "server/next-font-manifest.js", "server/interception-route-rewrite-manifest.js", "server/edge-runtime-webpack.js", "server/edge-chunks/639.js", "server/edge-chunks/619.js", "server/app/(home)/page.js"], "name": "app/(home)/page", "page": "/(home)/page", "matchers": [{ "regexp": "^/$", "originalSource": "/" }], "wasm": [], "assets": [], "env": { "__NEXT_BUILD_ID": "MrNyusMMUapcrntte9ZOC", "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "2sChxnnIvGFRediz169Cyz+SChN1YYMxgV4sjQexMVw=", "__NEXT_PREVIEW_MODE_ID": "46acc7936bf7e222348c8712dbdb953c", "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d7026dce5e3137ceb292df3de4ae4c5436726a69d475fa92cf385f3c91ffe735", "__NEXT_PREVIEW_MODE_SIGNING_KEY": "29d2007801e2730b3f18bbfb26f44219b731b3dff56d63f175c59af101ff53f9" } }, "/(navbarOnly)/[name]/page": { "files": ["server/server-reference-manifest.js", "server/app/(navbarOnly)/[name]/page_client-reference-manifest.js", "server/middleware-build-manifest.js", "server/middleware-react-loadable-manifest.js", "server/next-font-manifest.js", "server/interception-route-rewrite-manifest.js", "server/edge-runtime-webpack.js", "server/edge-chunks/639.js", "server/edge-chunks/619.js", "server/edge-chunks/651.js", "server/edge-chunks/800.js", "server/app/(navbarOnly)/[name]/page.js"], "name": "app/(navbarOnly)/[name]/page", "page": "/(navbarOnly)/[name]/page", "matchers": [{ "regexp": "^/(?<name>[^/]+?)$", "originalSource": "/[name]" }], "wasm": [], "assets": [], "env": { "__NEXT_BUILD_ID": "MrNyusMMUapcrntte9ZOC", "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "2sChxnnIvGFRediz169Cyz+SChN1YYMxgV4sjQexMVw=", "__NEXT_PREVIEW_MODE_ID": "46acc7936bf7e222348c8712dbdb953c", "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d7026dce5e3137ceb292df3de4ae4c5436726a69d475fa92cf385f3c91ffe735", "__NEXT_PREVIEW_MODE_SIGNING_KEY": "29d2007801e2730b3f18bbfb26f44219b731b3dff56d63f175c59af101ff53f9" } }, "/(navbarOnly)/account/reviews/page": { "files": ["server/server-reference-manifest.js", "server/app/(navbarOnly)/account/reviews/page_client-reference-manifest.js", "server/middleware-build-manifest.js", "server/middleware-react-loadable-manifest.js", "server/next-font-manifest.js", "server/interception-route-rewrite-manifest.js", "server/edge-runtime-webpack.js", "server/edge-chunks/639.js", "server/edge-chunks/619.js", "server/edge-chunks/800.js", "server/app/(navbarOnly)/account/reviews/page.js"], "name": "app/(navbarOnly)/account/reviews/page", "page": "/(navbarOnly)/account/reviews/page", "matchers": [{ "regexp": "^/account/reviews$", "originalSource": "/account/reviews" }], "wasm": [], "assets": [], "env": { "__NEXT_BUILD_ID": "MrNyusMMUapcrntte9ZOC", "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "2sChxnnIvGFRediz169Cyz+SChN1YYMxgV4sjQexMVw=", "__NEXT_PREVIEW_MODE_ID": "46acc7936bf7e222348c8712dbdb953c", "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d7026dce5e3137ceb292df3de4ae4c5436726a69d475fa92cf385f3c91ffe735", "__NEXT_PREVIEW_MODE_SIGNING_KEY": "29d2007801e2730b3f18bbfb26f44219b731b3dff56d63f175c59af101ff53f9" } }, "/(navbarOnly)/account/wishlist/page": { "files": ["server/server-reference-manifest.js", "server/app/(navbarOnly)/account/wishlist/page_client-reference-manifest.js", "server/middleware-build-manifest.js", "server/middleware-react-loadable-manifest.js", "server/next-font-manifest.js", "server/interception-route-rewrite-manifest.js", "server/edge-runtime-webpack.js", "server/edge-chunks/639.js", "server/edge-chunks/619.js", "server/edge-chunks/800.js", "server/app/(navbarOnly)/account/wishlist/page.js"], "name": "app/(navbarOnly)/account/wishlist/page", "page": "/(navbarOnly)/account/wishlist/page", "matchers": [{ "regexp": "^/account/wishlist$", "originalSource": "/account/wishlist" }], "wasm": [], "assets": [], "env": { "__NEXT_BUILD_ID": "MrNyusMMUapcrntte9ZOC", "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "2sChxnnIvGFRediz169Cyz+SChN1YYMxgV4sjQexMVw=", "__NEXT_PREVIEW_MODE_ID": "46acc7936bf7e222348c8712dbdb953c", "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d7026dce5e3137ceb292df3de4ae4c5436726a69d475fa92cf385f3c91ffe735", "__NEXT_PREVIEW_MODE_SIGNING_KEY": "29d2007801e2730b3f18bbfb26f44219b731b3dff56d63f175c59af101ff53f9" } }, "/(navbarOnly)/account/page": { "files": ["server/server-reference-manifest.js", "server/app/(navbarOnly)/account/page_client-reference-manifest.js", "server/middleware-build-manifest.js", "server/middleware-react-loadable-manifest.js", "server/next-font-manifest.js", "server/interception-route-rewrite-manifest.js", "server/edge-runtime-webpack.js", "server/edge-chunks/639.js", "server/edge-chunks/619.js", "server/edge-chunks/651.js", "server/edge-chunks/800.js", "server/app/(navbarOnly)/account/page.js"], "name": "app/(navbarOnly)/account/page", "page": "/(navbarOnly)/account/page", "matchers": [{ "regexp": "^/account$", "originalSource": "/account" }], "wasm": [], "assets": [], "env": { "__NEXT_BUILD_ID": "MrNyusMMUapcrntte9ZOC", "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "2sChxnnIvGFRediz169Cyz+SChN1YYMxgV4sjQexMVw=", "__NEXT_PREVIEW_MODE_ID": "46acc7936bf7e222348c8712dbdb953c", "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d7026dce5e3137ceb292df3de4ae4c5436726a69d475fa92cf385f3c91ffe735", "__NEXT_PREVIEW_MODE_SIGNING_KEY": "29d2007801e2730b3f18bbfb26f44219b731b3dff56d63f175c59af101ff53f9" } } }, "sortedMiddleware": [] };
+var AppPathRoutesManifest = { "/_not-found/page": "/_not-found", "/icon.png/route": "/icon.png", "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]", "/(home)/page": "/", "/(navbarOnly)/[name]/page": "/[name]", "/(navbarOnly)/account/reviews/page": "/account/reviews", "/(navbarOnly)/account/wishlist/page": "/account/wishlist", "/(navbarOnly)/account/page": "/account" };
+var FunctionsConfigManifest = { "version": 1, "functions": { "/api/auth/[...nextauth]": {}, "/": {}, "/[name]": {}, "/account/reviews": {}, "/account/wishlist": {}, "/account": {} } };
 var PagesManifest = { "/_app": "pages/_app.js", "/_error": "pages/_error.js", "/_document": "pages/_document.js", "/404": "pages/404.html" };
 process.env.NEXT_BUILD_ID = BuildId;
 
@@ -1080,6 +1103,7 @@ import { createHash } from "node:crypto";
 init_stream();
 
 // node_modules/@opennextjs/aws/dist/utils/cache.js
+init_logger();
 async function hasBeenRevalidated(key, tags, cacheEntry) {
   if (globalThis.openNextConfig.dangerous?.disableTagCache) {
     return false;
@@ -1113,6 +1137,7 @@ function getTagsFromValue(value) {
 init_logger();
 var CACHE_ONE_YEAR = 60 * 60 * 24 * 365;
 var CACHE_ONE_MONTH = 60 * 60 * 24 * 30;
+var VARY_HEADER = "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Next-Url";
 async function computeCacheControl(path3, body, host, revalidate, lastModified) {
   let finalRevalidate = CACHE_ONE_YEAR;
   const existingRoute = Object.entries(PrerenderManifest.routes).find((p) => p[0] === path3)?.[1];
@@ -1195,7 +1220,8 @@ async function generateResult(event, localizedPath, cachedValue, lastModified) {
     headers: {
       ...cacheControl,
       "content-type": type,
-      ...cachedValue.meta?.headers
+      ...cachedValue.meta?.headers,
+      vary: VARY_HEADER
     }
   };
 }
@@ -2107,6 +2133,7 @@ var INTERNAL_HEADER_PREFIX = "x-opennext-";
 var INTERNAL_HEADER_INITIAL_URL = `${INTERNAL_HEADER_PREFIX}initial-url`;
 var INTERNAL_HEADER_LOCALE = `${INTERNAL_HEADER_PREFIX}locale`;
 var INTERNAL_HEADER_RESOLVED_ROUTES = `${INTERNAL_HEADER_PREFIX}resolved-routes`;
+var INTERNAL_EVENT_REQUEST_ID = `${INTERNAL_HEADER_PREFIX}request-id`;
 var geoHeaderToNextHeader = {
   "x-open-next-city": "x-vercel-ip-city",
   "x-open-next-country": "x-vercel-ip-country",
@@ -2114,15 +2141,17 @@ var geoHeaderToNextHeader = {
   "x-open-next-latitude": "x-vercel-ip-latitude",
   "x-open-next-longitude": "x-vercel-ip-longitude"
 };
-function applyMiddlewareHeaders(eventHeaders, middlewareHeaders, setPrefix = true) {
-  const keyPrefix = setPrefix ? MIDDLEWARE_HEADER_PREFIX : "";
+function applyMiddlewareHeaders(eventOrResult, middlewareHeaders) {
+  const isResult = isInternalResult(eventOrResult);
+  const headers = eventOrResult.headers;
+  const keyPrefix = isResult ? "" : MIDDLEWARE_HEADER_PREFIX;
   Object.entries(middlewareHeaders).forEach(([key, value]) => {
     if (value) {
-      eventHeaders[keyPrefix + key] = Array.isArray(value) ? value.join(",") : value;
+      headers[keyPrefix + key] = Array.isArray(value) ? value.join(",") : value;
     }
   });
 }
-async function routingHandler(event) {
+async function routingHandler(event, { assetResolver }) {
   try {
     for (const [openNextGeoName, nextGeoName] of Object.entries(geoHeaderToNextHeader)) {
       const value = event.headers[openNextGeoName];
@@ -2135,98 +2164,101 @@ async function routingHandler(event) {
         delete event.headers[key];
       }
     }
-    const nextHeaders = getNextConfigHeaders(event, ConfigHeaders);
-    let internalEvent = fixDataPage(event, BuildId);
-    if ("statusCode" in internalEvent) {
-      return internalEvent;
+    let headers = getNextConfigHeaders(event, ConfigHeaders);
+    let eventOrResult = fixDataPage(event, BuildId);
+    if (isInternalResult(eventOrResult)) {
+      return eventOrResult;
     }
-    const redirect = handleRedirects(internalEvent, RoutesManifest.redirects);
+    const redirect = handleRedirects(eventOrResult, RoutesManifest.redirects);
     if (redirect) {
       redirect.headers.Location = new URL(redirect.headers.Location).href;
       debug("redirect", redirect);
       return redirect;
     }
-    const eventOrResult = await handleMiddleware(
-      internalEvent,
+    const middlewareEventOrResult = await handleMiddleware(
+      eventOrResult,
       // We need to pass the initial search without any decoding
       // TODO: we'd need to refactor InternalEvent to include the initial querystring directly
       // Should be done in another PR because it is a breaking change
       new URL(event.url).search
     );
-    const isResult = "statusCode" in eventOrResult;
-    if (isResult) {
-      return eventOrResult;
+    if (isInternalResult(middlewareEventOrResult)) {
+      return middlewareEventOrResult;
     }
-    const middlewareResponseHeaders = eventOrResult.responseHeaders;
-    let isExternalRewrite = eventOrResult.isExternalRewrite ?? false;
-    internalEvent = eventOrResult;
+    headers = {
+      ...middlewareEventOrResult.responseHeaders,
+      ...headers
+    };
+    let isExternalRewrite = middlewareEventOrResult.isExternalRewrite ?? false;
+    eventOrResult = middlewareEventOrResult;
     if (!isExternalRewrite) {
-      const beforeRewrites = handleRewrites(internalEvent, RoutesManifest.rewrites.beforeFiles);
-      internalEvent = beforeRewrites.internalEvent;
-      isExternalRewrite = beforeRewrites.isExternalRewrite;
+      const beforeRewrite = handleRewrites(eventOrResult, RoutesManifest.rewrites.beforeFiles);
+      eventOrResult = beforeRewrite.internalEvent;
+      isExternalRewrite = beforeRewrite.isExternalRewrite;
+      if (!isExternalRewrite) {
+        const assetResult = await assetResolver?.maybeGetAssetResult?.(eventOrResult);
+        if (assetResult) {
+          applyMiddlewareHeaders(assetResult, headers);
+          return assetResult;
+        }
+      }
     }
-    const foundStaticRoute = staticRouteMatcher(internalEvent.rawPath);
+    const foundStaticRoute = staticRouteMatcher(eventOrResult.rawPath);
     const isStaticRoute = !isExternalRewrite && foundStaticRoute.length > 0;
     if (!(isStaticRoute || isExternalRewrite)) {
-      const afterRewrites = handleRewrites(internalEvent, RoutesManifest.rewrites.afterFiles);
-      internalEvent = afterRewrites.internalEvent;
-      isExternalRewrite = afterRewrites.isExternalRewrite;
+      const afterRewrite = handleRewrites(eventOrResult, RoutesManifest.rewrites.afterFiles);
+      eventOrResult = afterRewrite.internalEvent;
+      isExternalRewrite = afterRewrite.isExternalRewrite;
     }
     let isISR = false;
     if (!isExternalRewrite) {
-      const fallbackResult = handleFallbackFalse(internalEvent, PrerenderManifest);
-      internalEvent = fallbackResult.event;
+      const fallbackResult = handleFallbackFalse(eventOrResult, PrerenderManifest);
+      eventOrResult = fallbackResult.event;
       isISR = fallbackResult.isISR;
     }
-    const foundDynamicRoute = dynamicRouteMatcher(internalEvent.rawPath);
+    const foundDynamicRoute = dynamicRouteMatcher(eventOrResult.rawPath);
     const isDynamicRoute = !isExternalRewrite && foundDynamicRoute.length > 0;
     if (!(isDynamicRoute || isStaticRoute || isExternalRewrite)) {
-      const fallbackRewrites = handleRewrites(internalEvent, RoutesManifest.rewrites.fallback);
-      internalEvent = fallbackRewrites.internalEvent;
+      const fallbackRewrites = handleRewrites(eventOrResult, RoutesManifest.rewrites.fallback);
+      eventOrResult = fallbackRewrites.internalEvent;
       isExternalRewrite = fallbackRewrites.isExternalRewrite;
     }
-    const isNextImageRoute = internalEvent.rawPath.startsWith("/_next/image");
+    const isNextImageRoute = eventOrResult.rawPath.startsWith("/_next/image");
     const isRouteFoundBeforeAllRewrites = isStaticRoute || isDynamicRoute || isExternalRewrite;
     if (!(isRouteFoundBeforeAllRewrites || isNextImageRoute || // We need to check again once all rewrites have been applied
-    staticRouteMatcher(internalEvent.rawPath).length > 0 || dynamicRouteMatcher(internalEvent.rawPath).length > 0)) {
-      internalEvent = {
-        ...internalEvent,
+    staticRouteMatcher(eventOrResult.rawPath).length > 0 || dynamicRouteMatcher(eventOrResult.rawPath).length > 0)) {
+      eventOrResult = {
+        ...eventOrResult,
         rawPath: "/404",
-        url: constructNextUrl(internalEvent.url, "/404"),
+        url: constructNextUrl(eventOrResult.url, "/404"),
         headers: {
-          ...internalEvent.headers,
+          ...eventOrResult.headers,
           "x-middleware-response-cache-control": "private, no-cache, no-store, max-age=0, must-revalidate"
         }
       };
     }
-    if (globalThis.openNextConfig.dangerous?.enableCacheInterception && !("statusCode" in internalEvent)) {
+    if (globalThis.openNextConfig.dangerous?.enableCacheInterception && !isInternalResult(eventOrResult)) {
       debug("Cache interception enabled");
-      internalEvent = await cacheInterceptor(internalEvent);
-      if ("statusCode" in internalEvent) {
-        applyMiddlewareHeaders(internalEvent.headers, {
-          ...middlewareResponseHeaders,
-          ...nextHeaders
-        }, false);
-        return internalEvent;
+      eventOrResult = await cacheInterceptor(eventOrResult);
+      if (isInternalResult(eventOrResult)) {
+        applyMiddlewareHeaders(eventOrResult, headers);
+        return eventOrResult;
       }
     }
-    applyMiddlewareHeaders(internalEvent.headers, {
-      ...middlewareResponseHeaders,
-      ...nextHeaders
-    });
+    applyMiddlewareHeaders(eventOrResult, headers);
     const resolvedRoutes = [
       ...foundStaticRoute,
       ...foundDynamicRoute
     ];
     debug("resolvedRoutes", resolvedRoutes);
     return {
-      internalEvent,
+      internalEvent: eventOrResult,
       isExternalRewrite,
       origin: false,
       isISR,
       resolvedRoutes,
       initialURL: event.url,
-      locale: NextConfig.i18n ? detectLocale(internalEvent, NextConfig.i18n) : void 0
+      locale: NextConfig.i18n ? detectLocale(eventOrResult, NextConfig.i18n) : void 0
     };
   } catch (e) {
     error("Error in routingHandler", e);
@@ -2252,18 +2284,25 @@ async function routingHandler(event) {
     };
   }
 }
+function isInternalResult(eventOrResult) {
+  return eventOrResult != null && "statusCode" in eventOrResult;
+}
 
 // node_modules/@opennextjs/aws/dist/adapters/middleware.js
 globalThis.internalFetch = fetch;
 globalThis.__openNextAls = new AsyncLocalStorage();
 var defaultHandler = async (internalEvent, options) => {
-  const originResolver = await resolveOriginResolver(globalThis.openNextConfig.middleware?.originResolver);
-  const externalRequestProxy = await resolveProxyRequest(globalThis.openNextConfig.middleware?.override?.proxyExternalRequest);
+  const config = globalThis.openNextConfig.middleware;
+  const originResolver = await resolveOriginResolver(config?.originResolver);
+  const externalRequestProxy = await resolveProxyRequest(config?.override?.proxyExternalRequest);
+  const assetResolver = await resolveAssetResolver(config?.assetResolver);
+  const requestId = Math.random().toString(36);
   return runWithOpenNextRequestContext({
     isISRRevalidation: internalEvent.headers["x-isr"] === "1",
-    waitUntil: options?.waitUntil
+    waitUntil: options?.waitUntil,
+    requestId
   }, async () => {
-    const result = await routingHandler(internalEvent);
+    const result = await routingHandler(internalEvent, { assetResolver });
     if ("internalEvent" in result) {
       debug("Middleware intercepted event", internalEvent);
       if (!result.isExternalRewrite) {
@@ -2275,7 +2314,8 @@ var defaultHandler = async (internalEvent, options) => {
             headers: {
               ...result.internalEvent.headers,
               [INTERNAL_HEADER_INITIAL_URL]: internalEvent.url,
-              [INTERNAL_HEADER_RESOLVED_ROUTES]: JSON.stringify(result.resolvedRoutes)
+              [INTERNAL_HEADER_RESOLVED_ROUTES]: JSON.stringify(result.resolvedRoutes),
+              [INTERNAL_EVENT_REQUEST_ID]: requestId
             }
           },
           isExternalRewrite: result.isExternalRewrite,
@@ -2293,6 +2333,10 @@ var defaultHandler = async (internalEvent, options) => {
           type: "middleware",
           internalEvent: {
             ...result.internalEvent,
+            headers: {
+              ...result.internalEvent.headers,
+              [INTERNAL_EVENT_REQUEST_ID]: requestId
+            },
             rawPath: "/500",
             url: constructNextUrl(result.internalEvent.url, "/500"),
             method: "GET"
@@ -2306,6 +2350,7 @@ var defaultHandler = async (internalEvent, options) => {
         };
       }
     }
+    result.headers[INTERNAL_EVENT_REQUEST_ID] = requestId;
     debug("Middleware response", result);
     return result;
   });

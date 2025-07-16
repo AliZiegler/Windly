@@ -43,3 +43,24 @@ export function mapRowToProduct(row: RawProductRow): ProductType {
         about: JSON.parse(row.about),
     };
 }
+type ProductDisplayRow = {
+    id: number;
+    name: string;
+    price: number;
+    discount: number;
+    img: string | null;
+    description: string;
+    rating: number;
+};
+
+export function mapRowToProductDisplay(row: ProductDisplayRow): Pick<ProductType, 'id' | 'name' | 'price' | 'discount' | 'img' | 'description' | 'rating'> {
+    return {
+        id: row.id,
+        name: row.name,
+        description: row.description,
+        rating: row.rating,
+        price: row.price,
+        discount: row.discount,
+        img: row.img ?? undefined,
+    };
+}
