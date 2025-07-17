@@ -1,8 +1,9 @@
 "use server"
+import { urlString } from "@/app/components/global/Atoms";
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
-import { eq } from "drizzle-orm"
-import { userTable, productTable } from "@/db/schema";
+import { eq, and } from "drizzle-orm"
+import { userTable, productTable, reviewTable } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 
 const ALLOWED_FIELDS = ['name', 'phone', 'birthday', 'gender'] as const;
@@ -127,5 +128,156 @@ export async function updateWishlist(productId: number) {
             success: false,
             error: error instanceof Error ? error.message : "Unknown error",
         };
+    }
+}
+
+export async function addReview(
+    productId: number,
+    userId: string,
+    rating: number,
+    reviewText: string
+) {
+    try {
+        if (!productId || !userId || !rating || !reviewText) {
+            return { success: false, error: "All fields are required" };
+        }
+
+        if (rating < 0.5 || rating > 5) {
+            return { success: false, error: "Rating must be between 1 and 5" };
+        }
+
+        if (reviewText.length < 10) {
+            return { success: false, error: "Review must be at least 10 characters" };
+        }
+
+        const existingReview = await db
+            .select()
+            .from(reviewTable)
+            .where(and(eq(reviewTable.productId, productId), eq(reviewTable.userId, userId)))
+            .get();
+
+        if (existingReview) {
+            return { success: false, error: "You have already reviewed this product" };
+        }
+
+        const productName = await db.select({ name: productTable.name }).from(productTable).where(eq(productTable.id, productId)).get();
+        if (!productName) {
+            return { success: false, error: "Product not found" };
+        }
+        const user = await db
+            .select({ name: userTable.name })
+            .from(userTable)
+            .where(eq(userTable.id, userId))
+            .get();
+
+        if (!user) {
+            return { success: false, error: "User not found" };
+        }
+
+        const newReview = await db
+            .insert(reviewTable)
+            .values({
+                productId,
+                userId,
+                rating,
+                review: reviewText,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            })
+            .returning();
+
+        const allProductReviews = await db
+            .select({ rating: reviewTable.rating })
+            .from(reviewTable)
+            .where(eq(reviewTable.productId, productId));
+
+        const avgRating = allProductReviews.reduce((sum, r) => sum + r.rating, 0) / allProductReviews.length;
+
+        await db
+            .update(productTable)
+            .set({
+                rating: Number(avgRating.toFixed(1)),
+                lastUpdated: new Date().toISOString()
+            })
+            .where(eq(productTable.id, productId));
+
+        revalidatePath(`/${urlString(productName?.name)}`);
+
+        return {
+            success: true,
+            review: newReview[0],
+            message: "Review added successfully!"
+        };
+
+    } catch (error) {
+        console.error("Error adding review:", error);
+        return {
+            success: false,
+            error: "Failed to add review. Please try again."
+        };
+    }
+}
+
+export async function getProductReviews(productId: number) {
+    try {
+        const reviews = await db
+            .select({
+                id: reviewTable.id,
+                rating: reviewTable.rating,
+                review: reviewTable.review,
+                createdAt: reviewTable.createdAt,
+                userName: userTable.name,
+                userImage: userTable.image
+            })
+            .from(reviewTable)
+            .innerJoin(userTable, eq(reviewTable.userId, userTable.id))
+            .where(eq(reviewTable.productId, productId))
+            .orderBy(reviewTable.createdAt); // Most recent first
+
+        return { success: true, reviews };
+    } catch (error) {
+        console.error("Error fetching reviews:", error);
+        return { success: false, error: "Failed to fetch reviews" };
+    }
+}
+
+export async function getUserReviews(userId: string) {
+    try {
+        const reviews = await db
+            .select({
+                id: reviewTable.id,
+                rating: reviewTable.rating,
+                review: reviewTable.review,
+                createdAt: reviewTable.createdAt,
+                updatedAt: reviewTable.updatedAt,
+                helpfulCount: reviewTable.helpfulCount,
+                productId: reviewTable.productId,
+                productName: productTable.name,
+                productImage: productTable.img,
+            })
+            .from(reviewTable)
+            .innerJoin(productTable, eq(reviewTable.productId, productTable.id))
+            .where(eq(reviewTable.userId, userId))
+            .orderBy(reviewTable.createdAt);
+
+        return { success: true, reviews };
+    } catch (error) {
+        console.error("Error fetching user reviews:", error);
+        return { success: false, error: "Failed to fetch user reviews" };
+    }
+}
+
+export async function canUserReview(productId: number, userId: string) {
+    try {
+        const existingReview = await db
+            .select()
+            .from(reviewTable)
+            .where(and(eq(reviewTable.productId, productId,), eq(reviewTable.userId, userId)))
+            .get();
+
+        return { canReview: !existingReview };
+    } catch (error) {
+        console.error("Error checking review permission:", error);
+        return { canReview: false };
     }
 }

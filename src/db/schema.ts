@@ -1,5 +1,6 @@
 import { int, sqliteTable, text, real, integer, primaryKey } from "drizzle-orm/sqlite-core";
 import type { AdapterAccountType } from "next-auth/adapters"
+import { sql } from "drizzle-orm"
 
 export const productTable = sqliteTable("product", {
     id: int().primaryKey({ autoIncrement: true }),
@@ -67,6 +68,16 @@ export const userTable = sqliteTable("user", {
     reviews: text("reviews").default("[]"), // JSON array: [{ id, date, productId, rating, review }]
     orders: text("orders").default("[]"), // JSON array: [{ id, date, productId, quantity, price }]
 })
+export const reviewTable = sqliteTable("review", {
+    id: int().primaryKey({ autoIncrement: true }),
+    productId: int("product_id").notNull().references(() => productTable.id),
+    userId: text("user_id").notNull().references(() => userTable.id),
+    rating: real("rating").notNull(),
+    review: text("review").notNull(),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    helpfulCount: int("helpful_count").notNull().default(0),
+});
 
 export const accountTable = sqliteTable(
     "account",

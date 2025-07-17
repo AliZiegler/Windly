@@ -115,7 +115,7 @@ export default async function Page(
                     className="ml-10 w-72 h-[730px] bg-[#21272f] border-2 border-[#373c43] rounded-2xl pl-5 pt-4 flex flex-col gap-4"
                 />
             </div>
-            <WriteReview searchParams={spRecord} />
+            <WriteReview searchParams={spRecord} productId={p.id} userId={session?.user?.id || ""} />
         </div>
     );
 }

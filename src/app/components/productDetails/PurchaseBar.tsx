@@ -45,7 +45,7 @@ export default function PurchaseBar({ p, searchParams, className }: { p: Product
             </table>
             <hr className="mt-4 mr-2"></hr>
             <Link className="w-48 h-9 rounded-lg mt-6 cursor-pointer border-2 border-gray-300 self-center flex items-center justify-center"
-                href={`?${ReviewShownParams.toString()}`} >
+                href={`?${ReviewShownParams.toString()}`} replace={true} >
                 Write Review
             </Link>
         </div>
