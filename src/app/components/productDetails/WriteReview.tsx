@@ -1,6 +1,7 @@
 "use client";
 import Stars from "@/app/components/global/ReactStars";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { addReview } from "@/app/actions/UserActions";
 import { z } from "zod";
 
@@ -8,28 +9,39 @@ export default function WriteReview(
     { searchParams, productId, userId }:
         { searchParams: { [key: string]: string | string[] | undefined }, productId: number, userId: string }
 ) {
+    const router = useRouter();
     const ReviewShown = searchParams.review;
     const isReviewShown = ReviewShown === "shown";
     const reviewRef = useRef<HTMLFormElement>(null);
     const [rating, setRating] = useState(0);
     const ReviewSchema = z.object({
         rating: z.number().min(0.5).max(5),
-        review: z.string().min(10).max(1000),
+        review: z.string().min(3).max(1000),
     })
     async function SubmitReview(formData: FormData) {
-        const review = formData.get("review");
-        const rating = formData.get("rating");
-        if (review && rating) {
-            const parsedReview = ReviewSchema.safeParse({
-                rating: Number(rating),
-                review: review as string,
-            });
-            if (parsedReview.success) {
-                await addReview(productId, userId, parsedReview.data.rating, parsedReview.data.review);
-            } if (parsedReview.error) {
-                console.error(parsedReview.error);
-            }
+        const rawRating = formData.get("rating");
+        const rawReview = formData.get("review");
+
+        const data = {
+            rating: typeof rawRating === "string" ? Number(rawRating) : 0,
+            review: typeof rawReview === "string" ? rawReview : "",
+        };
+        const parsed = ReviewSchema.safeParse(data);
+        if (!parsed.success) {
+            throw new Error(
+                "Validation error: " +
+                parsed.error.issues
+                    .map((e: z.core.$ZodIssue) => `${e.path.join(".")}: ${e.message}`)
+                    .join("; ")
+            );
         }
+        await addReview(
+            productId,
+            userId,
+            parsed.data.rating,
+            parsed.data.review,
+        );
+        router.refresh();
     }
     function handleRatingChange(rating: number) {
         setRating(rating);

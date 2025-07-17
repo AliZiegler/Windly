@@ -17,7 +17,6 @@ export default async function Page() {
         throw new Error("Sorry, We couldn't fetch your wishlist");
     }
     const wishlist = JSON.parse(row.wishlist);
-    console.log(wishlist);
     const products = await db
         .select({ name: productTable.name, id: productTable.id })
         .from(productTable)
