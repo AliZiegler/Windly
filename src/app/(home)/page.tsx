@@ -91,7 +91,6 @@ export default async function Page({ searchParams }: PageProps) {
         .from(productTable)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(orderBy);
-
     return (
         <main className="flex flex-wrap gap-5 m-7">
             {Products.map((product: DisplayProduct) => (

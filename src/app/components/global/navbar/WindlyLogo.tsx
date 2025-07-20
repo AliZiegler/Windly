@@ -3,13 +3,13 @@ import Link from "next/link";
 
 export default function WindlyLogo() {
     return (
-        <Link href="/" prefetch={true}>
+        <Link href="/" prefetch>
             <Image
-                alt="windly logo"
+                alt="Windly Logo"
                 src="/images/windlyLogo.png"
-                className="h-[80px] cursor-pointer"
-                width="80"
-                height="80"
+                width={80}
+                height={80}
+                className="cursor-pointer transition-transform hover:scale-105"
             />
         </Link>
     );

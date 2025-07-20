@@ -1,20 +1,20 @@
-import Image from "next/image"
-import Link from "next/link"
-import { signIn, auth } from "@/auth"
+import Image from "next/image";
+import Link from "next/link";
+import { signIn, auth } from "@/auth";
 
 export default async function SignIn() {
-    const session = await auth()
+    const session = await auth();
 
     return (
         <span>
             {!session?.user ? (
                 <form
                     action={async () => {
-                        "use server"
-                        await signIn("google")
+                        "use server";
+                        await signIn("google");
                     }}
                 >
-                    <button type="submit">
+                    <button type="submit" className="transition-transform hover:scale-105">
                         <Image
                             src="/images/loginIcon.png"
                             alt="login icon"
@@ -25,7 +25,7 @@ export default async function SignIn() {
                     </button>
                 </form>
             ) : (
-                <Link href="/account">
+                <Link href="/account" className="inline-block transition-transform hover:scale-105">
                     <Image
                         src={session.user.image || "/images/placeholder.png"}
                         alt="user avatar"
@@ -36,5 +36,5 @@ export default async function SignIn() {
                 </Link>
             )}
         </span>
-    )
+    );
 }

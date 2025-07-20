@@ -3,10 +3,9 @@
 import Image from "next/image";
 import { updateSearchParams, urlString, CATEGORIES } from "@/app/components/global/Atoms";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
-
-type SearchProps = {
+interface SearchProps {
     className?: string;
     placeholder?: string;
     onSearchChange?: (search: string, category: string) => void;
@@ -15,75 +14,82 @@ type SearchProps = {
 export default function Search({
     className = "",
     placeholder = "Search…",
-    onSearchChange
+    onSearchChange,
 }: SearchProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const currentSearch = useMemo(() =>
-        searchParams.get("search") ?? "",
-        [searchParams]
-    );
+    const currentSearch = searchParams.get("search") ?? "";
+    const currentCategory = searchParams.get("category") ?? "all";
 
-    const currentCategory = useMemo(() =>
-        searchParams.get("category") ?? "all",
-        [searchParams]
-    );
+    const [selectedCategory, setSelectedCategory] = useState(currentCategory);
+    const selectRef = useRef<HTMLSelectElement>(null);
+    const sizerRef = useRef<HTMLSpanElement>(null);
 
-    const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    useEffect(() => {
+        if (!sizerRef.current || !selectRef.current) return;
 
-        const formData = new FormData(event.currentTarget);
-        const search = (formData.get("search") ?? "").toString();
-        const category = (formData.get("category") ?? "").toString().toLowerCase();
+        // copy the selected label into the hidden sizer
+        const label = CATEGORIES.find((cat) => urlString(cat) === selectedCategory) ?? selectedCategory;
+        sizerRef.current.textContent = label;
 
-        if (search === currentSearch && category === currentCategory) {
-            return;
-        }
+        // measure and set width (add space for padding + arrow)
+        const measured = sizerRef.current.offsetWidth;
+        selectRef.current.style.width = `${measured + 32}px`;
+    }, [selectedCategory]);
 
-        let newParams = updateSearchParams(searchParams, "search", urlString(search));
+    const handleSubmit = useCallback(
+        (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const search = (formData.get("search") ?? "").toString();
+            const category = selectedCategory;
 
-        if (category !== "all") {
-            newParams = updateSearchParams(newParams, "category", category);
-        } else { newParams = updateSearchParams(newParams, "category", null); }
+            if (search === currentSearch && category === currentCategory) return;
 
-        onSearchChange?.(search, category);
+            let newParams = updateSearchParams(searchParams, "search", urlString(search));
+            if (category !== "all") {
+                newParams = updateSearchParams(newParams, "category", category);
+            } else {
+                newParams = updateSearchParams(newParams, "category", null);
+            }
 
-        router.push(`/?${newParams}`);
-    }, [router, searchParams, currentSearch, currentCategory, onSearchChange]);
-
-    const categoryOptions = useMemo(() =>
-        CATEGORIES.map((category) => (
-            <option key={category} value={urlString(category)}>
-                {category}
-            </option>
-        )),
-        []
+            onSearchChange?.(search, category);
+            router.push(`/?${newParams}`);
+        },
+        [router, searchParams, currentSearch, currentCategory, onSearchChange, selectedCategory]
     );
 
     return (
-        <form
-            onSubmit={handleSubmit}
-            className={`flex items-center w-[60%] ${className}`}
-            role="search"
-            aria-label="Product search"
-        >
-            <select
-                name="category"
-                defaultValue={currentCategory}
-                className="w-25 h-[60px]  cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r border-gray-300
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                aria-label="Select category"
-            >
-                {categoryOptions}
-            </select>
+        <form onSubmit={handleSubmit} className={`flex items-center w-[60%] ${className}`} role="search" aria-label="Product search">
+            <div className="relative inline-block">
+                <span
+                    ref={sizerRef}
+                    className="invisible absolute whitespace-nowrap text-white text-center h-[60px] px-4 text-base font-sans font-normal"
+                />
+
+                <select
+                    ref={selectRef}
+                    name="category"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    aria-label="Select category"
+                    className="inline-block h-[60px] px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r 
+                    border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                >
+                    {CATEGORIES.map((category) => (
+                        <option key={category} value={urlString(category)}>
+                            {category}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
             <input
                 name="search"
                 defaultValue={currentSearch}
                 type="text"
-                className="bg-[#F2F2F2] h-[60px] w-[900px] text-black text-lg px-4 border-y border-gray-300 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="bg-[#F2F2F2] h-[60px] w-[900px] text-black text-lg px-4 border-y border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 placeholder={placeholder}
                 aria-label="Search products"
                 autoComplete="off"
@@ -92,9 +98,7 @@ export default function Search({
 
             <button
                 type="submit"
-                className="bg-[#ECDFCC] h-[60px] w-[60px] flex items-center justify-center rounded-r-md
-                border-l border-gray-300 hover:bg-[#E5D4B1] focus:outline-none focus:ring-2 
-                focus:ring-blue-500 focus:border-transparent transition-all duration-200 group"
+                className="bg-[#ECDFCC] h-[60px] w-[60px] flex items-center justify-center rounded-r-md border-l border-gray-300 hover:bg-[#E5D4B1] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 group"
                 aria-label="Search"
             >
                 <Image
