@@ -52,7 +52,7 @@ export default async function Reviews() {
                 </td>
                 <td className="p-2 align-top">{trimmedReview}</td>
                 <td className="p-2 align-top">
-                    <Link href={`/${urlString(productName)}`}>View Details</Link>
+                    <Link href={`/account/reviews/${urlString(productName)}`}>View Details</Link>
                 </td>
             </tr>
         );

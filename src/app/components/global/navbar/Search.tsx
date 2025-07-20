@@ -64,14 +64,14 @@ export default function Search({
     return (
         <form
             onSubmit={handleSubmit}
-            className={`flex items-center ${className}`}
+            className={`flex items-center w-[60%] ${className}`}
             role="search"
             aria-label="Product search"
         >
             <select
                 name="category"
                 defaultValue={currentCategory}
-                className="w-25 h-[60px] cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r border-gray-300
+                className="w-25 h-[60px]  cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r border-gray-300
                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 aria-label="Select category"
             >

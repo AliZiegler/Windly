@@ -92,7 +92,7 @@ export default function WriteReview({
                 >
                     <h1 className="text-3xl">Write Your Own Review</h1>
 
-                    <Stars size={40} onChange={handleRatingChange} />
+                    <Stars edit={true} count={5} size={40} onChange={handleRatingChange} />
                     <input
                         name="rating"
                         type="number"
