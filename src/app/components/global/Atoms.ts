@@ -88,3 +88,24 @@ export const CATEGORIES = [
     "Video Games",
     "Other",
 ];
+export const iraqiProvinces = [
+    "Anbar",
+    "Babil",
+    "Baghdad",
+    "Basra",
+    "Dhi Qar",
+    "Diyala",
+    "Duhok",
+    "Erbil",
+    "Halabja",
+    "Karbala",
+    "Kirkuk",
+    "Maysan",
+    "Muthanna",
+    "Najaf",
+    "Nineveh",
+    "Qadisiyyah",
+    "Salah Al-Din",
+    "Sulaymaniyah",
+    "Wasit"
+];

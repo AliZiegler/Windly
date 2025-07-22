@@ -72,16 +72,19 @@ export default function EditableField({
                             ))}
                         </select>
                     ) : (
-                        <input
-                            type={inputType}
-                            value={fieldValue}
-                            onChange={(e) => setFieldValue(e.target.value)}
-                            placeholder={placeholder}
-                            className="text-[#FCECDD] font-bold outline-none bg-transparent border-b border-[#FCECDD]"
-                        />
+                        <span className="flex gap-1.5">
+                            <p className="text-[#FCECDD] font-bold">{field === "phone" && "+964 "}</p>
+                            <input
+                                type={inputType}
+                                value={fieldValue}
+                                onChange={(e) => setFieldValue(e.target.value)}
+                                placeholder={placeholder}
+                                className="text-[#FCECDD] font-bold outline-none bg-transparent border-b border-[#FCECDD]"
+                            />
+                        </span>
                     )
                 ) : (
-                    <p className="text-[#FCECDD] font-bold">{fieldValue || "-"}</p>
+                    <p className="text-[#FCECDD] font-bold">{field === "phone" && "+964 "}{fieldValue || "-"}</p>
                 )}
             </span>
             <div className="flex gap-2 ml-auto">

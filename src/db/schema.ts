@@ -1,4 +1,4 @@
-import { int, sqliteTable, text, real, integer, primaryKey } from "drizzle-orm/sqlite-core";
+import { int, sqliteTable, text, real, integer, primaryKey, } from "drizzle-orm/sqlite-core";
 import type { AdapterAccountType } from "next-auth/adapters"
 import { sql } from "drizzle-orm"
 
@@ -63,9 +63,7 @@ export const userTable = sqliteTable("user", {
     gender: text("gender"),
     birthday: text("birthday"), // use date format: YYYY-MM-DD
     phone: text("phone"),
-    address: text("address"),
     wishlist: text("wishlist").default("[]"), // JSON array: [productId, productId]
-    reviews: text("reviews").default("[]"), // JSON array: [{ id, date, productId, rating, review }]
     orders: text("orders").default("[]"), // JSON array: [{ id, date, productId, quantity, price }]
 })
 export const reviewTable = sqliteTable("review", {
@@ -78,6 +76,20 @@ export const reviewTable = sqliteTable("review", {
     updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
     helpfulCount: int("helpful_count").notNull().default(0),
 });
+export const addressTable = sqliteTable("address", {
+    id: int("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id").notNull().references(() => userTable.id),
+    name: text("name").notNull(),
+    country: text("country").notNull(),
+    phone: text("phone").notNull(),
+    state: text("state").notNull(),
+    city: text("city").notNull(),
+    street: text("street").notNull(),
+    buildingNumber: text("building_number").notNull(),
+    zipCode: text("zip_code").notNull(),
+    addressType: text("address_type", { enum: ['home', 'office'] }).notNull(),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+})
 
 export const accountTable = sqliteTable(
     "account",
@@ -134,3 +146,6 @@ export const sessionTable = sqliteTable("session", {
 });
 export type SelectProduct = typeof productTable.$inferSelect
 export type SelectUser = typeof userTable.$inferSelect
+export type SelectReview = typeof reviewTable.$inferSelect
+export type SelectAddress = typeof addressTable.$inferSelect
+export type InsertAddress = typeof addressTable.$inferInsert

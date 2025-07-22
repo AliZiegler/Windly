@@ -3,7 +3,8 @@ import { urlString } from "@/app/components/global/Atoms";
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { eq, and } from "drizzle-orm"
-import { userTable, productTable, reviewTable } from "@/db/schema";
+import { userTable, productTable, reviewTable, addressTable } from "@/db/schema";
+import type { InsertAddress } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 
 const ALLOWED_FIELDS = ['name', 'phone', 'birthday', 'gender'] as const;
@@ -279,5 +280,16 @@ export async function canUserReview(productId: number, userId: string) {
     } catch (error) {
         console.error("Error checking review permission:", error);
         return { canReview: false };
+    }
+}
+export async function addAddress(address: InsertAddress) {
+    const insertValues = { ...address, updatedAt: new Date().toISOString() };
+    try {
+        await db.insert(addressTable).values(insertValues);
+        revalidatePath("/user/addresses");
+        return { success: true };
+    } catch (error) {
+        console.error("Error adding address:", error);
+        return { success: false, error: "Failed to add address. Please try again." };
     }
 }

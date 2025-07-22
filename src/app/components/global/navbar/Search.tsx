@@ -48,7 +48,7 @@ export default function Search({
             if (search === currentSearch && category === currentCategory) return;
 
             let newParams = updateSearchParams(searchParams, "search", urlString(search));
-            if (category !== "all") {
+            if (category !== "All") {
                 newParams = updateSearchParams(newParams, "category", category);
             } else {
                 newParams = updateSearchParams(newParams, "category", null);
@@ -74,8 +74,7 @@ export default function Search({
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     aria-label="Select category"
-                    className="inline-block h-[60px] px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r 
-                    border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="inline-block h-[60px] px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 >
                     {CATEGORIES.map((category) => (
                         <option key={category} value={urlString(category)}>
@@ -89,7 +88,9 @@ export default function Search({
                 name="search"
                 defaultValue={currentSearch}
                 type="text"
-                className="bg-[#F2F2F2] h-[60px] w-[900px] text-black text-lg px-4 border-y border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="bg-[#F2F2F2] h-[60px] 2xl:w-[900px] xl-w-[700px] lg:w-[500px] sm:w-[400px] text-black
+                text-lg px-4 border-y border-gray-300 focus:outline-none focus:ring-2
+                focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 placeholder={placeholder}
                 aria-label="Search products"
                 autoComplete="off"
