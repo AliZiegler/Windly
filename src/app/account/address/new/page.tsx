@@ -21,38 +21,37 @@ const provincesOptions = iraqiProvinces.map((province) => {
         <option key={province} value={province}>{province}</option>
     )
 })
-export async function handleSubmit(formData: FormData) {
-    const session = await auth();
-    if (!session?.user) {
-        throw new Error("Not authenticated");
-    }
-
-    const data = {
-        name: formData.get("name") as string,
-        phone: formData.get("phone") as string,
-        state: formData.get("state") as string,
-        country: "Iraq" as const,
-        city: formData.get("city") as string,
-        buildingNumber: formData.get("buildingNumber") as string,
-        street: formData.get("street") as string,
-        zipCode: formData.get("zipCode") as string,
-        addressType: formData.get("type") as "home" | "office",
-        userId: session.user.id,
-    };
-
-    const parsed = AddressSchema.safeParse(data);
-    if (!parsed.success) {
-        throw new Error(parsed.error.issues.map((i) => `${i.path}: ${i.message}`).join("; "));
-    }
-
-    await addAddress(parsed.data);
-
-    redirect("/account/address");
-}
 export default async function Page() {
     const session = await auth();
     if (!session?.user?.id) {
-        return <div>Must login first</div>
+        throw new Error("Not authenticated");
+    }
+    async function handleSubmit(formData: FormData) {
+        "use server"
+        if (!session?.user?.id) {
+            throw new Error("Not authenticated");
+        }
+        const data = {
+            name: formData.get("name") as string,
+            phone: formData.get("phone") as string,
+            state: formData.get("state") as string,
+            country: "Iraq" as const,
+            city: formData.get("city") as string,
+            buildingNumber: formData.get("buildingNumber") as string,
+            street: formData.get("street") as string,
+            zipCode: formData.get("zipCode") as string,
+            addressType: formData.get("type") as "home" | "office",
+            userId: session.user.id,
+        };
+
+        const parsed = AddressSchema.safeParse(data);
+        if (!parsed.success) {
+            throw new Error(parsed.error.issues.map((i) => `${i.path}: ${i.message}`).join("; "));
+        }
+
+        await addAddress(parsed.data);
+
+        redirect("/account/address");
     }
     const className = "border-1 border-gray-400 2xl:w-[500px] xl:w-[400px] lg:w-[340px] h-7 p-1"
     return (
