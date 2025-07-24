@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { eq, and } from "drizzle-orm"
 import { userTable, productTable, reviewTable, addressTable } from "@/db/schema";
-import type { InsertAddress, SelectAddress } from "@/db/schema";
+import type { InsertAddress } from "@/db/schema";
 import type { UpdateAddress } from "@/app/components/global/Types";
 import { revalidatePath } from "next/cache";
 
