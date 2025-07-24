@@ -88,7 +88,7 @@ export default function Search({
                 name="search"
                 defaultValue={currentSearch}
                 type="text"
-                className="bg-[#F2F2F2] h-[60px] 2xl:w-[900px] xl-w-[700px] lg:w-[500px] sm:w-[400px] text-black
+                className="bg-[#F2F2F2] h-[60px] 2xl:w-[900px] xl-w-[700px] lg:w-[500px] sm:w-[400px] w-72 text-black
                 text-lg px-4 border-y border-gray-300 focus:outline-none focus:ring-2
                 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 placeholder={placeholder}
@@ -107,7 +107,7 @@ export default function Search({
                     alt=""
                     width={40}
                     height={40}
-                    className="cursor-pointer group-hover:scale-110 transition-transform duration-200"
+                    className="cursor-pointer group-hover:scale-110 transition-transform duration-200 sm:w-[40px] sm:h-[40px] w-[30px] h-[30px]"
                     priority={false}
                 />
             </button>

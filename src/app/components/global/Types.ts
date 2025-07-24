@@ -1,4 +1,4 @@
-import { SelectProduct } from "@/db/schema";
+import { SelectProduct, SelectAddress } from "@/db/schema";
 export type ProductType = {
     id: number;
     name: string;
@@ -41,3 +41,14 @@ export type SessionType = {
     expires: string;
 };
 export type DisplayProduct = Pick<SelectProduct, 'id' | 'name' | 'price' | 'discount' | 'img' | 'description' | 'rating'>
+export type UpdateAddress = {
+    name: string;
+    country: string;
+    phone: string;
+    state: string;
+    city: string;
+    street: string;
+    buildingNumber: string;
+    zipCode: string;
+    addressType: "home" | "office";
+};

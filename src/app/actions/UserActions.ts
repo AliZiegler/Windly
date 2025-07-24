@@ -4,7 +4,8 @@ import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { eq, and } from "drizzle-orm"
 import { userTable, productTable, reviewTable, addressTable } from "@/db/schema";
-import type { InsertAddress } from "@/db/schema";
+import type { InsertAddress, SelectAddress } from "@/db/schema";
+import type { UpdateAddress } from "@/app/components/global/Types";
 import { revalidatePath } from "next/cache";
 
 const ALLOWED_FIELDS = ['name', 'phone', 'birthday', 'gender'] as const;
@@ -27,12 +28,9 @@ export async function updateUserField(field: AllowedField, value: string) {
 
         const updateData: Partial<Record<AllowedField, string | undefined>> = {};
 
-        // Handle different field types appropriately
         if (field === 'name') {
-            // Name is required (notNull), so we don't allow empty values
             updateData[field] = value.trim();
         } else {
-            // Other fields can be empty/undefined
             updateData[field] = value.trim() || undefined;
         }
 
@@ -85,7 +83,6 @@ export async function updateWishlist(productId: number) {
             throw new Error("User not found");
         }
 
-        // Convert productId to number if your product table uses integer IDs
         if (isNaN(productId)) {
             throw new Error("Invalid product ID");
         }
@@ -100,11 +97,9 @@ export async function updateWishlist(productId: number) {
             throw new Error("Product not found");
         }
 
-        // Parse the JSON string to get the actual array
         const currentWishlist: number[] = JSON.parse(users[0].wishlist || "[]");
         const wishlist = [...currentWishlist];
 
-        // Toggle productId in wishlist array (keep as string in wishlist)
         const idx = wishlist.indexOf(productId);
         if (idx !== -1) {
             wishlist.splice(idx, 1);
@@ -112,7 +107,6 @@ export async function updateWishlist(productId: number) {
             wishlist.push(productId);
         }
 
-        // Convert back to JSON string before persisting
         await db
             .update(userTable)
             .set({ wishlist: JSON.stringify(wishlist) })
@@ -121,7 +115,7 @@ export async function updateWishlist(productId: number) {
 
         return {
             success: true,
-            wishlist, // Return the actual array, not the JSON string
+            wishlist,
         };
     } catch (error) {
         console.error("Error updating wishlist:", error);
@@ -286,10 +280,100 @@ export async function addAddress(address: InsertAddress) {
     const insertValues = { ...address, updatedAt: new Date().toISOString() };
     try {
         await db.insert(addressTable).values(insertValues);
+        const userDefaultAddress = await db.select({ addressId: userTable.addressId }).from(userTable).where(eq(userTable.id, address.userId));
+        if (userDefaultAddress.length === 0 || !userDefaultAddress) {
+            await db.update(userTable).set({ addressId: insertValues.id }).where(eq(userTable.id, insertValues.userId));
+        }
         revalidatePath("/user/addresses");
         return { success: true };
     } catch (error) {
         console.error("Error adding address:", error);
         return { success: false, error: "Failed to add address. Please try again." };
+    }
+}
+export async function updateAddress(
+    addressId: number,
+    input: UpdateAddress
+) {
+    const updateValues = {
+        ...input,
+        updatedAt: new Date().toISOString(),
+    };
+
+    try {
+        await db
+            .update(addressTable)
+            .set(updateValues)
+            .where(eq(addressTable.id, addressId));
+
+        revalidatePath("/user/addresses");
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating address:", error);
+        return {
+            success: false,
+            error: "Failed to update address. Please try again.",
+        };
+    }
+}
+export async function setUserAddress(addressId: number, userId: string) {
+    try {
+        await db.update(userTable).set({ addressId }).where(eq(userTable.id, userId));
+        revalidatePath("/user/addresses");
+        return { success: true };
+    } catch (error) {
+        console.error("Error setting user address:", error);
+        return { success: false, error: "Failed to set user address. Please try again." };
+    }
+}
+export async function deleteAddress(addressId: number, userId: string) {
+    try {
+        const userAddresses = await db.select({
+            addressId: addressTable.id,
+            updatedAt: addressTable.updatedAt
+        })
+            .from(addressTable)
+            .where(eq(addressTable.userId, userId));
+        const defaultAddressResult = await db.select({ addressId: userTable.addressId })
+            .from(userTable)
+            .where(eq(userTable.id, userId));
+
+        const currentDefaultAddressId = defaultAddressResult[0]?.addressId;
+
+        const addressesSorted = userAddresses.sort((a, b) =>
+            new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        );
+
+        if (currentDefaultAddressId !== addressId) {
+            await db.delete(addressTable).where(eq(addressTable.id, addressId));
+            revalidatePath("/user/addresses");
+            return { success: true };
+        } else {
+            if (userAddresses.length <= 1) {
+                await db.delete(addressTable).where(eq(addressTable.id, addressId));
+                await db.update(userTable)
+                    .set({ addressId: null })
+                    .where(eq(userTable.id, userId));
+
+                revalidatePath("/user/addresses");
+                return { success: true };
+            }
+
+            const newDefaultAddress = addressesSorted.find(addr => addr.addressId !== addressId);
+
+            await db.delete(addressTable).where(eq(addressTable.id, addressId));
+
+            if (newDefaultAddress) {
+                await db.update(userTable)
+                    .set({ addressId: newDefaultAddress.addressId })
+                    .where(eq(userTable.id, userId));
+            }
+
+            revalidatePath("/user/addresses");
+            return { success: true };
+        }
+    } catch (error) {
+        console.error("Error deleting address:", error);
+        return { success: false, error: "Failed to delete address. Please try again." };
     }
 }

@@ -65,6 +65,7 @@ export const userTable = sqliteTable("user", {
     phone: text("phone"),
     wishlist: text("wishlist").default("[]"), // JSON array: [productId, productId]
     orders: text("orders").default("[]"), // JSON array: [{ id, date, productId, quantity, price }]
+    addressId: int("address_id"),
 })
 export const reviewTable = sqliteTable("review", {
     id: int().primaryKey({ autoIncrement: true }),
