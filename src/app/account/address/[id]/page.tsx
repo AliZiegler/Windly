@@ -24,7 +24,7 @@ const provincesOptions = iraqiProvinces.map((province) => {
         <option key={province} value={province}>{province}</option>
     )
 })
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
     const p = await params
     const addressId = Number(p.id);
     const session = await auth();

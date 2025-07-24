@@ -1,4 +1,4 @@
-import { SelectProduct, SelectAddress } from "@/db/schema";
+import { SelectProduct } from "@/db/schema";
 export type ProductType = {
     id: number;
     name: string;
