@@ -72,13 +72,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     <span className="flex gap-3 bg-[#393e46] w-full h-28 items-center p-3">
                         <div className="flex flex-col">
                             <label htmlFor="name" className="ml-5">Full Name</label>
-                            <input type="text" name="name" id="name" className={className} defaultValue={address.name} />
+                            <input required type="text" name="name" id="name" className={className} defaultValue={address.name} />
                         </div>
                         <div className="flex flex-col">
                             <label htmlFor="phone" className="ml-5">Telephone</label>
                             <span className="flex">
                                 <div className="border-1 border-gray-400 w-12 h-7 text-center pt-0.5"><b>+964</b></div>
-                                <input type="text" name="phone" id="phone" className={className} defaultValue={address.phone} />
+                                <input required type="text" name="phone" id="phone" className={className} defaultValue={address.phone} />
                             </span>
                         </div>
                     </span>
@@ -95,27 +95,27 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                             </div>
                             <div className="flex flex-col">
                                 <label htmlFor="city" className="ml-5">City or Town</label>
-                                <input type="text" name="city" id="city" className={className} defaultValue={address.city} />
+                                <input required type="text" name="city" id="city" className={className} defaultValue={address.city} />
                             </div>
                             <div className="flex flex-col">
                                 <label htmlFor="building" className="ml-5">House/Building No</label>
-                                <input type="text" name="buildingNumber" id="buildingNumber" className={className} defaultValue={address.buildingNumber} />
+                                <input required type="text" name="buildingNumber" id="buildingNumber" className={className} defaultValue={address.buildingNumber} />
                             </div>
                             <div className="flex flex-col">
                                 <label htmlFor="street" className="ml-5">Street</label>
-                                <input type="text" name="street" id="street" className={className} defaultValue={address.street} />
+                                <input required type="text" name="street" id="street" className={className} defaultValue={address.street} />
                             </div>
                             <div className="flex flex-col">
                                 <label htmlFor="zipCode" className="ml-5">Zip/Postal Code</label>
-                                <input type="text" name="zipCode" id="zipCode" className={className} defaultValue={address.zipCode} />
+                                <input required type="text" name="zipCode" id="zipCode" className={className} defaultValue={address.zipCode} />
                             </div>
                             <div className="flex flex-col">
                                 <label htmlFor="country" className="ml-5">Country</label>
-                                <input type="text" name="country" id="country" value="Iraq" disabled={true} className={className} />
+                                <input required type="text" name="country" id="country" value="Iraq" disabled={true} className={className} />
                             </div>
                             <div className="flex flex-col">
                                 <label htmlFor="addressType" className="ml-5">Address Type</label>
-                                <select name="addressType" id="addressType" className={className} defaultValue={address.addressType}>
+                                <select required name="addressType" id="addressType" className={className} defaultValue={address.addressType}>
                                     <option value="home">Home</option>
                                     <option value="office">office</option>
                                 </select>

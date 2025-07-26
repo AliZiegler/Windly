@@ -2,6 +2,7 @@ import { db } from "@/lib/db"
 import { auth } from "@/auth"
 import { eq } from "drizzle-orm"
 import { addressTable, userTable } from "@/db/schema"
+import { capitalizeFirstLetter } from "@/app/components/global/Atoms"
 import Link from "next/link"
 import { deleteAddress, setUserAddress } from "@/app/actions/UserActions"
 import { redirect } from "next/navigation"
@@ -38,7 +39,7 @@ export default async function Page() {
                 {address.id === defaultAddressId[0].addressId &&
                     <span className="bg-[#007bff] mb-2 font-extrabold text-sm text-center text-white px-2 py-0.5 rounded-lg w-20">Default</span>
                 }
-                <b className="font-bold text-lg">{address.addressType === "home" ? "Home" : "Office"}</b>
+                <b className="font-bold text-lg">{capitalizeFirstLetter(address.addressType)}</b>
                 <p className="my-2">{address.name}</p>
                 <span className="flex justify-between">
                     <span className="flex flex-col">
@@ -89,7 +90,7 @@ export default async function Page() {
                     <div className="flex w-full justify-between mb-1">
                         <h1 className="font-bold text-xl block">Address Book</h1>
                         <Link href="/account/address/new">
-                            <button className="block bg-[#ffb100] px-2 py-0.5 rounded-lg font-bold text-black cursor-pointer mt-2">Add New Address</button>
+                            <button className="block bg-[#ffb100] px-4 py-1 rounded-lg font-bold text-black cursor-pointer mt-2">Add New Address</button>
                         </Link>
                     </div>
                     {...displayAddreeses}

@@ -69,6 +69,9 @@ export function salePrice(price: number, discountPercentage: number): string {
     const salePrice = applyDiscount(price, discountPercentage);
     return formatPrice(salePrice);
 }
+export function capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 export const CATEGORIES = [
     "All",
     "Arts & Craft",

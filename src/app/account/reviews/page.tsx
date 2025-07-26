@@ -65,7 +65,7 @@ export default async function Reviews() {
                 <thead className="bg-[#1e232b] h-10 border-y-2 border-[#1c2129]">
                     <tr>
                         <th className="w-[15%] p-2">Date</th>
-                        <th className="w-1/2 p-2">Product Name</th>
+                        <th className="2xl:w-1/2 w-[30%] p-2">Product Name</th>
                         <th className="p-2 w-[10%]">Rating</th>
                         <th className="p-2 w-[15%]">Review</th>
                         <th className="p-2 w-[10%]">Action</th>
