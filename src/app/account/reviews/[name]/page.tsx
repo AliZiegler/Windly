@@ -41,17 +41,15 @@ export default async function Page({ params, searchParams }: PageProps) {
 
     const rawReview = rawReviews[0];
 
-    // Transform the data to match component expectations
     const fReview = {
-        id: rawReview.id.toString(), // Convert number to string
+        id: rawReview.id,
         rating: rawReview.rating,
         review: rawReview.review,
-        createdAt: new Date(rawReview.createdAt), // Convert string to Date
+        createdAt: new Date(rawReview.createdAt),
         updatedAt: new Date(rawReview.updatedAt),
         description: rawReview.description
     };
 
-    // Conditionally render the appropriate component
     if (isEdit) {
         return (
             <ReviewEdit

@@ -6,7 +6,7 @@ type ReviewDetailsProps = {
     productName: string;
     name: string;
     fReview: {
-        id: string;
+        id: number;
         rating: number;
         review: string;
         createdAt: Date;
@@ -16,11 +16,10 @@ type ReviewDetailsProps = {
 };
 
 export default function ReviewDetails({ productName, name, fReview }: ReviewDetailsProps) {
-    const { rating, review, createdAt, description } = fReview;
-    const date = new Date(createdAt);
-    const formattedDate = date.toLocaleString();
-    const isUpdated = fReview.updatedAt !== fReview.createdAt;
-    const formattedUpdateDate = new Date(fReview.updatedAt).toLocaleString();
+    const { rating, review, createdAt, updatedAt, description } = fReview;
+    const formattedDate = createdAt.toLocaleString();
+    const isUpdated = updatedAt !== createdAt;
+    const formattedUpdateDate = updatedAt.toLocaleString();
 
     return (
         <div className="w-full flex flex-col gap-3 pr-4">
