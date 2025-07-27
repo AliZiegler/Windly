@@ -1,4 +1,3 @@
-export const runtime = 'edge';
 import WriteReview from "@/app/components/productDetails/WriteReview";
 import { db } from "@/lib/db";
 import { mapRowToProduct } from "@/lib/mappers";

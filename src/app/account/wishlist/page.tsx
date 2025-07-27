@@ -1,4 +1,3 @@
-export const runtime = 'edge';
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { userTable, productTable } from "@/db/schema";

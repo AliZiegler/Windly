@@ -1,4 +1,3 @@
-export const runtime = 'edge';
 import { db } from "@/lib/db";
 import { productTable } from "@/db/schema";
 import { CATEGORIES } from "@/app/components/global/Atoms.ts";
