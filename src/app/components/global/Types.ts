@@ -52,3 +52,8 @@ export type UpdateAddress = {
     zipCode: string;
     addressType: "home" | "office";
 };
+export type UpdateReview = {
+    rating: number;
+    review: string;
+    updatedAt: string;
+}

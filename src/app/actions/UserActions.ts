@@ -5,7 +5,7 @@ import { db } from "@/lib/db"
 import { eq, and } from "drizzle-orm"
 import { userTable, productTable, reviewTable, addressTable } from "@/db/schema";
 import type { InsertAddress } from "@/db/schema";
-import type { UpdateAddress } from "@/app/components/global/Types";
+import type { UpdateAddress, UpdateReview } from "@/app/components/global/Types";
 import { revalidatePath } from "next/cache";
 
 const ALLOWED_FIELDS = ['name', 'phone', 'birthday', 'gender'] as const;
@@ -274,6 +274,30 @@ export async function canUserReview(productId: number, userId: string) {
     } catch (error) {
         console.error("Error checking review permission:", error);
         return { canReview: false };
+    }
+}
+export async function updateReview(input: UpdateReview, reviewId: number, userId: string) {
+    const updateValues = {
+        ...input,
+        updatedAt: new Date().toISOString(),
+    }
+    try {
+        const review = await db.select({ userId: reviewTable.userId, productId: reviewTable.productId }).from(reviewTable).where(eq(reviewTable.id, reviewId)).get();
+        const doesUserOwnReview = review?.userId === userId;
+        if (!doesUserOwnReview) {
+            return { success: false, error: "You do not own this review" };
+        }
+        const productName = await db.select({ name: productTable.name }).from(productTable).where(eq(productTable.id, review.productId)).get();
+        if (!productName) {
+            return { success: false, error: "Product not found" };
+        }
+        await db.update(reviewTable).set(updateValues).where(eq(reviewTable.id, reviewId));
+        revalidatePath(`/account/reviews`);
+        revalidatePath(`/account/reviews/${urlString(productName.name)}`);
+        return { success: true };
+    } catch (error) {
+        console.error("Error", error);
+        return { success: false, error: "Failed to update review. Please try again." };
     }
 }
 export async function addAddress(address: InsertAddress) {
