@@ -55,5 +55,4 @@ export type UpdateAddress = {
 export type UpdateReview = {
     rating: number;
     review: string;
-    updatedAt: string;
 }

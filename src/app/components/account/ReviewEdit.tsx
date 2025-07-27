@@ -28,12 +28,10 @@ export default function ReviewEdit({ productName, name, fReview, userId }: Revie
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
-    const isUpdated = fReview.updatedAt !== fReview.createdAt;
 
-    const date = new Date(fReview.createdAt);
-    const updateDate = new Date(fReview.updatedAt);
-    const formattedDate = date.toLocaleString();
-    const formattedUpdateDate = updateDate.toLocaleString();
+    const formattedDate = fReview.createdAt.toLocaleString();
+    const formattedUpdateDate = fReview.updatedAt.toLocaleString();
+    const isUpdated = formattedDate !== formattedUpdateDate;
 
     const hasChanges = rating !== fReview.rating || review !== fReview.review;
 

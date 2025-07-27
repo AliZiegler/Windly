@@ -197,6 +197,7 @@ export async function addReview(
             .where(eq(productTable.id, productId));
 
         revalidatePath(`/${urlString(productName?.name)}`);
+        revalidatePath("/account/reviews");
 
         return {
             success: true,
@@ -227,7 +228,7 @@ export async function getProductReviews(productId: number) {
             .from(reviewTable)
             .innerJoin(userTable, eq(reviewTable.userId, userTable.id))
             .where(eq(reviewTable.productId, productId))
-            .orderBy(reviewTable.createdAt); // Most recent first
+            .orderBy(reviewTable.createdAt);
 
         return { success: true, reviews };
     } catch (error) {
@@ -292,7 +293,8 @@ export async function updateReview(input: UpdateReview, reviewId: number, userId
             return { success: false, error: "Product not found" };
         }
         await db.update(reviewTable).set(updateValues).where(eq(reviewTable.id, reviewId));
-        revalidatePath(`/account/reviews`);
+        revalidatePath("/account/reviews");
+        revalidatePath(`/${urlString(productName.name)}`);
         revalidatePath(`/account/reviews/${urlString(productName.name)}`);
         return { success: true };
     } catch (error) {

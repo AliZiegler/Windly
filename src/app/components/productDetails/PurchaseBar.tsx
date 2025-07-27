@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { ProductType } from "@/app/components/global/Types";
 import { salePrice, updateSearchParams } from "@/app/components/global/Atoms";
-export default function PurchaseBar({ p, searchParams, className }: { p: ProductType, searchParams: URLSearchParams, className?: string }) {
+type PurchaseBarProps = {
+    p: ProductType;
+    searchParams: URLSearchParams;
+    didReview: boolean;
+    className?: string;
+}
+export default function PurchaseBar({ p, searchParams, didReview, className }: PurchaseBarProps) {
     const formattedPrice = salePrice(p.price, p.discount);
     const ReviewShownParams = updateSearchParams(searchParams, "review", "shown");
     return (
@@ -46,7 +52,7 @@ export default function PurchaseBar({ p, searchParams, className }: { p: Product
             <hr className="mt-4 mr-2"></hr>
             <Link className="w-48 h-9 rounded-lg mt-6 cursor-pointer border-2 border-gray-300 self-center flex items-center justify-center"
                 href={`?${ReviewShownParams.toString()}`} replace={true} >
-                Write Review
+                {didReview ? "Edit Review" : "Write Review"}
             </Link>
         </div>
     )

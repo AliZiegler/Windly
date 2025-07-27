@@ -1,9 +1,9 @@
 import WriteReview from "@/app/components/productDetails/WriteReview";
 import { db } from "@/lib/db";
 import { mapRowToProduct } from "@/lib/mappers";
-import { productTable, userTable } from "@/db/schema";
+import { productTable, userTable, reviewTable } from "@/db/schema";
 import { auth } from "@/auth";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -52,6 +52,20 @@ export default async function Page(
         wishlist = JSON.parse(row.wishlist || '[]');
         isWishlisted = wishlist.includes(p.id);
     }
+
+    const userId = session?.user?.id;
+
+    let userReview = null;
+    if (userId) {
+        userReview = await db.select({
+            id: reviewTable.id,
+            rating: reviewTable.rating,
+            review: reviewTable.review,
+            createdAt: reviewTable.createdAt,
+            updatedAt: reviewTable.updatedAt
+        }).from(reviewTable).where(and(eq(reviewTable.productId, p.id), eq(reviewTable.userId, userId))).then((review) => review[0]);
+    }
+    const didUserReview = userReview !== null;
 
     return (
         <div className="flex flex-col gap-5">
@@ -112,9 +126,10 @@ export default async function Page(
                     p={p}
                     searchParams={sp}
                     className="ml-10 w-72 h-[730px] bg-[#21272f] border-2 border-[#373c43] rounded-2xl pl-5 pt-4 flex flex-col gap-4"
+                    didReview={didUserReview}
                 />
             </div>
-            <WriteReview searchParams={spRecord} productId={p.id} userId={session?.user?.id || ""} />
+            <WriteReview review={userReview} searchParams={spRecord} productId={p.id} userId={userId || ""} />
         </div>
     );
 }

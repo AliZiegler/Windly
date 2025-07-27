@@ -18,8 +18,8 @@ type ReviewDetailsProps = {
 export default function ReviewDetails({ productName, name, fReview }: ReviewDetailsProps) {
     const { rating, review, createdAt, updatedAt, description } = fReview;
     const formattedDate = createdAt.toLocaleString();
-    const isUpdated = updatedAt !== createdAt;
     const formattedUpdateDate = updatedAt.toLocaleString();
+    const isUpdated = formattedDate !== formattedUpdateDate;
 
     return (
         <div className="w-full flex flex-col gap-3 pr-4">
