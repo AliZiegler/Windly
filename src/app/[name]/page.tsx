@@ -1,7 +1,7 @@
 import WriteReview from "@/app/components/productDetails/WriteReview";
 import { db } from "@/lib/db";
 import { mapRowToProduct } from "@/lib/mappers";
-import { productTable, userTable, reviewTable } from "@/db/schema";
+import { productTable, reviewTable, wishlistTable } from "@/db/schema";
 import { auth } from "@/auth";
 import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -43,14 +43,22 @@ export default async function Page(
     const aboutList = p.about.map((item: string) => <li key={item}>{item}</li>);
     const formattedPrice = salePrice(p.price, p.discount);
     const session = await auth();
-    let row = null;
-    let wishlist: number[] = [];
     let isWishlisted = false;
 
     if (session?.user?.id) {
-        row = await db.select({ wishlist: userTable.wishlist }).from(userTable).where(eq(userTable.id, session.user.id)).then((user) => user[0]);
-        wishlist = JSON.parse(row.wishlist || '[]');
-        isWishlisted = wishlist.includes(p.id);
+        // Check if product is in user's wishlist using wishlistTable
+        const wishlistItem = await db
+            .select()
+            .from(wishlistTable)
+            .where(
+                and(
+                    eq(wishlistTable.userId, session.user.id),
+                    eq(wishlistTable.productId, p.id)
+                )
+            )
+            .limit(1);
+
+        isWishlisted = wishlistItem.length > 0;
     }
 
     const userId = session?.user?.id;

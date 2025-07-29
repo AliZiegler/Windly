@@ -3,7 +3,7 @@ import { urlString } from "@/app/components/global/Atoms";
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { eq, and } from "drizzle-orm"
-import { userTable, productTable, reviewTable, addressTable } from "@/db/schema";
+import { userTable, productTable, reviewTable, addressTable, wishlistTable } from "@/db/schema";
 import type { InsertAddress } from "@/db/schema";
 import type { UpdateAddress, UpdateReview } from "@/app/components/global/Types";
 import { revalidatePath } from "next/cache";
@@ -72,16 +72,7 @@ export async function updateWishlist(productId: number) {
         if (!session?.user?.id) {
             throw new Error("Unauthorized");
         }
-
-        const users = await db
-            .select()
-            .from(userTable)
-            .where(eq(userTable.id, session.user.id))
-            .limit(1);
-
-        if (users.length === 0) {
-            throw new Error("User not found");
-        }
+        const userId = session.user.id;
 
         if (isNaN(productId)) {
             throw new Error("Invalid product ID");
@@ -97,25 +88,47 @@ export async function updateWishlist(productId: number) {
             throw new Error("Product not found");
         }
 
-        const currentWishlist: number[] = JSON.parse(users[0].wishlist || "[]");
-        const wishlist = [...currentWishlist];
+        const existingWishlistItem = await db
+            .select()
+            .from(wishlistTable)
+            .where(
+                and(
+                    eq(wishlistTable.userId, userId),
+                    eq(wishlistTable.productId, productId)
+                )
+            )
+            .limit(1);
 
-        const idx = wishlist.indexOf(productId);
-        if (idx !== -1) {
-            wishlist.splice(idx, 1);
+        if (existingWishlistItem.length > 0) {
+            await db
+                .delete(wishlistTable)
+                .where(
+                    and(
+                        eq(wishlistTable.userId, userId),
+                        eq(wishlistTable.productId, productId)
+                    )
+                );
         } else {
-            wishlist.push(productId);
+            await db
+                .insert(wishlistTable)
+                .values({
+                    userId: userId,
+                    productId: productId
+                });
         }
 
-        await db
-            .update(userTable)
-            .set({ wishlist: JSON.stringify(wishlist) })
-            .where(eq(userTable.id, session.user.id));
+        const updatedWishlist = await db
+            .select({ productId: wishlistTable.productId })
+            .from(wishlistTable)
+            .where(eq(wishlistTable.userId, userId));
+
+        const wishlistProductIds = updatedWishlist.map(item => item.productId);
+
         revalidatePath("/account/wishlist");
 
         return {
             success: true,
-            wishlist,
+            wishlist: wishlistProductIds,
         };
     } catch (error) {
         console.error("Error updating wishlist:", error);

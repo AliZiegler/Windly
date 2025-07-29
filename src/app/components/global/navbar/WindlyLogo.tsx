@@ -10,6 +10,7 @@ export default function WindlyLogo() {
                 width={80}
                 height={80}
                 className="cursor-pointer transition-transform hover:scale-105"
+                priority
             />
         </Link>
     );

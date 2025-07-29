@@ -7,12 +7,6 @@ import { urlString } from '@/app/components/global/Atoms';
 import Stars from '@/app/components/global/ReactStars';
 
 
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: '2-digit',
-});
-
 export default async function Reviews() {
     const session = await auth();
     if (!session?.user?.id) {
@@ -36,22 +30,22 @@ export default async function Reviews() {
         return <h1 className="font-bold text-xl">My Reviews</h1>;
     }
     const displayReviews = reviews.map(({ id, createdAt, productName, rating, reviewText }) => {
-        const formattedDate = dateFormatter.format(new Date(createdAt));
+        const formattedDate = (new Date(createdAt)).toLocaleString();
         const trimmedReview =
             reviewText.length > 50 ? reviewText.slice(0, 47) + '...' : reviewText;
 
         return (
-            <tr key={id} className="odd:bg-[#1c2129] even:bg-[#222831]">
+            <tr key={id} className="odd:bg-[#1c2129] even:bg-[#222831] xl:text-base text-sm">
                 <td className="p-2 align-top">{formattedDate}</td>
                 <td className="p-2 align-top">
                     <Link href={`/${urlString(productName)}`} className='hover:text-[#00CAFF] duration-200'>{productName}</Link>
                 </td>
                 <td className="p-2 align-top">
-                    <Stars value={rating} edit={false} count={5} size={25} />
+                    <Stars value={rating} edit={false} count={5} size={22} />
                 </td>
                 <td className="p-2 align-top">{trimmedReview}</td>
                 <td className="p-2 align-top">
-                    <Link href={`/account/reviews/${urlString(productName)}`} className='hover:text-[#00CAFF] duration-200'>View Details</Link>
+                    <Link href={`/account/reviews/${urlString(productName)}`} className="hover:text-[#00CAFF] duration-200 underline">View Details</Link>
                 </td>
             </tr>
         );
@@ -64,9 +58,9 @@ export default async function Reviews() {
                 <thead className="bg-[#1e232b] h-10 border-y-2 border-[#1c2129]">
                     <tr>
                         <th className="w-[15%] p-2">Date</th>
-                        <th className="2xl:w-1/2 w-[30%] p-2">Product Name</th>
-                        <th className="p-2 w-[10%]">Rating</th>
-                        <th className="p-2 w-[15%]">Review</th>
+                        <th className="2xl:w-[40%] w-[30%] p-2">Product Name</th>
+                        <th className="p-2 2xl:w-[10%] w-1/5 min-w-[105.25px]">Rating</th>
+                        <th className="p-2 2xl:w-[20%] w-1/4">Review</th>
                         <th className="p-2 w-[10%]">Action</th>
                     </tr>
                 </thead>

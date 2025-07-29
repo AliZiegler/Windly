@@ -63,14 +63,18 @@ export const userTable = sqliteTable("user", {
     gender: text("gender"),
     birthday: text("birthday"), // use date format: YYYY-MM-DD
     phone: text("phone"),
-    wishlist: text("wishlist").default("[]"), // JSON array: [productId, productId]
     orders: text("orders").default("[]"), // JSON array: [{ id, date, productId, quantity, price }]
     addressId: int("address_id"),
+    cartId: int("cart_id"),
+})
+export const wishlistTable = sqliteTable("wishlist", {
+    productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),
 })
 export const reviewTable = sqliteTable("review", {
     id: int().primaryKey({ autoIncrement: true }),
-    productId: int("product_id").notNull().references(() => productTable.id),
-    userId: text("user_id").notNull().references(() => userTable.id),
+    productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),
     rating: real("rating").notNull(),
     review: text("review").notNull(),
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
@@ -79,7 +83,7 @@ export const reviewTable = sqliteTable("review", {
 });
 export const addressTable = sqliteTable("address", {
     id: int("id").primaryKey({ autoIncrement: true }),
-    userId: text("user_id").notNull().references(() => userTable.id),
+    userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     country: text("country").notNull(),
     phone: text("phone").notNull(),
@@ -91,6 +95,22 @@ export const addressTable = sqliteTable("address", {
     addressType: text("address_type", { enum: ['home', 'office'] }).notNull(),
     updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 })
+export const cartTable = sqliteTable("cart", {
+    id: int("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    status: text("status", { enum: ['active', 'ordered'] }).notNull().default('active'),
+});
+
+export const cartItemTable = sqliteTable("cart_item", {
+    cartId: text("cart_id").notNull().references(() => cartTable.id, { onDelete: "cascade" }),
+    productId: int("product_id").notNull().references(() => productTable.id),
+    quantity: int("quantity").notNull().default(1),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (cartItem) => ({
+    pk: primaryKey({ columns: [cartItem.cartId, cartItem.productId] }),
+}));
 
 export const accountTable = sqliteTable(
     "account",

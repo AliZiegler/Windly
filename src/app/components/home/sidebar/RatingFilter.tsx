@@ -8,7 +8,7 @@ export default function RatingFilter() {
     const searchParams = useSearchParams();
     const rating = searchParams.get("rating") || 0;
     function ratingChanged(r: number): void {
-        if (r !== rating) {
+        if (r !== rating && r !== 0.5) {
             router.push(
                 `?${updateSearchParams(
                     searchParams,
