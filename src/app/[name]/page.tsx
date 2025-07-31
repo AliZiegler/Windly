@@ -7,11 +7,11 @@ import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import Stars from "@/app/components/global/ReactStars";
 import { salePrice } from "@/app/components/global/Atoms";
 import ColorSelect from "@/app/components/productDetails/ColorSelect";
 import PropsTable from "@/app/components/productDetails/PropsTable";
 import PurchaseBar from "@/app/components/productDetails/PurchaseBar";
+import AllReviews from "@/app/components/productDetails/AllRatings";
 import Heart from "@/app/components/global/Heart";
 
 export default async function Page(
@@ -46,7 +46,6 @@ export default async function Page(
     let isWishlisted = false;
 
     if (session?.user?.id) {
-        // Check if product is in user's wishlist using wishlistTable
         const wishlistItem = await db
             .select()
             .from(wishlistTable)
@@ -96,7 +95,7 @@ export default async function Page(
 
                     <span className="flex items-center gap-1">
                         <b className="mt-1.5">{p.rating}</b>
-                        <Stars value={p.rating} size={25} edit={false} />
+                        <AllReviews rating={p.rating} url={`/${name}/reviews`} />
                         {session && <Heart productId={p.id} size={25} isWishlisted={isWishlisted} className="ml-2 mt-0.5" />}
                     </span>
 
@@ -137,7 +136,7 @@ export default async function Page(
                     didReview={didUserReview}
                 />
             </div>
-            <WriteReview review={userReview} searchParams={spRecord} productId={p.id} userId={userId || ""} />
+            <WriteReview review={userReview} searchParams={spRecord} productId={p.id} productName={p.name} userId={userId || ""} />
         </div>
     );
 }

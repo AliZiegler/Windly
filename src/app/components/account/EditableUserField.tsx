@@ -72,7 +72,7 @@ export default function EditableField({
                             ))}
                         </select>
                     ) : (
-                        <span className="flex gap-1.5">
+                        <span className="flex gap-1.5 justify-center items-center">
                             <p className="text-[#FCECDD] font-bold">{field === "phone" && "+964 "}</p>
                             <input
                                 type={inputType}

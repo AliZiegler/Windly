@@ -70,7 +70,9 @@ export const userTable = sqliteTable("user", {
 export const wishlistTable = sqliteTable("wishlist", {
     productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),
     userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),
-})
+}, (table) => ({
+    pk: primaryKey(table.productId, table.userId),
+}))
 export const reviewTable = sqliteTable("review", {
     id: int().primaryKey({ autoIncrement: true }),
     productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),
@@ -81,6 +83,14 @@ export const reviewTable = sqliteTable("review", {
     updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
     helpfulCount: int("helpful_count").notNull().default(0),
 });
+export const helpfulTable = sqliteTable("helpful", {
+    reviewId: int("review_id").notNull().references(() => reviewTable.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),
+    createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
+}
+    , (table) => ({
+        pk: primaryKey(table.reviewId, table.userId),
+    }));
 export const addressTable = sqliteTable("address", {
     id: int("id").primaryKey({ autoIncrement: true }),
     userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),

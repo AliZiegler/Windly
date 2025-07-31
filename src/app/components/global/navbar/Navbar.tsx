@@ -11,8 +11,10 @@ export default async function Navbar() {
             <Suspense fallback={<FilterSkeleton />}>
                 <Search />
             </Suspense>
-            <SignIn />
-            <CartIcon />
+            <span className="flex gap-8 items-center justify-center">
+                <SignIn />
+                <CartIcon />
+            </span>
         </nav>
     );
 }

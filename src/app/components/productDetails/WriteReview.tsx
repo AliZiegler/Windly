@@ -2,7 +2,9 @@
 import Stars from "@/app/components/global/ReactStars";
 import { useEffect, useRef, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { addReview, updateReview } from "@/app/actions/UserActions"; // Assuming these are server actions
+import { urlString } from "@/app/components/global/Atoms";
+import Link from "next/link";
+import { addReview, updateReview } from "@/app/actions/UserActions";
 import { z } from "zod";
 
 type WriteReviewProps = {
@@ -16,13 +18,15 @@ type WriteReviewProps = {
         createdAt: string;
         updatedAt: string;
     } | null | undefined;
+    productName: string;
 }
 
 export default function WriteReview({
     searchParams,
     productId,
     userId,
-    review
+    review,
+    productName
 }: WriteReviewProps) {
     const router = useRouter();
     const ReviewShown = searchParams.review;
@@ -180,7 +184,10 @@ export default function WriteReview({
                         className="sr-only"
                     />
 
-                    <label htmlFor="review-textarea" className="text-2xl text-white font-medium mt-4">Review</label>
+                    <span className="mt-4 flex justify-between items-center">
+                        <label htmlFor="review-textarea" className="text-2xl text-white font-medium ">Review</label>
+                        <Link href={`/${urlString(productName)}/reviews`} className="text-sm text-gray-400 hover:underline cursor-pointer">See All Reviews</Link>
+                    </span>
                     <textarea
                         id="review-textarea"
                         name="review"

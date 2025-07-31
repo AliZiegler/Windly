@@ -2,14 +2,24 @@
 import { urlString } from "@/app/components/global/Atoms";
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
-import { eq, and } from "drizzle-orm"
-import { userTable, productTable, reviewTable, addressTable, wishlistTable } from "@/db/schema";
+import { eq, and, sql } from "drizzle-orm"
+import { userTable, productTable, reviewTable, addressTable, wishlistTable, helpfulTable } from "@/db/schema";
 import type { InsertAddress } from "@/db/schema";
 import type { UpdateAddress, UpdateReview } from "@/app/components/global/Types";
 import { revalidatePath } from "next/cache";
 
 const ALLOWED_FIELDS = ['name', 'phone', 'birthday', 'gender'] as const;
 type AllowedField = typeof ALLOWED_FIELDS[number];
+interface SqliteError extends Error {
+    code: string;
+}
+
+function isSqliteError(e: unknown): e is SqliteError {
+    return (
+        e instanceof Error &&
+        typeof (e).message === "string"
+    );
+}
 
 export async function updateUserField(field: AllowedField, value: string) {
     try {
@@ -209,7 +219,7 @@ export async function addReview(
             })
             .where(eq(productTable.id, productId));
 
-        revalidatePath(`/${urlString(productName?.name)}`);
+        revalidatePath("/[name]");
         revalidatePath("/account/reviews");
 
         return {
@@ -227,16 +237,82 @@ export async function addReview(
     }
 }
 
-export async function getProductReviews(productId: number) {
+export async function markReviewHelpful(
+    reviewId: number
+): Promise<{ success: boolean; error?: string }> {
     try {
+        const session = await auth();
+        const userId = session?.user?.id;
+
+        if (!userId) {
+            return { success: false, error: "You must be signed in to vote." };
+        }
+
+        const result = await db.transaction(async (tx) => {
+            try {
+                await tx.insert(helpfulTable).values({ reviewId, userId });
+
+                await tx
+                    .update(reviewTable)
+                    .set({ helpfulCount: sql`${reviewTable.helpfulCount} + 1` })
+                    .where(eq(reviewTable.id, reviewId));
+
+                return { success: true };
+            } catch (err: unknown) {
+                if (
+                    isSqliteError(err) &&
+                    (err.message.includes("UNIQUE constraint failed") ||
+                        err.code === "SQLITE_CONSTRAINT_UNIQUE")
+                ) {
+                    throw new Error("ALREADY_VOTED");
+                }
+                throw err;
+            }
+        });
+
+        revalidatePath("/[name]/reviews");
+        return result;
+
+    } catch (err: unknown) {
+        if (err instanceof Error && err.message === "ALREADY_VOTED") {
+            return { success: false, error: "You've already marked this review as helpful." };
+        }
+
+        console.error("Error marking review as helpful:", err);
+        return { success: false, error: "Failed to mark review as helpful. Please try again." };
+    }
+}
+
+export async function getProductReviews(identifier: number | string) {
+    try {
+        let productId: number;
+
+        if (typeof identifier === "string") {
+            const product = await db
+                .select({ id: productTable.id })
+                .from(productTable)
+                .where(eq(productTable.name, identifier))
+                .get();
+
+            if (!product) {
+                return { success: false, error: "Product not found" };
+            }
+
+            productId = product.id;
+        } else {
+            productId = identifier;
+        }
+
         const reviews = await db
             .select({
                 id: reviewTable.id,
                 rating: reviewTable.rating,
                 review: reviewTable.review,
                 createdAt: reviewTable.createdAt,
+                updatedAt: reviewTable.updatedAt,
                 userName: userTable.name,
-                userImage: userTable.image
+                userImage: userTable.image,
+                helpfulCount: reviewTable.helpfulCount
             })
             .from(reviewTable)
             .innerJoin(userTable, eq(reviewTable.userId, userTable.id))
