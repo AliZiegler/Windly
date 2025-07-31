@@ -8,7 +8,7 @@ type Params = {
     params: Promise<{ name: string }>
 }
 
-export async function handleHelpfulAction(formData: FormData) {
+async function handleHelpfulAction(formData: FormData) {
     "use server";
 
     const reviewId = formData.get("reviewId");
