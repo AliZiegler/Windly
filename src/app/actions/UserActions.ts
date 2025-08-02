@@ -351,6 +351,21 @@ export async function getUserReviews(userId: string) {
         return { success: false, error: "Failed to fetch user reviews" };
     }
 }
+export async function getUserHelpfulReviewsIds(userId: string | undefined) {
+    if (!userId) {
+        return { success: false, error: "User is Undefined" };
+    }
+    try {
+        const reviews = await db
+            .select({ reviewId: helpfulTable.reviewId })
+            .from(helpfulTable)
+            .where(eq(helpfulTable.userId, userId));
+        return { success: true, reviews };
+    } catch (error) {
+        console.error("Error fetching user helpful reviews:", error);
+        return { success: false, error: "Failed to fetch user helpful reviews" };
+    }
+}
 
 export async function canUserReview(productId: number, userId: string) {
     try {

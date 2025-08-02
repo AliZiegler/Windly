@@ -1,10 +1,10 @@
 import { db } from "@/lib/db";
-import { productTable } from "@/db/schema";
+import { productTable, reviewTable } from "@/db/schema";
 import { CATEGORIES } from "@/app/components/global/Atoms.ts";
 import Product from "@/app/components/home/Product.tsx";
 import { DisplayProduct } from "@/app/components/global/Types";
 import { reverseUrlString } from "@/app/components/global/Atoms";
-import { and, gte, lte, like, eq, inArray, not } from "drizzle-orm";
+import { and, gte, lte, like, eq, inArray, not, avg, count } from "drizzle-orm";
 
 type PageProps = {
     searchParams: Promise<{
@@ -20,7 +20,6 @@ type PageProps = {
 
 function sortProducts(products: DisplayProduct[], sort: string, reverse: boolean): DisplayProduct[] {
     const sortedProducts = [...products];
-
     switch (sort) {
         case "price":
             sortedProducts.sort((a, b) => {
@@ -46,7 +45,6 @@ function sortProducts(products: DisplayProduct[], sort: string, reverse: boolean
             });
             break;
     }
-
     return sortedProducts;
 }
 
@@ -61,15 +59,11 @@ export default async function Page({ searchParams }: PageProps) {
     const category = params.category || "all";
 
     const conditions = [];
-
     if (maxPrice < 12000) {
         conditions.push(lte(productTable.price, maxPrice));
     }
     if (minDiscount > 0) {
         conditions.push(gte(productTable.discount, minDiscount));
-    }
-    if (minRating > 0) {
-        conditions.push(gte(productTable.rating, minRating));
     }
     if (search) {
         conditions.push(like(productTable.name, `%${search}%`));
@@ -82,7 +76,7 @@ export default async function Page({ searchParams }: PageProps) {
         }
     }
 
-    const rawProducts = await db
+    const productsWithRatings = await db
         .select({
             id: productTable.id,
             name: productTable.name,
@@ -90,10 +84,26 @@ export default async function Page({ searchParams }: PageProps) {
             discount: productTable.discount,
             img: productTable.img,
             description: productTable.description,
-            rating: productTable.rating,
+            avgRating: avg(reviewTable.rating),
         })
         .from(productTable)
-        .where(conditions.length > 0 ? and(...conditions) : undefined);
+        .leftJoin(reviewTable, eq(productTable.id, reviewTable.productId))
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .groupBy(productTable.id);
+
+    let rawProducts: DisplayProduct[] = productsWithRatings.map(product => ({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        discount: product.discount,
+        img: product.img,
+        description: product.description,
+        rating: product.avgRating ? Number(product.avgRating) : 0,
+    }));
+
+    if (minRating > 0) {
+        rawProducts = rawProducts.filter(product => product.rating >= minRating);
+    }
 
     const Products = sortProducts(rawProducts, sort, reverse);
 

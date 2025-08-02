@@ -12,7 +12,6 @@
     "dependencies": {
         "@auth/drizzle-adapter": "^1.10.0",
         "@libsql/client": "^0.15.10",
-        "@opennextjs/cloudflare": "^1.6.2",
         "@types/react-stars": "^2.2.4",
         "dotenv": "^17.2.1",
         "drizzle-orm": "^0.44.4",
@@ -38,6 +37,6 @@
         "eslint-config-next": "15.3.3",
         "tailwindcss": "^4.1.11",
         "tsx": "^4.20.3",
-        "typescript": "^5.8.3"
+        "typescript": "^5.9.2"
     }
 }

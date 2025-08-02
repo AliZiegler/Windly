@@ -1,5 +1,6 @@
 import { reverseUrlString } from "@/app/components/global/Atoms"
-import { getProductReviews, markReviewHelpful } from "@/app/actions/UserActions"
+import { getProductReviews, getUserHelpfulReviewsIds, markReviewHelpful } from "@/app/actions/UserActions"
+import { auth } from "@/auth"
 import Image from "next/image"
 import Stars from "@/app/components/global/ReactStars"
 import Link from "next/link"
@@ -30,6 +31,10 @@ async function handleHelpfulAction(formData: FormData) {
 
 export default async function ReviewsPage({ params }: Params) {
     const { name } = await params
+    const session = await auth()
+    const userId = session?.user?.id
+    const userHelpfulReviewsIds = await getUserHelpfulReviewsIds(userId)
+    const helpfulIds = userHelpfulReviewsIds.reviews?.map(review => review.reviewId)
     const productName = reverseUrlString(name)
     const raw = await getProductReviews(productName)
     const reviews = raw.reviews
@@ -39,9 +44,11 @@ export default async function ReviewsPage({ params }: Params) {
 
     const overallRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
     const currentPath = `/${name}/reviews`
+    const writeReviewPath = `/${name}?review=shown`
 
     const displayReviews = reviews.map((review) => {
         const createdAt = new Date(review.createdAt)
+        const isHelpful = helpfulIds?.includes(review.id)
         return (
             <div key={review.id} className="flex flex-col gap-1">
                 <span className="flex gap-3 items-center">
@@ -65,7 +72,7 @@ export default async function ReviewsPage({ params }: Params) {
                         type="submit"
                         className="w-32 h-9 border border-gray-300 rounded-xl mt-2 cursor-pointer hover:font-bold disabled:opacity-50"
                     >
-                        Helpful
+                        Helpful {isHelpful && "✓"}
                     </button>
                 </form>
             </div>
@@ -79,7 +86,7 @@ export default async function ReviewsPage({ params }: Params) {
                     <h1 className="text-2xl font-bold">Customer Reviews</h1>
                     <span className="flex gap-3 items-center">
                         <Stars value={overallRating} edit={false} size={30} />
-                        <b className="text-xl">{Math.floor(overallRating)} out of 5</b>
+                        <b className="text-xl">{overallRating || 0} out of 5</b>
                     </span>
                     <p className="text-gray-300">{reviews.length} reviews</p>
                 </div>
@@ -98,9 +105,14 @@ export default async function ReviewsPage({ params }: Params) {
                         </h2>
                     </Link>
                 </div>
+                <Link href={writeReviewPath}
+                    className="text-xl font-bold self-center underline ml-auto hover:text-[#00CAFF] text-center duration-200 cursor-pointer"
+                >
+                    Write your own Review
+                </Link>
             </div>
             <hr />
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-8">
                 {displayReviews}
             </div>
         </div>

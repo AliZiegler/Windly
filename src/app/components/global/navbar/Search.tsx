@@ -29,11 +29,9 @@ export default function Search({
     useEffect(() => {
         if (!sizerRef.current || !selectRef.current) return;
 
-        // copy the selected label into the hidden sizer
         const label = CATEGORIES.find((cat) => urlString(cat) === selectedCategory) ?? selectedCategory;
         sizerRef.current.textContent = label;
 
-        // measure and set width (add space for padding + arrow)
         const measured = sizerRef.current.offsetWidth;
         selectRef.current.style.width = `${measured + 32}px`;
     }, [selectedCategory]);
@@ -74,7 +72,9 @@ export default function Search({
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     aria-label="Select category"
-                    className="inline-block h-[60px] px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="inline-block h-[60px] px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r
+                    border-gray-300 font-bold focus:outline-none focus:ring-2
+                    focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 >
                     {CATEGORIES.map((category) => (
                         <option key={category} value={urlString(category)}>
@@ -99,7 +99,9 @@ export default function Search({
 
             <button
                 type="submit"
-                className="bg-[#ECDFCC] h-[60px] w-[60px] flex items-center justify-center rounded-r-md border-l border-gray-300 hover:bg-[#E5D4B1] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 group"
+                className="bg-[#ECDFCC] h-[60px] w-[60px] flex items-center justify-center rounded-r-md border-l
+                border-gray-300 hover:bg-[#E5D4B1] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                transition-all duration-200 group"
                 aria-label="Search"
             >
                 <Image
