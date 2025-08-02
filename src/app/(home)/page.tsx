@@ -4,7 +4,7 @@ import { CATEGORIES } from "@/app/components/global/Atoms.ts";
 import Product from "@/app/components/home/Product.tsx";
 import { DisplayProduct } from "@/app/components/global/Types";
 import { reverseUrlString } from "@/app/components/global/Atoms";
-import { and, gte, lte, like, eq, inArray, not, avg, count } from "drizzle-orm";
+import { and, gte, lte, like, eq, inArray, not, avg } from "drizzle-orm";
 
 type PageProps = {
     searchParams: Promise<{
