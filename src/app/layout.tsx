@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next"
 import "@/app/globals.css";
 import Navbar from "@/app/components/global/navbar/Navbar";
 import { Ubuntu } from "next/font/google";
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <body className="h-screen bg-[#222831] text-[#FCECDD]">
                 <Navbar />
                 {children}
+                <Analytics />
             </body>
         </html>
     );

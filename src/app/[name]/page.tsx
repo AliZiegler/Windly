@@ -1,6 +1,7 @@
 import WriteReview from "@/app/components/productDetails/WriteReview";
 import { db } from "@/lib/db";
 import { mapRowToProduct } from "@/lib/mappers";
+import { getProductReviews } from "@/app/actions/UserActions";
 import { productTable, reviewTable, wishlistTable } from "@/db/schema";
 import { auth } from "@/auth";
 import { eq, and } from "drizzle-orm";
@@ -27,7 +28,10 @@ export default async function Page(
     const productName = name.replace(/-/g, " ");
     const rawP = await db.select().from(productTable).where(eq(productTable.name, productName)).limit(1);
     const p = mapRowToProduct(rawP[0]);
-
+    const rawReviews = await getProductReviews(productName)
+    const averageRating = rawReviews?.reviews?.length
+        ? rawReviews.reviews.reduce((acc, review) => acc + review.rating, 0) / rawReviews.reviews.length
+        : 0
     if (!p) return redirect("/");
     const spRecord = await searchParams;
     const sp = new URLSearchParams();
@@ -94,8 +98,8 @@ export default async function Page(
                     </Link>
 
                     <span className="flex items-center gap-1">
-                        <b className="mt-1.5">{p.rating}</b>
-                        <AllReviews rating={p.rating} url={`/${name}/reviews`} />
+                        <b className="mt-1.5">{averageRating}</b>
+                        <AllReviews rating={averageRating} url={`/${name}/reviews`} />
                         {session && <Heart productId={p.id} size={25} isWishlisted={isWishlisted} className="ml-2 mt-0.5" />}
                     </span>
 
