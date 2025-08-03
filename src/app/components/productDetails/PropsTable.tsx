@@ -10,9 +10,9 @@ export default function PropsTable({ p, className }: { p: ProductType, className
                 <tr>
                     <td className="font-bold">Dimensions:</td>
                     <td>
-                        {p.dimensionsLength} x {p.dimensionsWidth} x
+                        {p.dimensions.length} x {p.dimensions.width} x
                         {" "}
-                        {p.dimensionsHeight} cm
+                        {p.dimensions.height} cm
                     </td>
                 </tr>
                 <tr>
@@ -29,7 +29,7 @@ export default function PropsTable({ p, className }: { p: ProductType, className
                 </tr>
                 <tr>
                     <td className="font-bold">Date added:</td>
-                    <td>{p.dateAdded}</td>
+                    <td>{p.dateAdded.toLocaleDateString()}</td>
                 </tr>
                 <tr>
                     <td className="font-bold">Category:</td>

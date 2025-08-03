@@ -1,6 +1,6 @@
 import WriteReview from "@/app/components/productDetails/WriteReview";
 import { db } from "@/lib/db";
-import { mapRowToProduct } from "@/lib/mappers";
+import { parseProduct } from "@/lib/mappers";
 import { getProductReviews } from "@/app/actions/UserActions";
 import { productTable, reviewTable, wishlistTable } from "@/db/schema";
 import { auth } from "@/auth";
@@ -27,22 +27,13 @@ export default async function Page(
     const { name } = await params;
     const productName = name.replace(/-/g, " ");
     const rawP = await db.select().from(productTable).where(eq(productTable.name, productName)).limit(1);
-    const p = mapRowToProduct(rawP[0]);
+    const p = parseProduct(rawP[0])
     const rawReviews = await getProductReviews(productName)
     const averageRating = rawReviews?.reviews?.length
         ? rawReviews.reviews.reduce((acc, review) => acc + review.rating, 0) / rawReviews.reviews.length
         : 0
     if (!p) return redirect("/");
-    const spRecord = await searchParams;
-    const sp = new URLSearchParams();
-    for (const [key, value] of Object.entries(spRecord)) {
-        if (Array.isArray(value)) {
-            value.forEach((v) => sp.append(key, v));
-        } else if (value != null) {
-            sp.append(key, value);
-        }
-    }
-    sp.delete("name");
+    const sp = await searchParams;
 
     const aboutList = p.about.map((item: string) => <li key={item}>{item}</li>);
     const formattedPrice = salePrice(p.price, p.discount);
@@ -118,7 +109,7 @@ export default async function Page(
 
                     <div className="flex flex-col">
                         <h2 className="text-neutral-300">Colors:</h2>
-                        <ColorSelect product={p} searchParams={sp} />
+                        <ColorSelect colors={p.colors} searchParams={sp} />
                     </div>
 
                     <PropsTable p={p} className="mt-3" />
@@ -140,7 +131,7 @@ export default async function Page(
                     didReview={didUserReview}
                 />
             </div>
-            <WriteReview review={userReview} searchParams={spRecord} productId={p.id} productName={p.name} userId={userId || ""} />
+            <WriteReview review={userReview} searchParams={sp} productId={p.id} productName={p.name} userId={userId || ""} />
         </div>
     );
 }

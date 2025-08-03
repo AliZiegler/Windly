@@ -1,66 +1,42 @@
-import type { InferSelectModel } from "drizzle-orm";
-import { productTable } from "../db/schema";
-import { ProductType } from "../app/components/global/Types";
-
-type RawProductRow = InferSelectModel<typeof productTable>;
-
-export function mapRowToProduct(row: RawProductRow): ProductType {
-    return {
-        id: row.id,
-        name: row.name,
-        description: row.description,
-        rating: row.rating,
-        price: row.price,
-        category: row.category,
-        brand: row.brand,
-        discount: row.discount,
-
-        img: row.img ?? undefined,
-        imgAlt: row.imgAlt ?? undefined,
-
-        sku: row.sku,
-        stock: row.stock,
-        weight: row.weight,
-        dimensionsLength: row.dimensionsLength,
-        dimensionsWidth: row.dimensionsWidth,
-        dimensionsHeight: row.dimensionsHeight,
-
-        colors: JSON.parse(row.colors),
-        sizes: row.sizes ? JSON.parse(row.sizes) : undefined,
-        tags: JSON.parse(row.tags),
-
-        dateAdded: row.dateAdded,
-        lastUpdated: row.lastUpdated,
-
-        featured: row.featured as 0 | 1,
-        shippingFreeShipping: row.shippingFreeShipping as 0 | 1,
-        shippingEstimatedDays: row.shippingEstimatedDays,
-        shippingCost: row.shippingCost,
-
-        warrantyDuration: row.warrantyDuration,
-        warrantyType: row.warrantyType,
-
-        about: JSON.parse(row.about),
+import { SelectProduct } from "@/db/schema";
+import { ProductType } from "@/app/components/global/Types";
+export function parseProduct(product: SelectProduct): ProductType {
+    const parsedProduct = {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        rating: product.rating,
+        price: product.price,
+        category: product.category,
+        brand: product.brand,
+        discount: product.discount,
+        img: product.img,
+        imgAlt: product.imgAlt,
+        sku: product.sku,
+        stock: product.stock,
+        weight: product.weight,
+        dimensions: {
+            length: product.dimensionsLength,
+            width: product.dimensionsWidth,
+            height: product.dimensionsHeight
+        },
+        colors: JSON.parse(product.colors) as { colorName: string; colorHex: string }[],
+        sizes: product.sizes ? JSON.parse(product.sizes) as string[] : undefined,
+        tags: JSON.parse(product.tags) as string[],
+        dateAdded: new Date(product.dateAdded),
+        lastUpdated: new Date(product.lastUpdated),
+        featured: Boolean(product.featured),
+        shipping: {
+            freeShipping: Boolean(product.shippingFreeShipping),
+            estimatedDays: product.shippingEstimatedDays,
+            cost: product.shippingCost
+        },
+        warranty: {
+            duration: product.warrantyDuration,
+            type: product.warrantyType
+        },
+        about: JSON.parse(product.about) as string[]
     };
-}
-type ProductDisplayRow = {
-    id: number;
-    name: string;
-    price: number;
-    discount: number;
-    img: string | null;
-    description: string;
-    rating: number;
-};
 
-export function mapRowToProductDisplay(row: ProductDisplayRow): Pick<ProductType, 'id' | 'name' | 'price' | 'discount' | 'img' | 'description' | 'rating'> {
-    return {
-        id: row.id,
-        name: row.name,
-        description: row.description,
-        rating: row.rating,
-        price: row.price,
-        discount: row.discount,
-        img: row.img ?? undefined,
-    };
+    return parsedProduct;
 }

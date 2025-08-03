@@ -3,27 +3,24 @@
 import { Fragment } from "react";
 import { Tooltip } from "react-tooltip";
 import Link from "next/link";
-import { ProductType } from "@/app/components/global/Types";
-import { urlString } from "@/app/components/global/Atoms";
+import { updateSearchParams } from "@/app/components/global/Atoms";
 
 interface ColorSelectProps {
-    product: ProductType;
-    searchParams: URLSearchParams;
+    colors: { colorName: string; colorHex: string }[];
+    searchParams: Record<string, string | string[] | undefined>;
 }
 
-export default function ColorSelect({ product, searchParams }: ColorSelectProps) {
-    const baseParams = new URLSearchParams(searchParams);
-    baseParams.delete("name");
-    const firstColor = product.colors[0];
+export default function ColorSelect({ colors, searchParams }: ColorSelectProps) {
+    const firstColor = colors[0];
 
     return (
         <span className="flex gap-2 mt-2">
-            {product.colors.map((color: { colorName: string; colorHex: string }) => {
-                const params = new URLSearchParams(baseParams);
+            {colors.map((color: { colorName: string; colorHex: string }) => {
+                let params
                 if (color.colorName === firstColor.colorName) {
-                    params.delete("color");
+                    params = updateSearchParams(searchParams, "color", null)
                 } else {
-                    params.set("color", urlString(color.colorName.toLowerCase()));
+                    params = updateSearchParams(searchParams, "color", color.colorName.toLowerCase())
                 }
 
                 return (

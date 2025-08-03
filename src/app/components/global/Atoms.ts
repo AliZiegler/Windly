@@ -1,35 +1,35 @@
 export function updateSearchParams(
-    currentSearchParams: string | URLSearchParams,
+    input: URLSearchParams | Record<string, string | string[] | undefined>,
     key: string,
-    value: string | null | undefined,
+    value: string | null | undefined
 ): string {
-    const params = new URLSearchParams(currentSearchParams);
-    if (value === null || value === undefined || value === "") {
-        params.delete(key);
-    } else {
-        params.set(key, value);
-    }
-    const order = [
-        "search",
-        "category",
-        "price",
-        "discount",
-        "sort",
-        "reverse",
-    ];
-    const sortedParams = new URLSearchParams();
-    order.forEach((paramName) => {
-        if (params.has(paramName)) {
-            sortedParams.set(paramName, params.get(paramName)!);
-        }
-    });
-    for (const [paramName, paramValue] of params.entries()) {
-        if (!order.includes(paramName)) {
-            sortedParams.set(paramName, paramValue);
-        }
+    const entries: [string, string][] = input instanceof URLSearchParams
+        ? [...input.entries()]
+        : Object.entries(input).flatMap(([k, v]) =>
+            v == null
+                ? []
+                : Array.isArray(v)
+                    ? v.map((val) => [k, val] as [string, string])
+                    : [[k, v] as [string, string]]
+        );
+
+    const filtered = entries.filter(([k]) => k !== key);
+
+    if (value != null && value !== "") {
+        filtered.push([key, value]);
     }
 
-    return sortedParams.toString();
+    const order = ["search", "category", "price", "discount", "sort", "reverse"];
+    filtered.sort(([a], [b]) => {
+        const ia = order.indexOf(a);
+        const ib = order.indexOf(b);
+        if (ia !== -1 || ib !== -1) {
+            return (ia === -1 ? Infinity : ia) - (ib === -1 ? Infinity : ib);
+        }
+        return a.localeCompare(b);
+    });
+
+    return new URLSearchParams(filtered).toString();
 }
 export const ORIGINAL_MAX_PRICE = 12000;
 export function spacesToDashes(str: string): string {

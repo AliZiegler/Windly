@@ -13,21 +13,27 @@ export type ProductType = {
     sku: string;
     stock: number;
     weight: number; // in grams
-    dimensionsLength: number; // in cm
-    dimensionsWidth: number; // in cm
-    dimensionsHeight: number; // in cm
-    colors: { colorName: string; colorHex: string }[]; // stored as JSON string in DB
-    sizes?: string[]; // optional, stored as JSON string in DB
-    tags: string[]; // stored as JSON string in DB
-    dateAdded: string; // ISO string
-    lastUpdated: string; // ISO string
-    featured: 0 | 1;
-    shippingFreeShipping: 0 | 1;
-    shippingEstimatedDays: number;
-    shippingCost: number;
-    warrantyDuration: number; // in months
-    warrantyType: string;
-    about: string[]; // long descriptive points, stored as JSON string in DB
+    dimensions: {
+        length: number; // in cm
+        width: number; // in cm
+        height: number; // in cm
+    };
+    colors: { colorName: string; colorHex: string }[];
+    sizes?: string[];
+    tags: string[];
+    dateAdded: Date;
+    lastUpdated: Date;
+    featured: boolean;
+    shipping: {
+        freeShipping: boolean;
+        estimatedDays: number;
+        cost: number;
+    };
+    warranty: {
+        duration: number;
+        type: string;
+    };
+    about: string[];
 };
 export type searchParamsType = Promise<
     Record<string, string | string[] | undefined>

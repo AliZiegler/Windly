@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { ProductType } from "@/app/components/global/Types";
 import { salePrice, updateSearchParams } from "@/app/components/global/Atoms";
+
 type PurchaseBarProps = {
     p: ProductType;
-    searchParams: URLSearchParams;
+    searchParams: Record<string, string | string[] | undefined>;
     didReview: boolean;
     className?: string;
 }
 export default function PurchaseBar({ p, searchParams, didReview, className }: PurchaseBarProps) {
     const formattedPrice = salePrice(p.price, p.discount);
-    const isReviewShown = searchParams.get("review") === "shown";
+    const isReviewShown = searchParams.review === "shown";
     const ReviewShownParams = updateSearchParams(searchParams, "review", "shown");
     const ReviewHiddenParams = updateSearchParams(searchParams, "review", null);
     return (
@@ -18,9 +19,9 @@ export default function PurchaseBar({ p, searchParams, didReview, className }: P
                 <h1 className="text-3xl font-extralight">{formattedPrice}{p.discount > 0 && ","}</h1>
                 <b className="text-green-400 inline ml-1.5 mt-2.5 text-xl">{p.discount > 0 && `${p.discount}% off!`}</b>
             </span>
-            <aside className="text-sm text-gray-400">{p.shippingFreeShipping ? "Free Shipping!"
-                : `${p.shippingCost} Shipping & Import Charges to Your Country`}</aside>
-            <b className="text-lg">delivery in {p.shippingEstimatedDays} days</b>
+            <aside className="text-sm text-gray-400">{p.shipping.freeShipping ? "Free Shipping!"
+                : `${p.shipping.cost} Shipping & Import Charges to Your Country`}</aside>
+            <b className="text-lg">delivery in {p.shipping.estimatedDays} days</b>
             <h2 className="text-2xl text-green-500">In Stock</h2>
             <input type="number" min="1" max={p.stock / 2} className="w-48 h-12 border-2 border-gray-300 rounded-md text-center" />
             <span className="w-56 flex flex-col items-center mt-6 gap-4">
