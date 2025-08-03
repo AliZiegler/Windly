@@ -72,7 +72,6 @@ export default async function Page(
     return (
         <div className="flex flex-col gap-5">
             <div className="flex mt-20 gap-3">
-
                 <Image
                     src="/images/placeholder.png"
                     alt="Placeholder"

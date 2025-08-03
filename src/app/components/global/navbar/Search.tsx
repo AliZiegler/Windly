@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { updateSearchParams, urlString, CATEGORIES } from "@/app/components/global/Atoms";
+import { urlString, CATEGORIES } from "@/app/components/global/Atoms";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -45,25 +45,26 @@ export default function Search({
 
             if (search === currentSearch && category === currentCategory) return;
 
-            let newParams = updateSearchParams(searchParams, "search", urlString(search));
+            const newParams = new URLSearchParams(searchParams);
+            newParams.set("search", urlString(search));
             if (category !== "All") {
-                newParams = updateSearchParams(newParams, "category", category);
+                newParams.set("category", category);
             } else {
-                newParams = updateSearchParams(newParams, "category", null);
+                newParams.delete("category");
             }
 
             onSearchChange?.(search, category);
-            router.push(`/?${newParams}`);
+            router.push(`/?${newParams.toString()}`);
         },
-        [router, searchParams, currentSearch, currentCategory, onSearchChange, selectedCategory]
+        [router, currentSearch, currentCategory, onSearchChange, selectedCategory, searchParams]
     );
 
     return (
-        <form onSubmit={handleSubmit} className={`flex items-center w-[60%] ${className}`} role="search" aria-label="Product search">
+        <form onSubmit={handleSubmit} className={`flex items-center ${className}`} role="search" aria-label="Product search">
             <div className="relative inline-block">
                 <span
                     ref={sizerRef}
-                    className="invisible absolute whitespace-nowrap text-white text-center h-[60px] px-4 text-base font-sans font-normal"
+                    className="invisible absolute whitespace-nowrap text-white text-center h-[50px] md:h-[60px] px-3 md:px-4 text-sm md:text-base font-sans font-normal"
                 />
 
                 <select
@@ -72,9 +73,9 @@ export default function Search({
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     aria-label="Select category"
-                    className="inline-block h-[60px] px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r
+                    className="inline-block h-[50px] md:h-[60px] px-3 md:px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r
                     border-gray-300 font-bold focus:outline-none focus:ring-2
-                    focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm md:text-base"
                 >
                     {CATEGORIES.map((category) => (
                         <option key={category} value={urlString(category)}>
@@ -88,9 +89,11 @@ export default function Search({
                 name="search"
                 defaultValue={currentSearch}
                 type="text"
-                className="bg-[#F2F2F2] h-[60px] 2xl:w-[900px] xl-w-[700px] lg:w-[500px] sm:w-[400px] w-72 text-black
-                text-lg px-4 border-y border-gray-300 focus:outline-none focus:ring-2
-                focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="bg-[#F2F2F2] h-[50px] md:h-[60px] flex-1 md:flex-none 
+                md:2xl:w-[900px] md:xl:w-[700px] md:lg:w-[500px] md:sm:w-[400px] md:w-72 
+                text-black text-base md:text-lg px-3 md:px-4 border-y border-gray-300 
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                transition-all duration-200"
                 placeholder={placeholder}
                 aria-label="Search products"
                 autoComplete="off"
@@ -99,7 +102,7 @@ export default function Search({
 
             <button
                 type="submit"
-                className="bg-[#ECDFCC] h-[60px] w-[60px] flex items-center justify-center rounded-r-md border-l
+                className="bg-[#ECDFCC] h-[50px] md:h-[60px] w-[50px] md:w-[60px] flex items-center justify-center rounded-r-md border-l
                 border-gray-300 hover:bg-[#E5D4B1] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                 transition-all duration-200 group"
                 aria-label="Search"
@@ -109,7 +112,7 @@ export default function Search({
                     alt=""
                     width={40}
                     height={40}
-                    className="cursor-pointer group-hover:scale-110 transition-transform duration-200 sm:w-[40px] sm:h-[40px] w-[30px] h-[30px]"
+                    className="cursor-pointer group-hover:scale-110 transition-transform duration-200 w-[25px] h-[25px] md:w-[40px] md:h-[40px]"
                     priority={false}
                 />
             </button>
