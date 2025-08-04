@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import SignIn from "@/app/components/global/navbar/SignIn";
 import WindlyLogo from "@/app/components/global/navbar/WindlyLogo.tsx";
 import Search from "@/app/components/global/navbar/Search.tsx";
@@ -9,7 +10,10 @@ export default function Navbar() {
             {/* Desktop Layout */}
             <div className="hidden md:flex justify-evenly items-center w-full h-[80px]">
                 <WindlyLogo />
-                <Search />
+
+                <Suspense fallback={<div>Loading...</div>}>
+                    <Search />
+                </Suspense>
                 <span className="flex gap-8 items-center justify-center">
                     <SignIn />
                     <CartIcon />
@@ -26,7 +30,9 @@ export default function Navbar() {
                     </span>
                 </div>
                 <div className="px-4 pb-3 mt-2">
-                    <Search className="w-full" />
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Search className="w-full" />
+                    </Suspense>
                 </div>
             </div>
         </nav>

@@ -5,7 +5,7 @@ import { userTable } from "@/db/schema";
 import Image from "next/image"
 import EditableUserField from "@/app/components/account/EditableUserField"
 import SignOut from "@/app/components/global/SignOut"
-export default async function page() {
+export default async function Page() {
     const session = await auth();
     if (!session?.user?.id) {
         return <div>Unauthorized</div>;
