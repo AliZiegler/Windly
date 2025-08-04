@@ -27,12 +27,16 @@ export default async function Page(
     const { name } = await params;
     const productName = name.replace(/-/g, " ");
     const rawP = await db.select().from(productTable).where(eq(productTable.name, productName)).limit(1);
+    if (!rawP || rawP.length === 0) {
+        console.log(`Product not found: "${productName}"`);
+        return redirect("/");
+    }
     const p = parseProduct(rawP[0])
+    if (!p) return redirect("/");
     const rawReviews = await getProductReviews(productName)
     const averageRating = rawReviews?.reviews?.length
         ? rawReviews.reviews.reduce((acc, review) => acc + review.rating, 0) / rawReviews.reviews.length
         : 0
-    if (!p) return redirect("/");
     const sp = await searchParams;
 
     const aboutList = p.about.map((item: string) => <li key={item}>{item}</li>);

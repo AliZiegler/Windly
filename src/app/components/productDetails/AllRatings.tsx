@@ -4,7 +4,7 @@ import Stars from "@/app/components/global/ReactStars";
 import Link from "next/link";
 
 
-export default function AllRatings({ rating, url }: { rating: number; url: string }) {
+export default function AllRatings({ rating, url, size = 25 }: { rating: number; url: string, size?: number }) {
     return (
         <span className="cursor-pointer">
             <Link href={url}
@@ -14,7 +14,7 @@ export default function AllRatings({ rating, url }: { rating: number; url: strin
             >
                 <Stars
                     value={rating}
-                    size={25}
+                    size={size}
                     edit={false}
                     className="cursor-pointer"
                 />

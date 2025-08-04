@@ -1,7 +1,15 @@
 import { SelectProduct } from "@/db/schema";
 import { ProductType } from "@/app/components/global/Types";
-export function parseProduct(product: SelectProduct): ProductType | void {
+export function parseProduct(product: SelectProduct): ProductType {
     try {
+        if (!product) {
+            throw new Error('Product is undefined or null');
+        }
+
+        if (!product.id) {
+            console.error('Product missing id:', product);
+            throw new Error('Product missing required id field');
+        }
         const parsedProduct = {
             id: product.id,
             name: product.name,
@@ -42,7 +50,8 @@ export function parseProduct(product: SelectProduct): ProductType | void {
         return parsedProduct;
     }
     catch (error) {
-        console.error("Error parsing product:", error);
-        return
+        console.error('Error parsing product:', error);
+        console.error('Product data:', product);
+        throw error;
     }
 }

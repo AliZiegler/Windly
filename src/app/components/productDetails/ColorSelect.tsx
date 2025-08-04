@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import { Tooltip } from "react-tooltip";
 import Link from "next/link";
 import { updateSearchParams } from "@/app/components/global/Atoms";
+import { urlString } from "@/app/components/global/Atoms";
 
 interface ColorSelectProps {
     colors: { colorName: string; colorHex: string }[];
@@ -20,7 +21,7 @@ export default function ColorSelect({ colors, searchParams }: ColorSelectProps) 
                 if (color.colorName === firstColor.colorName) {
                     params = updateSearchParams(searchParams, "color", null)
                 } else {
-                    params = updateSearchParams(searchParams, "color", color.colorName.toLowerCase())
+                    params = updateSearchParams(searchParams, "color", urlString(color.colorName))
                 }
 
                 return (
@@ -30,7 +31,7 @@ export default function ColorSelect({ colors, searchParams }: ColorSelectProps) 
                             data-tooltip-content={color.colorName}
                             data-tooltip-place="bottom"
                             href={`?${params.toString()}`}
-                            className="block"
+                            replace
                         >
                             <div
                                 className="w-16 h-16 rounded-md border border-white"

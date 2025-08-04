@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { Suspense } from "react";
 import { productTable, reviewTable } from "@/db/schema";
 import { CATEGORIES } from "@/app/components/global/Atoms.ts";
 import Product from "@/app/components/home/Product.tsx";
@@ -108,10 +109,12 @@ export default async function Page({ searchParams }: PageProps) {
     const Products = sortProducts(rawProducts, sort, reverse);
 
     return (
-        <main className="flex flex-wrap gap-5 m-7">
-            {Products.map((product: DisplayProduct) => (
-                <Product key={product.id} {...product} />
-            ))}
-        </main>
+        <Suspense fallback={<div>Loading Products…</div>}>
+            <main className="flex flex-wrap gap-5 m-7">
+                {Products.map((product: DisplayProduct) => (
+                    <Product key={product.id} {...product} />
+                ))}
+            </main>
+        </Suspense>
     );
 }

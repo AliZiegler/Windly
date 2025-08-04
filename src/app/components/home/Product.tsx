@@ -1,74 +1,89 @@
 import Image from "next/image";
 import Link from "next/link";
-import Stars from "@/app/components/global/ReactStars.tsx";
+import Stars from "@/app/components/productDetails/AllRatings";
 import { urlString, applyDiscount } from "@/app/components/global/Atoms.ts";
 import { DisplayProduct } from "@/app/components/global/Types";
 
-export default function Product(props: DisplayProduct) {
+export default function Product({
+    name,
+    img,
+    price,
+    discount,
+    description,
+    rating,
+}: DisplayProduct) {
+    const numericPrice = Number(price);
+    const numericDiscount = Number(discount);
+    const finalPrice = applyDiscount(numericPrice, numericDiscount);
 
-    const price = Number(props.price);
-    const discount = Number(props.discount);
-    const finalePrice = applyDiscount(price, discount);
-    const formattedPrice = finalePrice.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+    const formatCurrency = (value: number) =>
+        value.toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
 
+    const formattedPrice = formatCurrency(finalPrice);
+    const originalPrice = formatCurrency(numericPrice);
 
-
-    const dashedName = urlString(props.name);
-    const productUrl = `/${dashedName}`;
+    const productUrl = `/${urlString(name)}`;
 
     return (
-        <div className="bg-[#1e232b] w-[300px] h-auto max-h-[700px]  flex flex-wrap flex-col gap-3 pl-6 py-6 pr-2">
-            <Link href={productUrl}>
-                <Image
-                    src={props.img || "/images/placeholder.png"}
-                    alt={props.name}
-                    width={254}
-                    height={254}
-                    className="text-center overflow-hidden cursor-pointer"
-                />
+        <div className="group flex flex-col bg-[#1e232b] w-48 lg:w-72 p-3 text-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
+            <Link href={productUrl} aria-label={`View product details for ${name}`}>
+                <div className="relative w-full aspect-square overflow-hidden rounded-md">
+                    <Image
+                        src={img || "/images/placeholder.png"}
+                        alt={name}
+                        fill
+                        style={{ objectFit: "contain" }}
+                        sizes="(max-width: 768px) 192px, 288px"
+                        className="transition-transform duration-300 group-hover:scale-105"
+                    />
+                </div>
             </Link>
 
-            <Link
-                href={productUrl}
-                className="font-extrabold text-2xl my-2 hover:text-[#00CAFF] duration-200 cursor-pointer"
-            >
-                {props.name}
-            </Link>
-
-            <p className="self-center font-bold hover:text-[#00CAFF] duration-200 cursor-pointer">
-                {props.description}
-            </p>
-            <Stars value={props.rating} size={35} edit={false} />
-
-            <span>
-                <Link
-                    href={productUrl}
-                    className="font-extralight text-3xl my-2 duration-200 inline cursor-pointer"
-                >
-                    <span className="hover:text-[#00CAFF]">
-                        {formattedPrice}
-                    </span>
-                    {props.discount > 0 && ","}
+            <div className="flex flex-col flex-grow mt-3">
+                <Link href={productUrl}>
+                    <h3 className="text-base font-semibold line-clamp-2 transition-colors duration-200 group-hover:text-[#00CAFF]">
+                        {name}
+                    </h3>
                 </Link>
-                {props.discount > 0 && (
-                    <b className="text-green-400 inline ml-1">
-                        a save of {discount}%!
-                    </b>
-                )}
-            </span>
 
-            <Link
-                href={productUrl}
-                className="bg-[#FCECDD] text-black font-bold py-1 px-1 text-nowrap
-                text-center rounded w-28 hover:bg-[#f9d7b8] transition-all duration-200 cursor-pointer block"
-            >
-                Add to Cart
-            </Link>
+                <p className="text-sm text-gray-400 line-clamp-2 mt-1 min-h-[2rem]">
+                    {description}
+                </p>
+
+                <div className="mt-2">
+                    <Stars rating={rating} url={`${productUrl}/reviews`} />
+                </div>
+
+                <div className="mt-auto pt-2 flex flex-col gap-1">
+                    {numericDiscount > 0 && (
+                        <div className="flex items-center gap-1">
+                            <span className="text-red-500 font-bold text-sm">
+                                -{numericDiscount}%
+                            </span>
+                            <span className="text-gray-500 line-through text-sm">
+                                {originalPrice}
+                            </span>
+                        </div>
+                    )}
+                    <div className="flex items-end justify-between">
+                        <span className="font-extrabold text-xl">
+                            {formattedPrice}
+                        </span>
+                        <Link
+                            href={productUrl}
+                            className="bg-[#FCECDD] text-black font-bold py-1.5 px-3 text-xs rounded-full transition-colors 
+                            duration-200 hover:bg-[#f9d7b8] focus:outline-none focus:ring-2 focus:ring-[#f9d7b8]"
+                        >
+                            Add to Cart
+                        </Link>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

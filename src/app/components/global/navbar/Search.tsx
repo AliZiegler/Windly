@@ -73,9 +73,9 @@ export default function Search({
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     aria-label="Select category"
-                    className="inline-block h-[50px] md:h-[60px] px-3 md:px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r
+                    className="inline-block h-[50px] md:h-[60px] px-2 md:px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r
                     border-gray-300 font-bold focus:outline-none focus:ring-2
-                    focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm md:text-base"
+                    focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-xs sm::text-sm md:text-base"
                 >
                     {CATEGORIES.map((category) => (
                         <option key={category} value={urlString(category)}>
@@ -89,7 +89,7 @@ export default function Search({
                 name="search"
                 defaultValue={currentSearch}
                 type="text"
-                className="bg-[#F2F2F2] h-[50px] md:h-[60px] flex-1 md:flex-none 
+                className="bg-[#F2F2F2] h-[50px] w-[200px] md:h-[60px] flex-1 md:flex-none 
                 md:2xl:w-[900px] md:xl:w-[700px] md:lg:w-[500px] md:sm:w-[400px] md:w-72 
                 text-black text-base md:text-lg px-3 md:px-4 border-y border-gray-300 
                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
