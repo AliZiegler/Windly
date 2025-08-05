@@ -31,7 +31,7 @@ export default function Navbar() {
                 </div>
                 <div className="px-4 pb-3 mt-2">
                     <Suspense fallback={<div>Loading...</div>}>
-                        <Search className="w-full" />
+                        <Search />
                     </Suspense>
                 </div>
             </div>

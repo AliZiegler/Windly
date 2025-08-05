@@ -11,6 +11,7 @@ export default function AllRatings({ rating, url, size = 25 }: { rating: number;
                 data-tooltip-id="allRatings"
                 data-tooltip-content="See All Reviews"
                 data-tooltip-place="bottom"
+                className="flex gap-1 items-start"
             >
                 <Stars
                     value={rating}
@@ -18,6 +19,7 @@ export default function AllRatings({ rating, url, size = 25 }: { rating: number;
                     edit={false}
                     className="cursor-pointer"
                 />
+                <b className="text-lg">⌄</b>
             </Link>
             <Tooltip id="allRatings" />
         </span>

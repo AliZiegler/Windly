@@ -81,7 +81,14 @@ export default async function Page(
                     alt="Placeholder"
                     height={450}
                     width={450}
-                    className="ml-32 mr-10 h-[460px] w-auto max-w-[460px]"
+                    className="hidden lg:block ml-32 mr-10 h-[460px] w-auto max-w-[460px]"
+                />
+                <Image
+                    src="/images/placeholder.png"
+                    alt="Placeholder"
+                    height={300}
+                    width={300}
+                    className="block lg:hidden ml-32 mr-10 h-[300px] w-auto max-w-[300px]"
                 />
 
                 <article className="flex flex-col gap-4">

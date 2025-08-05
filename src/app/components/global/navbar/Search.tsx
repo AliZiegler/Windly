@@ -73,9 +73,10 @@ export default function Search({
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     aria-label="Select category"
-                    className="inline-block h-[50px] md:h-[60px] px-2 md:px-4 cursor-pointer bg-[#697565] text-white text-center rounded-l-md border-r
+                    className="inline-block h-[50px] w-[60px] sm:w-[82px] md:h-[60px] px-2 md:px-4 cursor-pointer bg-[#697565]
+                    text-white text-center rounded-l-md border-r
                     border-gray-300 font-bold focus:outline-none focus:ring-2
-                    focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-xs sm::text-sm md:text-base"
+                    focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-xs sm:text-sm md:text-base"
                 >
                     {CATEGORIES.map((category) => (
                         <option key={category} value={urlString(category)}>

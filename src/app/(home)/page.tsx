@@ -48,6 +48,22 @@ function sortProducts(products: DisplayProduct[], sort: string, reverse: boolean
     }
     return sortedProducts;
 }
+function EmptyProducts({ searchTerm }: { searchTerm?: string }) {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[400px] px-4 text-center">
+            <div className="text-6xl sm:text-7xl md:text-8xl mb-4 opacity-20">📦</div>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
+                No Products Found
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-md">
+                {searchTerm
+                    ? `We couldn't find any products matching "${searchTerm}". Try adjusting your filters or search terms.`
+                    : "No products match your current filters. Try adjusting your search criteria."
+                }
+            </p>
+        </div>
+    );
+}
 
 export default async function Page({ searchParams }: PageProps) {
     const params = await searchParams;
@@ -110,10 +126,34 @@ export default async function Page({ searchParams }: PageProps) {
 
     return (
         <Suspense fallback={<div>Loading Products…</div>}>
-            <main className="flex flex-wrap gap-5 m-7">
-                {Products.map((product: DisplayProduct) => (
-                    <Product key={product.id} {...product} />
-                ))}
+            <main className="min-h-screen">
+                {Products.length > 0 && (
+                    <div className="px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 py-2 sm:py-3 border-b border-[#2a3038]">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <p className="text-gray-400 text-sm sm:text-base">
+                                Showing <span className="text-white font-semibold">{Products.length}</span> products
+                                {search && (
+                                    <span> for &quot;<span className="text-[#00CAFF]">{search}</span>&quot;</span>
+                                )}
+                            </p>
+                            <p className="text-gray-500 text-xs sm:text-sm">
+                                Sorted by {sort} {reverse && "(reverse)"}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {Products.length > 0 ? (
+                    <main className="flex flex-wrap justify-center sm:justify-start  gap-8 my-7 ml-5 min-[831px]:ml-20 mr-3">
+                        {Products.map((product: DisplayProduct) => (
+                            <Product key={product.id} {...product} />
+                        ))}
+                    </main>
+                ) : (
+                    <EmptyProducts searchTerm={search} />
+                )}
+
+                <div className="h-8 sm:h-12 md:h-16"></div>
             </main>
         </Suspense>
     );
