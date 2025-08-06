@@ -21,7 +21,7 @@ export default function PriceFilter() {
             ? updateSearchParams(searchParams, "price", null)
             : updateSearchParams(searchParams, "price", maxPrice.toString());
 
-        router.push(`?${newParams}`);
+        router.push(`?${newParams.toString()}`);
     }
     useEffect(() => {
         setMaxPrice(paramsPrice);

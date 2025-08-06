@@ -11,15 +11,15 @@ export default function SortBy() {
     function changeSort(event: React.ChangeEvent<HTMLSelectElement>): void {
         const newSort = event.target.value === "relevance" ? null : event.target.value;
         router.push(
-            `?${updateSearchParams(searchParams, "sort", newSort)
+            `?${updateSearchParams(searchParams, "sort", newSort).toString()
             }`,
         );
     }
     function flipReverse(): void {
         if (reverse === "false") {
-            router.push(`?${updateSearchParams(searchParams, "reverse", "true")}`);
+            router.push(`?${updateSearchParams(searchParams, "reverse", "true").toString()}`);
         } else {
-            router.push(`?${updateSearchParams(searchParams, "reverse", null)}`);
+            router.push(`?${updateSearchParams(searchParams, "reverse", null).toString()}`);
         }
     }
     return (

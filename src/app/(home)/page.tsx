@@ -144,7 +144,7 @@ export default async function Page({ searchParams }: PageProps) {
                 )}
 
                 {Products.length > 0 ? (
-                    <main className="flex flex-wrap justify-center sm:justify-start  gap-8 my-7 ml-5 min-[831px]:ml-20 mr-3">
+                    <main className="flex flex-wrap justify-center sm:justify-start  gap-8 my-7 ml-1 min-[831px]:ml-20 mr-1">
                         {Products.map((product: DisplayProduct) => (
                             <Product key={product.id} {...product} />
                         ))}

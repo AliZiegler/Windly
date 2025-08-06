@@ -19,7 +19,7 @@ export default function MobileSidebar() {
     const updateQueryParam = useCallback(
         (key: string, value: string | null) => {
             const newSearchParams = updateSearchParams(searchParams, key, value);
-            router.push(`?${newSearchParams}`);
+            router.push(`?${newSearchParams.toString()}`);
         },
         [router, searchParams]
     );

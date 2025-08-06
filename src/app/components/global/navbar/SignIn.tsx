@@ -28,7 +28,7 @@ export default async function SignIn() {
                     </button>
                 </form>
             ) : (
-                <Link href="/account" className="inline-block transition-transform hover:scale-105">
+                <Link href="/account" prefetch className="inline-block transition-transform hover:scale-105">
                     <div className={`${sizeClasses} relative rounded-full overflow-hidden`}>
                         <Image
                             src={session.user.image || "/images/placeholder.png"}

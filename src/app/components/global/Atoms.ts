@@ -2,7 +2,7 @@ export function updateSearchParams(
     input: URLSearchParams | Record<string, string | string[] | undefined>,
     key: string,
     value: string | null | undefined
-): string {
+): URLSearchParams {
     const entries: [string, string][] = input instanceof URLSearchParams
         ? [...input.entries()]
         : Object.entries(input).flatMap(([k, v]) =>
@@ -29,7 +29,7 @@ export function updateSearchParams(
         return a.localeCompare(b);
     });
 
-    return new URLSearchParams(filtered).toString();
+    return new URLSearchParams(filtered);
 }
 export const ORIGINAL_MAX_PRICE = 12000;
 export function spacesToDashes(str: string): string {

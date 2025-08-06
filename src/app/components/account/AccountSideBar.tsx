@@ -4,7 +4,7 @@ export default function AccountSideBar() {
     const links = ["Account Information", "Wishlist", "Address", "Reviews", "Orders"];
     const liLinks = links.map((link) => (
         <li key={link} className="border-b-1 border-gray-400 py-2 hover:font-extrabold">
-            <Link href={link === "Account Information" ? "/account" : `/account/${link.toLowerCase()}`}>{link}</Link></li>
+            <Link href={link === "Account Information" ? "/account" : `/account/${link.toLowerCase()}`} prefetch>{link}</Link></li>
     ))
     return (
         <div className="w-72 h-[340px] text-[#FCECDD] border-r-1 border-gray-400 pr-3">

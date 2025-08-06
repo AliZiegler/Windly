@@ -17,7 +17,7 @@ export default function DiscountFilter() {
             ? updateSearchParams(searchParams, "discount", String(minDiscount))
             : updateSearchParams(searchParams, "discount", null);
 
-        router.push(`?${newParams}`);
+        router.push(`?${newParams.toString()}`);
     }
     useEffect(() => {
         setMinDiscount(paramsDiscount);

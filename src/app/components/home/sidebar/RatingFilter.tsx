@@ -14,11 +14,11 @@ export default function RatingFilter() {
                     searchParams,
                     "rating",
                     r.toString(),
-                )
+                ).toString()
                 }`,
             );
         } else {
-            router.push(`?${updateSearchParams(searchParams, "rating", "")}`);
+            router.push(`?${updateSearchParams(searchParams, "rating", "").toString()}`);
         }
     }
 
