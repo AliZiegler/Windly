@@ -9,7 +9,7 @@ interface EditableFieldProps {
     className?: string;
     inputType?: 'text' | 'tel' | 'date' | 'email';
     placeholder?: string;
-    options?: string[]; // For select fields like gender
+    options?: string[];
 }
 
 export default function EditableField({
@@ -89,7 +89,7 @@ export default function EditableField({
             </span>
             <div className="flex gap-2 ml-auto">
                 {isEditing ? (
-                    <span className="pr-3 flex gap-3">
+                    <span className="pr-3 flex flex-col sm:flex-row my-2 gap-3">
                         <button
                             onClick={handleSave}
                             disabled={isSaving}

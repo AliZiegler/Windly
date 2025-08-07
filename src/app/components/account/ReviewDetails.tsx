@@ -17,49 +17,122 @@ type ReviewDetailsProps = {
 
 export default function ReviewDetails({ productName, name, fReview }: ReviewDetailsProps) {
     const { rating, review, createdAt, updatedAt, description } = fReview;
-    const formattedDate = createdAt.toLocaleString();
-    const formattedUpdateDate = updatedAt.toLocaleString();
-    const isUpdated = formattedDate !== formattedUpdateDate;
+
+    const formatDate = (date: Date) => date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    const formattedDate = formatDate(createdAt);
+    const formattedUpdateDate = formatDate(updatedAt);
+    const isUpdated = createdAt.getTime() !== updatedAt.getTime();
 
     return (
-        <div className="w-full flex flex-col gap-3 pr-4">
-            <h1 className="font-bold text-xl">Review Details</h1>
-            <span className="flex flex-col gap-3 w-full border-2 bg-[#393e46] border-[#1c2129] p-5">
-                <span className="flex gap-3 mb-5">
-                    <Link href={`/${name}`} className="cursor-pointer">
-                        <Image
-                            src="/images/placeholder.png"
-                            width={350}
-                            height={350}
-                            alt="Product Image"
-                            className="w-[473px] h-[350px]"
-                        />
-                    </Link>
-                    <span className="flex flex-col gap-7 w-full h-[350px] pt-10 pl-5">
-                        <span>
-                            <Link href={`/${name}`} className="cursor-pointer hover:text-[#00CAFF] duration-200">
-                                <h2 className="text-3xl font-bold mb-0.5">{productName}</h2>
+        <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
+            <div className="mb-6">
+                <h1 className="font-bold text-2xl sm:text-3xl text-white">Review Details</h1>
+            </div>
+
+            <div className="bg-[#393e46] border-2 border-[#1c2129] rounded-lg overflow-hidden shadow-lg">
+                <div className="p-4 sm:p-6">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                        <div className="flex-shrink-0">
+                            <Link
+                                href={`/${name}`}
+                                className="block group overflow-hidden rounded-lg bg-white/5 aspect-square w-full max-w-[300px] mx-auto lg:mx-0 lg:w-[300px]"
+                            >
+                                <Image
+                                    src="/images/placeholder.png"
+                                    width={300}
+                                    height={300}
+                                    alt={`${productName} product image`}
+                                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 p-4"
+                                />
                             </Link>
-                            <b className="text-md font-light text-gray-300">{description}</b>
-                        </span>
-                        <span className="flex gap-5">
-                            <b className="text-xl font-light mt-2.5">Your Rating:</b>
-                            <Stars value={rating} edit={false} count={5} size={30} />
-                        </span>
-                    </span>
-                </span>
-                <span className="flex justify-between items-center">
-                    <p>Your Review (submitted on {formattedDate} {isUpdated && `, updated on ${formattedUpdateDate}`})</p>
-                    <Link href="?edit=true">
-                        <button className="block bg-[#ffb100] px-4 py-1 rounded-lg font-bold text-black cursor-pointer">
-                            Edit
-                        </button>
-                    </Link>
-                </span>
-                <div className="text-lg font-light w-full h-auto p-3 border-1 border-[#1c2129]">
-                    {review}
+                        </div>
+
+                        <div className="flex-1 flex flex-col justify-center space-y-6">
+                            <div>
+                                <Link
+                                    href={`/${name}`}
+                                    className="group block"
+                                >
+                                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 
+                                        group-hover:text-[#00CAFF] transition-colors duration-200 line-clamp-2">
+                                        {productName}
+                                    </h2>
+                                </Link>
+                                <p className="text-sm sm:text-base text-gray-300 leading-relaxed line-clamp-3">
+                                    {description}
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+                                <span className="text-lg sm:text-xl font-medium text-white">
+                                    Your Rating:
+                                </span>
+                                <div className="flex items-center">
+                                    <Stars value={rating} edit={false} count={5} size={28} />
+                                    <span className="ml-2 text-lg font-medium text-[#00CAFF]">
+                                        {rating}/5
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </span>
+
+                {/* Divider */}
+                <div className="border-t border-[#1c2129]"></div>
+
+                {/* Review Section */}
+                <div className="p-4 sm:p-6">
+                    {/* Review Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                        <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-white mb-1">Your Review</h3>
+                            <div className="text-sm text-gray-400">
+                                <span>Submitted on {formattedDate}</span>
+                                {isUpdated && (
+                                    <span className="block sm:inline sm:ml-2 sm:before:content-['•'] sm:before:mx-2">
+                                        Updated on {formattedUpdateDate}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <Link
+                            href="?edit=true"
+                            className="inline-flex items-center justify-center bg-[#ffb100] hover:bg-[#e09d00] text-black font-semibold px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#ffb100] focus:ring-offset-2 focus:ring-offset-[#393e46] active:scale-95"
+                        >
+                            <svg
+                                className="w-4 h-4 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                            </svg>
+                            Edit Review
+                        </Link>
+                    </div>
+
+                    {/* Review Content */}
+                    <div className="bg-[#2a2f38] border border-[#1c2129] rounded-lg p-4 sm:p-5">
+                        <div className="text-base sm:text-lg leading-relaxed text-gray-100 whitespace-pre-wrap">
+                            {review}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

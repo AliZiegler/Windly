@@ -1,11 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Stars from "@/app/components/global/ReactStars";
-import { updateReview } from "@/app/actions/UserActions";
+import Stars from '@/app/components/global/ReactStars';
+import { updateReview } from '@/app/actions/UserActions';
+import { z } from 'zod';
+
+const ReviewUpdateSchema = z.object({
+    rating: z.number().int().min(1, 'Rating must be at least 1 star').max(5, 'Rating cannot be more than 5 stars'),
+    review: z.string().trim().min(3, 'Review must be at least 3 characters long').max(1000, 'Review cannot exceed 1000 characters'),
+    updatedAt: z.iso.datetime(),
+});
 
 type ReviewEditProps = {
     productName: string;
@@ -29,9 +36,18 @@ export default function ReviewEdit({ productName, name, fReview, userId }: Revie
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
-    const formattedDate = fReview.createdAt.toLocaleString();
-    const formattedUpdateDate = fReview.updatedAt.toLocaleString();
-    const isUpdated = formattedDate !== formattedUpdateDate;
+    const formatDate = (date: Date) =>
+        date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+
+    const formattedDate = formatDate(fReview.createdAt);
+    const formattedUpdateDate = formatDate(fReview.updatedAt);
+    const isUpdated = fReview.createdAt.getTime() !== fReview.updatedAt.getTime();
 
     const hasChanges = rating !== fReview.rating || review !== fReview.review;
 
@@ -39,17 +55,7 @@ export default function ReviewEdit({ productName, name, fReview, userId }: Revie
         e.preventDefault();
 
         if (!hasChanges) {
-            setError("No changes were made to the review.");
-            return;
-        }
-
-        if (rating < 1 || rating > 5) {
-            setError("Rating must be between 1 and 5 stars.");
-            return;
-        }
-
-        if (review.trim().length < 3) {
-            setError("Review must be at least 3 characters long.");
+            setError('No changes were made to the review.');
             return;
         }
 
@@ -57,17 +63,19 @@ export default function ReviewEdit({ productName, name, fReview, userId }: Revie
         setError(null);
         setSuccess(false);
 
-        try {
-            const data = {
-                rating,
-                review: review.trim(),
-                updatedAt: new Date().toISOString()
-            };
+        const formData = {
+            rating,
+            review: review.trim(),
+            updatedAt: new Date().toISOString(),
+        };
 
-            const result = await updateReview(data, fReview.id, userId);
+        try {
+            const validatedData = ReviewUpdateSchema.parse(formData);
+
+            const result = await updateReview(validatedData, fReview.id, userId);
 
             if (result?.success === false) {
-                setError(result.error || "Failed to update review");
+                setError(result.error || 'Failed to update review');
             } else {
                 setSuccess(true);
                 setTimeout(() => {
@@ -75,7 +83,11 @@ export default function ReviewEdit({ productName, name, fReview, userId }: Revie
                 }, 1500);
             }
         } catch (err) {
-            setError(`Failed to update review: ${err instanceof Error ? err.message : 'Unknown error'}`);
+            if (err instanceof z.ZodError) {
+                setError(err.message);
+            } else {
+                setError(`Failed to update review: ${err instanceof Error ? err.message : 'Unknown error'}`);
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -93,105 +105,182 @@ export default function ReviewEdit({ productName, name, fReview, userId }: Revie
 
     const handleCancel = () => {
         if (hasChanges) {
-            const confirmCancel = window.confirm("You have unsaved changes. Are you sure you want to cancel?");
+            const confirmCancel = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
             if (!confirmCancel) return;
         }
-        router.push("?");
+        router.push('?');
     };
 
     return (
-        <form className="w-full flex flex-col gap-3 pr-4" onSubmit={handleSubmit}>
-            <div className="w-full flex flex-col gap-3 pr-4">
-                <h1 className="font-bold text-xl">Edit Review</h1>
+        <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
+            <div className="mb-6">
+                <h1 className="font-bold text-2xl sm:text-3xl text-white">Edit Review</h1>
+            </div>
 
-                {error && (
-                    <div className="bg-red-500 text-white p-3 rounded mb-3">
-                        {error}
-                    </div>
-                )}
+            {error && (
+                <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-lg mb-6 flex items-start gap-3">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                        />
+                    </svg>
+                    <span>{error}</span>
+                </div>
+            )}
 
-                {success && (
-                    <div className="bg-green-500 text-white p-3 rounded mb-3">
-                        Review updated successfully! Redirecting...
-                    </div>
-                )}
+            {success && (
+                <div className="bg-green-500/20 border border-green-500 text-green-200 p-4 rounded-lg mb-6 flex items-start gap-3">
+                    <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                        />
+                    </svg>
+                    <span>Review updated successfully! Redirecting...</span>
+                </div>
+            )}
 
-                <span className="flex flex-col gap-3 w-full border-2 bg-[#393e46] border-[#1c2129] p-5">
-                    <span className="flex gap-3 mb-5">
-                        <Link href={`/${name}`} className="cursor-pointer">
-                            <Image
-                                src="/images/placeholder.png"
-                                width={350}
-                                height={350}
-                                alt="Product Image"
-                                className="w-[473px] h-[350px] object-cover"
-                            />
-                        </Link>
-                        <span className="flex flex-col gap-7 w-full h-[350px] pt-10 pl-5">
-                            <span>
-                                <Link href={`/${name}`} className="cursor-pointer hover:text-[#00CAFF] duration-200">
-                                    <h2 className="text-3xl font-bold mb-0.5">{productName}</h2>
-                                </Link>
-                                <b className="text-md font-light text-gray-300">{fReview.description}</b>
-                            </span>
-                            <span className="flex gap-5">
-                                <b className="text-xl font-light mt-2.5">Your Rating:</b>
-                                <Stars
-                                    value={rating}
-                                    edit={true}
-                                    count={5}
-                                    size={30}
-                                    onChange={handleRatingChange}
-                                />
-                            </span>
-                        </span>
-                    </span>
-
-                    <span className="flex justify-between items-center">
-                        <p>Your Review (submitted on {formattedDate} {isUpdated && `,updated on ${formattedUpdateDate}`})</p>
-                        <div className="flex gap-2">
-                            <button
-                                type="submit"
-                                disabled={isSubmitting || !hasChanges}
-                                className={`block px-4 py-1 rounded-lg font-bold text-white cursor-pointer transition-opacity ${hasChanges
-                                    ? 'bg-green-500 hover:bg-green-600'
-                                    : 'bg-gray-400 cursor-not-allowed'
-                                    } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            <form onSubmit={handleSubmit} className="bg-[#393e46] border-2 border-[#1c2129] rounded-lg overflow-hidden shadow-lg">
+                <div className="p-4 sm:p-6">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                        <div className="flex-shrink-0">
+                            <Link
+                                href={`/${name}`}
+                                className="block group overflow-hidden rounded-lg bg-white/5 aspect-square w-full max-w-[300px] mx-auto lg:mx-0 lg:w-[300px]"
                             >
-                                {isSubmitting ? 'Saving...' : 'Save Changes'}
-                            </button>
+                                <Image
+                                    src="/images/placeholder.png"
+                                    width={300}
+                                    height={300}
+                                    alt={`${productName} product image`}
+                                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 p-4"
+                                />
+                            </Link>
+                        </div>
+
+                        <div className="flex-1 flex flex-col justify-center space-y-6">
+                            <div>
+                                <Link href={`/${name}`} className="group block">
+                                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 group-hover:text-[#00CAFF] transition-colors duration-200 line-clamp-2">
+                                        {productName}
+                                    </h2>
+                                </Link>
+                                <p className="text-sm sm:text-base text-gray-300 leading-relaxed line-clamp-3">
+                                    {fReview.description}
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+                                <span className="text-lg sm:text-xl font-medium text-white">Your Rating:</span>
+                                <div className="flex items-center gap-2">
+                                    <Stars
+                                        value={rating}
+                                        edit={true}
+                                        count={5}
+                                        size={28}
+                                        onChange={handleRatingChange}
+                                    />
+                                    <span className="ml-2 text-lg font-medium text-[#00CAFF]">
+                                        {rating}/5
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="border-t border-[#1c2129]"></div>
+
+                <div className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-white mb-1">Edit Your Review</h3>
+                            <div className="text-sm text-gray-400">
+                                <span>Originally submitted on {formattedDate}</span>
+                                {isUpdated && (
+                                    <span className="block sm:inline sm:ml-2 sm:before:content-['•'] sm:before:mx-2">
+                                        Last updated on {formattedUpdateDate}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3">
                             <button
                                 type="button"
                                 onClick={handleCancel}
                                 disabled={isSubmitting}
-                                className="block bg-gray-500 hover:bg-gray-600 px-4 py-1 rounded-lg font-bold text-white
-                                cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="inline-flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-[#393e46] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                             >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
                                 Cancel
                             </button>
+
+                            <button
+                                type="submit"
+                                disabled={isSubmitting || !hasChanges}
+                                className={`inline-flex items-center justify-center font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#393e46] active:scale-95 disabled:hover:scale-100 ${hasChanges && !isSubmitting
+                                    ? 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500'
+                                    : 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                                    } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                            ></path>
+                                        </svg>
+                                        Saving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Save Changes
+                                    </>
+                                )}
+                            </button>
                         </div>
-                    </span>
-
-                    <textarea
-                        value={review}
-                        onChange={handleReviewChange}
-                        className="text-lg font-light w-full h-32 p-3 border-1 border-[#1c2129] bg-[#2a2f37] text-white
-                        resize-vertical rounded focus:outline-none focus:ring-2 focus:ring-[#00CAFF] focus:border-transparent"
-                        placeholder="Write your review..."
-                        maxLength={1000}
-                        minLength={3}
-                        required
-                        disabled={isSubmitting}
-                    />
-
-                    <div className="flex justify-between items-center text-sm text-gray-400">
-                        <span>Minimum 3 characters required</span>
-                        <span className={review.length > 950 ? 'text-yellow-500' : ''}>
-                            {review.length}/1000 characters
-                        </span>
                     </div>
-                </span>
-            </div>
-        </form>
+
+                    <div className="space-y-3">
+                        <textarea
+                            value={review}
+                            onChange={handleReviewChange}
+                            className="w-full h-32 sm:h-40 p-4 bg-[#2a2f38] border border-[#1c2129] rounded-lg text-white text-base leading-relaxed resize-vertical placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00CAFF] focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            placeholder="Share your thoughts about this product..."
+                            maxLength={1000}
+                            minLength={3}
+                            required
+                            disabled={isSubmitting}
+                        />
+
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-400">Minimum 3 characters required</span>
+                            <span
+                                className={`font-medium ${review.length > 950
+                                    ? 'text-yellow-400'
+                                    : review.length > 900
+                                        ? 'text-yellow-500'
+                                        : 'text-gray-400'
+                                    }`}
+                            >
+                                {review.length}/1000 characters
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     );
 }
