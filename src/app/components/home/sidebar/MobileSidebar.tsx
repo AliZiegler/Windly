@@ -71,14 +71,14 @@ export default function MobileSidebar() {
 
     return (
         <>
-            <div className="w-full h-14 bg-[#393e46] flex items-center justify-between px-4 border-t border-[#272D36]">
-                <div className="flex items-center gap-3">
+            <div className="w-full h-14 bg-[#393e46] flex items-center justify-around px-4 border-t border-[#272D36]">
+                <div className="flex w-full items-center gap-3">
                     <span className="text-white font-semibold text-sm">Sort:</span>
-                    <div className="flex items-center gap-1">
+                    <div className="flex w-1/2 items-center gap-1">
                         <select
                             value={sort}
                             onChange={handleSortChange}
-                            className="h-8 bg-[#697565] text-white text-sm px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="h-8 bg-[#697565] w-full min-w-[90px] text-white text-sm px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="relevance">Relevance</option>
                             <option value="price">Price</option>
@@ -87,7 +87,7 @@ export default function MobileSidebar() {
                         </select>
                         <button
                             onClick={handleReverseToggle}
-                            className="bg-[#FEBA17] h-8 w-8 flex items-center justify-center rounded hover:bg-[#e3a001] transition-colors duration-200"
+                            className="bg-[#FEBA17] h-8 w-8 min-w-8 flex items-center justify-center rounded hover:bg-[#e3a001] transition-colors duration-200"
                             aria-label={
                                 reverse === "true" ? "Sort ascending" : "Sort descending"
                             }
@@ -108,9 +108,10 @@ export default function MobileSidebar() {
                 </div>
                 <button
                     onClick={openSidebar}
-                    className="px-4 py-2 bg-[#697565] text-white font-semibold text-sm rounded hover:bg-[#5a6358] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-4 py-2 bg-[#697565] w-[40%] text-white font-semibold text-sm rounded 
+                    hover:bg-[#5a6358] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                    Filter
+                    Filters
                 </button>
             </div>
 
@@ -120,7 +121,8 @@ export default function MobileSidebar() {
                     onClick={closeSidebar}
                 >
                     <div
-                        className={`bg-[#222831] w-[85%] max-w-sm h-full overflow-y-auto shadow-xl transform transition-transform duration-300 ${isClosing ? "-translate-x-full" : "translate-x-0"
+                        className={`bg-[#222831] w-[85%] max-w-sm h-full overflow-y-auto shadow-xl transform transition-transform
+                                  duration-300 ${isClosing ? "-translate-x-full" : "translate-x-0"
                             }`}
                         onClick={(e) => e.stopPropagation()}
                     >

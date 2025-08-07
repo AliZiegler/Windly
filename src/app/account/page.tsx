@@ -12,7 +12,7 @@ export default async function Page() {
     }
     const user = await db.select().from(userTable).where(eq(userTable.id, session.user.id)).then((user) => user[0]);
     return (
-        <div className="w-5xl h-[550px] bg-none flex flex-col gap-5">
+        <div className="w-full max-w-6xl min-w-[333px] h-[550px] bg-none flex flex-col gap-5">
             <h1 className="text-2xl">Account Information</h1>
             <ul className="bg-[#393e46] border-2 border-[#1e232b]">
                 <li className="flex items-center gap-3 w-full h-auto border border-[#1e232b]">

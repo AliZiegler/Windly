@@ -35,7 +35,7 @@ export default async function Page() {
     }
     const displayAddreeses = userAddresses.map((address) => {
         return (
-            <div key={address.id} className="flex flex-col bg-[#393e46] p-4 rounded-xs mb-3">
+            <div key={address.id} className="flex w-full lg:w-auto flex-col bg-[#393e46] p-4 rounded-xs mb-3">
                 {address.id === defaultAddressId[0].addressId &&
                     <span className="bg-[#007bff] mb-2 font-extrabold text-sm text-center text-white px-2 py-0.5 rounded-lg w-20">Default</span>
                 }
@@ -85,7 +85,7 @@ export default async function Page() {
     })
     return (
         <>
-            <div className="felx w-[55%] pr-4 border-r-1 border-gray-400">
+            <div className="felx w-full lg:w-[55%] lg:pr-4 lg:border-r-1 border-gray-400">
                 <div className="flex flex-col gap-2">
                     <div className="flex w-full justify-between mb-1">
                         <h1 className="font-bold text-xl block">Address Book</h1>
@@ -96,9 +96,9 @@ export default async function Page() {
                     {...displayAddreeses}
                 </div>
             </div>
-            <span className="flex flex-col w-[25%] gap-3">
+            <span className="hidden lg:flex flex-col w-[25%] gap-3">
                 <h1 className="font-bold text-xl block">Default Address</h1>
-                <div className="flex flex-col bg-[#393e46] p-4 w-full max-h-56 rounded-xs mb-3">
+                <div className="flex flex-col bg-[#393e46] p-4 w-full max-h-60 rounded-xs mb-3">
                     <b className="font-bold text-lg">{defaultAddress.addressType === "home" ? "Home" : "Office"}</b>
                     <p className="my-2">{defaultAddress.name}</p>
                     <span>

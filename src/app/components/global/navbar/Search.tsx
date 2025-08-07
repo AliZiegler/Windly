@@ -46,8 +46,12 @@ export default function Search({
             if (search === currentSearch && category === currentCategory) return;
 
             const newParams = new URLSearchParams(searchParams);
-            newParams.set("search", urlString(search));
-            if (category !== "All") {
+            if (search !== "") {
+                newParams.set("search", urlString(search));
+            } else {
+                newParams.delete("search");
+            }
+            if (category.toLowerCase() !== "all") {
                 newParams.set("category", category);
             } else {
                 newParams.delete("category");
