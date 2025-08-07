@@ -34,7 +34,7 @@ export default async function Reviews() {
             <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
                 <div className="text-4xl mb-4 opacity-50">⭐</div>
                 <h1 className="font-bold text-2xl mb-2">My Reviews</h1>
-                <p className="text-gray-400">You haven't written any reviews yet.</p>
+                <p className="text-gray-400">You haven&apos;t written any reviews yet.</p>
             </div>
         );
     }
