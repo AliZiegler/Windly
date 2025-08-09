@@ -407,7 +407,12 @@ export async function updateReview(input: UpdateReview, reviewId: number, userId
     }
 }
 export async function addAddress(address: InsertAddress) {
-    const insertValues = { ...address, updatedAt: new Date().toISOString() };
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+    const userId = session.user.id;
+    const insertValues = { ...address, updatedAt: new Date().toISOString(), userId: userId };
     try {
         await db.insert(addressTable).values(insertValues);
         const userDefaultAddress = await db.select({ addressId: userTable.addressId }).from(userTable).where(eq(userTable.id, address.userId));
@@ -421,29 +426,26 @@ export async function addAddress(address: InsertAddress) {
         return { success: false, error: "Failed to add address. Please try again." };
     }
 }
-export async function updateAddress(
-    addressId: number,
-    input: UpdateAddress
-) {
-    const updateValues = {
-        ...input,
-        updatedAt: new Date().toISOString(),
-    };
+export async function updateAddress(addressId: number, input: UpdateAddress) {
+    if (!Object.keys(input).length) {
+        return { success: false, error: "No fields provided for update." };
+    }
 
     try {
         await db
             .update(addressTable)
-            .set(updateValues)
+            .set({
+                ...input,
+                updatedAt: new Date().toISOString(),
+            })
             .where(eq(addressTable.id, addressId));
 
         revalidatePath("/user/addresses");
+
         return { success: true };
     } catch (error) {
         console.error("Error updating address:", error);
-        return {
-            success: false,
-            error: "Failed to update address. Please try again.",
-        };
+        return { success: false, error: "Failed to update address. Please try again." };
     }
 }
 export async function setUserAddress(addressId: number, userId: string) {

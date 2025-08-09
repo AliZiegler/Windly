@@ -213,7 +213,10 @@ export default function ReviewEdit({ productName, name, fReview, userId }: Revie
                                 type="button"
                                 onClick={handleCancel}
                                 disabled={isSubmitting}
-                                className="inline-flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-[#393e46] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                className="inline-flex items-center cursor-pointer justify-center bg-gray-600 hover:bg-gray-700 text-white 
+                                font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 
+                                focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-[#393e46] active:scale-95 disabled:opacity-50 
+                                disabled:cursor-not-allowed disabled:hover:scale-100"
                             >
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -224,9 +227,11 @@ export default function ReviewEdit({ productName, name, fReview, userId }: Revie
                             <button
                                 type="submit"
                                 disabled={isSubmitting || !hasChanges}
-                                className={`inline-flex items-center justify-center font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#393e46] active:scale-95 disabled:hover:scale-100 ${hasChanges && !isSubmitting
-                                    ? 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500'
-                                    : 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                                className={`inline-flex items-center justify-center font-medium px-4 py-2 rounded-lg transition-all duration-200 
+                                            hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#393e46] active:scale-95 
+                                            disabled:hover:scale-100  ${hasChanges && !isSubmitting
+                                        ? 'bg-green-600 hover:bg-green-700 cursor-pointer text-white focus:ring-green-500'
+                                        : 'bg-gray-500 text-gray-300 cursor-not-allowed'
                                     } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {isSubmitting ? (

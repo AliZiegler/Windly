@@ -9,8 +9,16 @@ import Heart from "@/app/components/global/Heart";
 
 export default async function Page() {
     const session = await auth();
+
     if (!session?.user?.id) {
-        return <div>Need to Sign in</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center p-8 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+                    <h2 className="text-2xl font-semibold text-gray-200 mb-4">Authentication Required</h2>
+                    <p className="text-gray-400">Please sign in to view your wishlist</p>
+                </div>
+            </div>
+        );
     }
 
     const wishlistItems = await db
@@ -24,31 +32,77 @@ export default async function Page() {
 
     if (wishlistItems.length === 0) {
         return (
-            <div>
-                <h1 className="font-bold text-xl">My Wishlist</h1>
-                <p className="mt-4 text-gray-400">Your wishlist is empty</p>
+            <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-8">My Wishlist</h1>
+                    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 mb-6 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full flex items-center justify-center">
+                            <svg className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-xl sm:text-2xl font-semibold text-gray-200 mb-2">Your wishlist is empty</h2>
+                        <p className="text-gray-400 max-w-md">Start adding products you love to see them here</p>
+                    </div>
+                </div>
             </div>
         );
     }
 
-
     const DisplayProducts = wishlistItems.map((item) => (
-        <div key={item.productId} className="w-[350px] max-h-[450px] h-auto bg-[#2d3440] border-1 border-gray-400 rounded-xl my-2 p-7">
-            <span className="flex flex-col items-end mb-10">
-                <Heart productId={item.productId} isWishlisted={true} size={22} />
-                <Link href={`/${urlString(item.productName)}`} className="self-center" >
-                    <Image src="/images/placeholder.png" alt={item.productName} width={250} height={250} />
-                </Link>
-            </span>
-            <Link href={`/${urlString(item.productName)}`} className="text-xl font-light hover:text-[#00CAFF] duration-200">{item.productName}</Link>
+        <div
+            key={item.productId}
+            className="group relative bg-gradient-to-br from-[#2d3440] to-[#252a35] border border-gray-600/50 rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-400/30"
+        >
+            {/* Heart Icon - Top Right */}
+            <div className="absolute top-4 right-4 z-10">
+                <div className="p-2 bg-black/20 backdrop-blur-sm rounded-full transition-all duration-200 hover:bg-black/40">
+                    <Heart productId={item.productId} isWishlisted={true} size={20} />
+                </div>
+            </div>
+
+            {/* Product Image */}
+            <Link href={`/${urlString(item.productName)}`} className="block mb-4">
+                <div className="relative aspect-square w-full bg-gray-800/50 rounded-xl overflow-hidden group-hover:shadow-lg transition-all duration-300">
+                    <Image
+                        src="/images/placeholder.png"
+                        alt={item.productName}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
+            </Link>
+
+            {/* Product Name */}
+            <Link
+                href={`/${urlString(item.productName)}`}
+                className="block text-base sm:text-lg font-medium text-gray-200 hover:text-[#00CAFF] transition-colors duration-200 line-clamp-2"
+            >
+                {item.productName}
+            </Link>
         </div>
     ));
 
     return (
-        <div>
-            <h1 className="font-bold text-xl">My Wishlist</h1>
-            <div className="flex gap-10 flex-wrap">
-                {DisplayProducts}
+        <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-8">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-100">My Wishlist</h1>
+                    <div className="px-4 py-2 bg-blue-500/10 border border-blue-400/20 rounded-full">
+                        <span className="text-sm text-blue-300 font-medium">
+                            {wishlistItems.length} item{wishlistItems.length !== 1 ? 's' : ''}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Products Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+                    {DisplayProducts}
+                </div>
             </div>
         </div>
     );

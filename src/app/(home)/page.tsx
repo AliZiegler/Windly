@@ -95,7 +95,6 @@ export default async function Page({ searchParams }: PageProps) {
             conditions.push(eq(productTable.category, reverseUrlString(category)));
         }
     }
-
     const productsWithRatings = await db
         .select({
             id: productTable.id,
