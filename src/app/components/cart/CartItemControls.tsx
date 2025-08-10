@@ -3,7 +3,7 @@ import { useState, useTransition } from "react";
 import { updateCartItemQuantity, removeFromCart } from "@/app/actions/CartActions";
 
 interface CartItemControlsProps {
-    cartId: string;
+    cartId: number;
     productId: number;
     quantity: number;
     maxQuantity: number;

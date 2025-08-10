@@ -105,7 +105,7 @@ export default async function CartPage() {
         })
         .from(cartItemTable)
         .innerJoin(productTable, eq(cartItemTable.productId, productTable.id))
-        .where(eq(cartItemTable.cartId, userCart[0].id.toString()));
+        .where(eq(cartItemTable.cartId, userCart[0].id));
 
     if (!cartItems.length) {
         return (
@@ -222,15 +222,13 @@ export default async function CartPage() {
                                                 </div>
 
                                                 <div className="flex flex-row sm:flex-col items-center sm:items-end gap-4">
-                                                    {/* Quantity Controls */}
                                                     <CartItemControls
-                                                        cartId={userCart[0].id.toString()}
+                                                        cartId={userCart[0].id}
                                                         productId={item.productId}
                                                         quantity={item.quantity}
                                                         maxQuantity={Math.min(item.productStock, 10)}
                                                     />
 
-                                                    {/* Item Total */}
                                                     <div className="text-right">
                                                         <div className="text-lg font-bold text-gray-100">
                                                             ${itemTotal.toFixed(2)}

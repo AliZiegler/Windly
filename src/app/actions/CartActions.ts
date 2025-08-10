@@ -70,7 +70,7 @@ export async function updateCartItemQuantity(
     productId: number,
     quantity: number
 ) {
-    "use serer"
+    "use server"
     try {
         if (quantity < 1) {
             return await removeFromCart(cartId, productId);

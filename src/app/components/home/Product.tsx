@@ -5,7 +5,6 @@ import { urlString, applyDiscount } from "@/app/components/global/Atoms.ts";
 import { DisplayProduct } from "@/app/components/global/Types";
 
 export default function Product({
-    id,
     name,
     img,
     price,
@@ -28,10 +27,6 @@ export default function Product({
     const formattedPrice = formatCurrency(finalPrice);
     const originalPrice = formatCurrency(numericPrice);
     const productUrl = `/${urlString(name)}`;
-    async function handleAddToCart() {
-        "use server";
-        await addToCart(undefined, id);
-    }
 
     return (
         <article className="group flex flex-col bg-[#1e232b] rounded-lg shadow-md transition-all
@@ -85,7 +80,7 @@ export default function Product({
                                 {formattedPrice}
                             </span>
                         </div>
-                        <form action={handleAddToCart}>
+                        <form >
                             <button
                                 className="inline-flex items-center justify-center bg-[#FCECDD] text-black font-medium rounded-md
                             transition-all duration-200 hover:bg-[#f9d7b8] hover:scale-105 focus:outline-none focus:ring-2
