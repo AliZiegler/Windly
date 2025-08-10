@@ -86,7 +86,7 @@ export const reviewTable = sqliteTable("review", {
 export const helpfulTable = sqliteTable("helpful", {
     reviewId: int("review_id").notNull().references(() => reviewTable.id, { onDelete: "cascade" }),
     userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),
-    createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 }
     , (table) => ({
         pk: primaryKey(table.reviewId, table.userId),
@@ -114,10 +114,11 @@ export const cartTable = sqliteTable("cart", {
 });
 
 export const cartItemTable = sqliteTable("cart_item", {
-    cartId: text("cart_id").notNull().references(() => cartTable.id, { onDelete: "cascade" }),
+    cartId: int("cart_id").notNull().references(() => cartTable.id, { onDelete: "cascade" }),
     productId: int("product_id").notNull().references(() => productTable.id),
     quantity: int("quantity").notNull().default(1),
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 }, (cartItem) => ({
     pk: primaryKey({ columns: [cartItem.cartId, cartItem.productId] }),
 }));
@@ -180,3 +181,5 @@ export type SelectUser = typeof userTable.$inferSelect
 export type SelectReview = typeof reviewTable.$inferSelect
 export type SelectAddress = typeof addressTable.$inferSelect
 export type InsertAddress = typeof addressTable.$inferInsert
+export type SelectCart = typeof cartTable.$inferSelect
+export type InsertCart = typeof cartTable.$inferInsert

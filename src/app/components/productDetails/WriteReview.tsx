@@ -34,7 +34,6 @@ export default function WriteReview({
     const reviewRef = useRef<HTMLFormElement>(null);
 
     const didUserReview = !!review && typeof review.id === 'number';
-
     const reviewId = didUserReview ? review.id : undefined;
 
     const [rating, setRating] = useState(0);
@@ -47,7 +46,7 @@ export default function WriteReview({
         } else {
             setRating(0);
         }
-    }, [didUserReview, review?.rating, review]);
+    }, [didUserReview, review]);
 
     useEffect(() => {
         if (isReviewShown && reviewRef.current) {
@@ -160,54 +159,120 @@ export default function WriteReview({
     return (
         <>
             {isReviewShown && (
-                <form
-                    onSubmit={didUserReview ? handleUpdate : handleAdd}
-                    ref={reviewRef}
-                    className="bg-[#2a313c] p-8 flex flex-col gap-4 rounded-lg shadow-lg mx-auto my-8 max-w-3xl w-full"
-                >
-                    <h1 className="text-3xl text-white font-semibold mb-4">
-                        {didUserReview ? "Update Your Review" : "Write Your Own Review"}
-                    </h1>
-
-                    <Stars
-                        value={rating}
-                        edit={true}
-                        count={5}
-                        size={40}
-                        onChange={handleRatingChange}
-                    />
-                    <input
-                        name="rating"
-                        type="number"
-                        value={rating}
-                        readOnly
-                        className="sr-only"
-                    />
-
-                    <span className="mt-4 flex justify-between items-center">
-                        <label htmlFor="review-textarea" className="text-2xl text-white font-medium ">Review</label>
-                        <Link href={`/${urlString(productName)}/reviews`} className="text-sm text-gray-400 hover:underline cursor-pointer">See All Reviews</Link>
-                    </span>
-                    <textarea
-                        id="review-textarea"
-                        name="review"
-                        className="w-full h-40 border-2 border-gray-500 text-lg p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:border-blue-500 resize-y"
-                        defaultValue={didUserReview && review ? review.review : ""}
-                        placeholder="Share your thoughts about the product..."
-                    />
-
-                    {error && <div className="text-red-400 mt-2">{error}</div>}
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className={`bg-[#ffb100] h-12 rounded-lg text-[#2a313c] font-bold text-lg mt-6 transition-colors duration-200
-                            ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-[#e0a000] cursor-pointer"
-                            }`}
+                <div className="max-w-4xl mx-auto">
+                    <form
+                        onSubmit={didUserReview ? handleUpdate : handleAdd}
+                        ref={reviewRef}
+                        className="bg-[#22272f] border border-gray-600/50 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6"
                     >
-                        {loading ? "Submitting…" : (didUserReview ? "Update Review" : "Submit Review")}
-                    </button>
-                </form>
+                        <div className="text-center space-y-2">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+                                {didUserReview ? "Update Your Review" : "Share Your Experience"}
+                            </h2>
+                            <p className="text-gray-400">
+                                Help other customers by sharing your thoughts about this product
+                            </p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="text-center space-y-3">
+                                <label className="block text-lg font-semibold text-gray-200">
+                                    How would you rate this product?
+                                </label>
+                                <div className="flex justify-center">
+                                    <Stars
+                                        value={rating}
+                                        edit={true}
+                                        count={5}
+                                        size={45}
+                                        onChange={handleRatingChange}
+                                    />
+                                </div>
+                                {rating > 0 && (
+                                    <div className="flex items-center justify-center gap-2 text-gray-300">
+                                        <span className="text-2xl font-bold">{rating}</span>
+                                        <span>out of 5 stars</span>
+                                    </div>
+                                )}
+                            </div>
+                            <input
+                                name="rating"
+                                type="number"
+                                value={rating}
+                                readOnly
+                                className="sr-only"
+                            />
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <label htmlFor="review-textarea" className="text-lg font-semibold text-gray-200">
+                                    Write Your Review
+                                </label>
+                                <Link
+                                    href={`/${urlString(productName)}/reviews`}
+                                    className="text-sm text-blue-400 hover:text-blue-300 transition-colors duration-200 flex items-center gap-1"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    See All Reviews
+                                </Link>
+                            </div>
+
+                            <div className="relative">
+                                <textarea
+                                    id="review-textarea"
+                                    name="review"
+                                    className="w-full h-40 px-4 py-3 bg-gray-700 border-2 border-gray-600 rounded-xl text-white placeholder-gray-400 resize-y transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                                    defaultValue={didUserReview && review ? review.review : ""}
+                                    placeholder="What did you like or dislike about this product? What should other customers know before purchasing?"
+                                />
+                                <div className="absolute bottom-3 right-3 text-xs text-gray-500">
+                                    Max 1000 characters
+                                </div>
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="p-4 bg-red-500/10 border border-red-400/30 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span className="text-red-300 font-medium">{error}</span>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex justify-center pt-4">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className={`
+                                    px-8 py-4 rounded-xl font-bold text-lg transition-all duration-200
+                                    ${loading
+                                        ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                                        : "bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black hover:from-[#e0a000] hover:to-[#e08500] hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0"
+                                    }
+                                `}
+                            >
+                                {loading ? (
+                                    <div className="flex items-center gap-2">
+                                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>Submitting...</span>
+                                    </div>
+                                ) : (
+                                    didUserReview ? "Update Review" : "Submit Review"
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             )}
         </>
     );

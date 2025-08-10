@@ -406,7 +406,7 @@ export async function updateReview(input: UpdateReview, reviewId: number, userId
         return { success: false, error: "Failed to update review. Please try again." };
     }
 }
-export async function addAddress(address: InsertAddress) {
+export async function addAddress(address: Omit<InsertAddress, "userId">) {
     const session = await auth();
     if (!session?.user?.id) {
         throw new Error("Unauthorized");
@@ -415,7 +415,7 @@ export async function addAddress(address: InsertAddress) {
     const insertValues = { ...address, updatedAt: new Date().toISOString(), userId: userId };
     try {
         await db.insert(addressTable).values(insertValues);
-        const userDefaultAddress = await db.select({ addressId: userTable.addressId }).from(userTable).where(eq(userTable.id, address.userId));
+        const userDefaultAddress = await db.select({ addressId: userTable.addressId }).from(userTable).where(eq(userTable.id, userId));
         if (userDefaultAddress.length === 0 || !userDefaultAddress) {
             await db.update(userTable).set({ addressId: insertValues.id }).where(eq(userTable.id, insertValues.userId));
         }

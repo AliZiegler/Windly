@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 export function updateSearchParams(
     input: URLSearchParams | Record<string, string | string[] | undefined>,
     key: string,
@@ -32,6 +33,11 @@ export function updateSearchParams(
     return new URLSearchParams(filtered);
 }
 export const ORIGINAL_MAX_PRICE = 12000;
+export async function requireAuth(): Promise<string> {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+    return session.user.id;
+}
 export function spacesToDashes(str: string): string {
     return str.replace(/\s+/g, "-");
 }

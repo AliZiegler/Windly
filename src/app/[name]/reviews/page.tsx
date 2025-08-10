@@ -39,82 +39,237 @@ export default async function ReviewsPage({ params }: Params) {
     const raw = await getProductReviews(productName)
     const reviews = raw.reviews
 
-    if (!raw.success) return <h1>Failed to fetch reviews</h1>
-    if (!reviews) return <h1>No reviews found</h1>
+    if (!raw.success) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="text-center p-8 bg-red-500/10 border border-red-400/30 rounded-2xl max-w-md">
+                    <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h1 className="text-2xl font-bold text-red-300 mb-2">Failed to Load Reviews</h1>
+                    <p className="text-gray-400">Please try again later</p>
+                </div>
+            </div>
+        )
+    }
+
+    if (!reviews || reviews.length === 0) {
+        return (
+            <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+                <div className="max-w-6xl mx-auto">
+                    <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
+                        <Link href={`/${name}`} className="flex items-center gap-4 group">
+                            <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-800">
+                                <Image
+                                    src="/images/placeholder.png"
+                                    fill
+                                    alt="Product"
+                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                            </div>
+                            <div>
+                                <h1 className="text-xl sm:text-2xl font-bold text-gray-100 group-hover:text-[#00CAFF] transition-colors duration-200">
+                                    {productName}
+                                </h1>
+                                <p className="text-gray-400">Customer Reviews</p>
+                            </div>
+                        </Link>
+                    </div>
+
+                    <div className="text-center py-16">
+                        <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full flex items-center justify-center">
+                            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-200 mb-2">No Reviews Yet</h2>
+                        <p className="text-gray-400 mb-8 max-w-md mx-auto">
+                            Be the first to share your experience with this product
+                        </p>
+                        <Link
+                            href={`/${name}?review=shown`}
+                            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 transform hover:-translate-y-0.5"
+                        >
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Write First Review
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     const overallRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
     const currentPath = `/${name}/reviews`
     const writeReviewPath = `/${name}?review=shown`
 
+    const ratingCounts = [5, 4, 3, 2, 1].map(star => ({
+        star,
+        count: reviews.filter(review => Math.floor(review.rating) === star).length,
+        percentage: (reviews.filter(review => Math.floor(review.rating) === star).length / reviews.length) * 100
+    }))
+
     const displayReviews = reviews.map((review) => {
         const createdAt = new Date(review.createdAt)
         const isHelpful = helpfulIds?.includes(review.id)
+        const timeAgo = getTimeAgo(createdAt)
+
         return (
-            <div key={review.id} className="flex flex-col gap-1">
-                <span className="flex gap-3 items-center">
-                    <Image
-                        src={review.userImage || "/images/placeholder.png"}
-                        width={50}
-                        height={50}
-                        alt="User Profile"
-                        className="rounded-full"
-                    />
-                    <b>{review.userName}</b>
-                </span>
-                <Stars value={review.rating} edit={false} size={25} />
-                <p className="text-gray-400">Reviewed on {createdAt.toLocaleString()}</p>
-                <p>{review.review}</p>
-                <p className="text-gray-400">{review.helpfulCount} people found this helpful</p>
-                <form action={handleHelpfulAction}>
-                    <input type="hidden" name="reviewId" value={review.id} />
-                    <input type="hidden" name="currentPath" value={currentPath} />
-                    <button
-                        type="submit"
-                        className="w-32 h-9 border border-gray-300 rounded-xl mt-2 cursor-pointer hover:font-bold disabled:opacity-50"
-                    >
-                        Helpful {isHelpful && "✓"}
-                    </button>
-                </form>
+            <div key={review.id} className="border border-gray-700/50 rounded-2xl p-6 hover:border-gray-600/50 transition-all duration-300" style={{ backgroundColor: "#2a313c" }}>
+                <div className="flex items-start gap-4 mb-4">
+                    <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
+                        <Image
+                            src={review.userImage || "/images/placeholder.png"}
+                            fill
+                            alt={`${review.userName}'s profile`}
+                            className="object-cover"
+                        />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <h3 className="font-semibold text-gray-200 truncate">{review.userName}</h3>
+                            <time className="text-sm text-gray-400">{timeAgo}</time>
+                        </div>
+                        <div className="flex items-center gap-3 mt-1">
+                            <Stars value={review.rating} edit={false} size={20} />
+                            <span className="text-sm font-medium text-gray-300">{review.rating}/5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mb-4">
+                    <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{review.review}</p>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V9a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                        </svg>
+                        <span>{review.helpfulCount} people found this helpful</span>
+                    </div>
+
+                    {userId && (
+                        <form action={handleHelpfulAction}>
+                            <input type="hidden" name="reviewId" value={review.id} />
+                            <input type="hidden" name="currentPath" value={currentPath} />
+                            <button
+                                type="submit"
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 ${isHelpful
+                                    ? 'border-blue-400 bg-blue-500/10 text-blue-300'
+                                    : 'border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white hover:bg-gray-700/30'
+                                    }`}
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V9a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                </svg>
+                                <span className="font-medium">
+                                    {isHelpful ? 'Helpful ✓' : 'Helpful'}
+                                </span>
+                            </button>
+                        </form>
+                    )}
+                </div>
             </div>
         )
     })
 
     return (
-        <div className="flex flex-col w-full p-5 gap-8">
-            <div className="flex w-full gap-8">
-                <div className="flex flex-col">
-                    <h1 className="text-2xl font-bold">Customer Reviews</h1>
-                    <span className="flex gap-3 items-center">
-                        <Stars value={overallRating} edit={false} size={30} />
-                        <b className="text-xl">{overallRating || 0} out of 5</b>
-                    </span>
-                    <p className="text-gray-300">{reviews.length} reviews</p>
-                </div>
-                <div className="flex justify-center items-center gap-2">
-                    <Link href={`/${name}`} className="cursor-pointer">
-                        <Image
-                            src="/images/placeholder.png"
-                            width={100}
-                            height={100}
-                            alt="Product Image"
-                        />
+        <div className="min-h-screen" style={{ backgroundColor: "#222831" }}>
+            <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 gap-6">
+                    <Link href={`/${name}`} className="flex items-center gap-4 group">
+                        <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-800 shadow-lg">
+                            <Image
+                                src="/images/placeholder.png"
+                                fill
+                                alt="Product"
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-100 group-hover:text-[#00CAFF] transition-colors duration-200">
+                                {productName}
+                            </h1>
+                            <p className="text-gray-400 text-lg">Customer Reviews</p>
+                        </div>
                     </Link>
-                    <Link href={`/${name}`}>
-                        <h2 className="text-2xl font-bold hover:text-[#00CAFF] text-center duration-200 cursor-pointer">
-                            {productName}
+                    <Link
+                        href={writeReviewPath}
+                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Write Your Review
+                    </Link>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                    <div className="lg:col-span-1">
+                        <div className="border flex flex-col items-center border-gray-700/50 rounded-2xl p-6 text-center" style={{ backgroundColor: "#2a313c" }}>
+                            <div className="text-5xl font-bold text-gray-100 mb-2">
+                                {overallRating.toFixed(1)}
+                            </div>
+                            <Stars value={overallRating} edit={false} size={32} />
+                            <p className="text-gray-400 mt-2">
+                                Based on {reviews.length} review{reviews.length !== 1 ? 's' : ''}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="lg:col-span-2">
+                        <div className="border border-gray-700/50 rounded-2xl p-6" style={{ backgroundColor: "#2a313c" }}>
+                            <h3 className="text-lg font-semibold text-gray-200 mb-4">Rating Breakdown</h3>
+                            <div className="space-y-3">
+                                {ratingCounts.map(({ star, count, percentage }) => (
+                                    <div key={star} className="flex items-center gap-4">
+                                        <div className="flex items-center gap-1 w-12">
+                                            <span className="text-sm text-gray-300">{star}</span>
+                                            <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        </div>
+                                        <div className="flex-1 rounded-full h-2" style={{ backgroundColor: "#1a1f26" }}>
+                                            <div
+                                                className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full transition-all duration-500"
+                                                style={{ width: `${percentage}%` }}
+                                            />
+                                        </div>
+                                        <span className="text-sm text-gray-400 w-12">{count}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-2xl font-bold text-gray-100">
+                            All Reviews ({reviews.length})
                         </h2>
-                    </Link>
+                    </div>
+
+                    <div className="space-y-6">
+                        {displayReviews}
+                    </div>
                 </div>
-                <Link href={writeReviewPath}
-                    className="text-xl font-bold self-center underline ml-auto hover:text-[#00CAFF] text-center duration-200 cursor-pointer"
-                >
-                    Write your own Review
-                </Link>
-            </div>
-            <hr />
-            <div className="flex flex-col gap-8">
-                {displayReviews}
             </div>
         </div>
     )
+}
+
+function getTimeAgo(date: Date): string {
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+    if (diffInSeconds < 60) return 'Just now'
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`
+    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`
+    if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo ago`
+    return `${Math.floor(diffInSeconds / 31536000)}y ago`
 }

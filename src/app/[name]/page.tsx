@@ -39,7 +39,6 @@ export default async function Page(
         : 0
     const sp = await searchParams;
 
-    const aboutList = p.about.map((item: string) => <li key={item}>{item}</li>);
     const formattedPrice = salePrice(p.price, p.discount);
     const session = await auth();
     let isWishlisted = false;
@@ -74,79 +73,160 @@ export default async function Page(
     const didUserReview = userReview !== null;
 
     return (
-        <div className="flex flex-col gap-5 px-4 lg:px-16 xl:px-32">
-            <div className="flex flex-col lg:flex-row mt-10 lg:mt-20 gap-8 lg:gap-3 items-center lg:items-start">
-                {/* Product Image Section */}
-                <div className="mx-auto lg:mx-0">
-                    <Image
-                        src="/images/placeholder.png"
-                        alt="Placeholder"
-                        height={450}
-                        width={450}
-                        className="hidden lg:block h-auto w-auto max-w-full"
-                    />
-                    <Image
-                        src="/images/placeholder.png"
-                        alt="Placeholder"
-                        height={300}
-                        width={300}
-                        className="block lg:hidden h-auto w-auto max-w-full"
-                    />
+        <div className="min-h-screen bg-[#222831]">
+            <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-16 py-6 lg:py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-12">
+
+                    <div className="lg:col-span-5 xl:col-span-4">
+                        <div className="sticky top-6">
+                            <div className="relative group">
+                                <div className="aspect-square w-full max-w-lg mx-auto lg:max-w-none bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
+                                    <Image
+                                        src="/images/placeholder.png"
+                                        alt={p.name}
+                                        fill
+                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                                        priority
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                </div>
+
+                                <div className="flex justify-center mt-4 space-x-2">
+                                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                                    <div className="w-2 h-2 rounded-full bg-gray-600"></div>
+                                    <div className="w-2 h-2 rounded-full bg-gray-600"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="lg:col-span-4 xl:col-span-5">
+                        <article className="space-y-6">
+                            <div className="space-y-4">
+                                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-100 leading-tight">
+                                    {p.name}
+                                </h1>
+                                <p className="text-lg sm:text-xl text-gray-300 font-medium leading-relaxed">
+                                    {p.description}
+                                </p>
+                                <Link
+                                    href="/"
+                                    className="inline-flex items-center text-[#00CAFF] hover:text-blue-300 transition-colors duration-200 font-medium"
+                                >
+                                    <span className="mr-1">Visit the</span>
+                                    <span className="font-semibold">{p.brand}</span>
+                                    <span className="ml-1">store</span>
+                                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </Link>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-2xl font-bold text-gray-100">{averageRating.toFixed(1)}</span>
+                                    <AllReviews rating={averageRating} url={`/${name}/reviews`} size={28} />
+                                </div>
+                                {session && (
+                                    <div className="flex items-center">
+                                        <Heart
+                                            productId={p.id}
+                                            size={35}
+                                            isWishlisted={isWishlisted}
+                                            className="p-2 hover:bg-gray-700/50 rounded-full transition-colors duration-200"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent" />
+
+                            {/* Pricing */}
+                            <div className="space-y-2">
+                                <div className="flex flex-wrap items-baseline gap-3">
+                                    <span className="text-4xl sm:text-5xl font-bold text-gray-100">
+                                        {formattedPrice}
+                                    </span>
+                                    {p.discount > 0 && (
+                                        <div className="flex flex-col">
+                                            <span className="text-xl sm:text-2xl text-green-400 font-semibold">
+                                                {p.discount}% OFF
+                                            </span>
+                                            <span className="text-sm right-7 text-gray-400 line-through">
+                                                ${(p.price).toFixed(2)}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                                {p.discount > 0 && (
+                                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-500/10 border border-green-400/20">
+                                        <svg className="w-4 h-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                        </svg>
+                                        <span className="text-green-300 font-medium text-sm">
+                                            You save ${((p.price * p.discount) / 100).toFixed(2)}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Colors */}
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-semibold text-gray-200">Available Colors:</h3>
+                                <ColorSelect colors={p.colors} searchParams={sp} />
+                            </div>
+
+                            {/* Product Properties */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-gray-200">Product Details:</h3>
+                                <div className="bg-[#1e232b] rounded-xl p-4 border border-gray-700/50">
+                                    <PropsTable p={p} className="w-full" />
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent" />
+
+                            {/* About Section */}
+                            <div className="space-y-4">
+                                <h2 className="text-2xl sm:text-3xl font-bold text-gray-100">About this item</h2>
+                                <div className="bg-[#1e232b] rounded-xl p-6 border border-gray-700/30">
+                                    <ul className="space-y-3 text-gray-300">
+                                        {p.about.map((item: string) => (
+                                            <li key={item} className="flex items-start gap-3">
+                                                <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 flex-shrink-0"></div>
+                                                <span className="text-base leading-relaxed">{item}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    {/* Purchase Sidebar */}
+                    <div className="lg:col-span-3 xl:col-span-3">
+                        <div className="sticky top-6">
+                            <PurchaseBar
+                                p={p}
+                                searchParams={sp}
+                                className="bg-gradient-to-br from-[#21272f] to-[#1a1f26] border border-[#373c43] rounded-2xl p-6 shadow-2xl space-y-4"
+                                didReview={didUserReview}
+                            />
+                        </div>
+                    </div>
                 </div>
 
-                {/* Product Details Section */}
-                <article className="flex flex-col gap-4 w-full lg:w-auto">
-                    <h1 className="text-4xl sm:text-5xl">{p.name}</h1>
-                    <b className="text-lg sm:text-xl block">{p.description}</b>
-                    <Link href="/" className="text-[#00CAFF] hover:underline">
-                        Visit the {p.brand} store
-                    </Link>
-
-                    <span className="flex items-center gap-1">
-                        <b className="mt-1.5">{averageRating}</b>
-                        <AllReviews rating={averageRating} url={`/${name}/reviews`} />
-                        {session && <Heart productId={p.id} size={25} isWishlisted={isWishlisted} className="ml-2 mt-0.5" />}
-                    </span>
-
-                    <hr />
-
-                    <div className="flex flex-wrap items-center">
-                        <h1 className="text-3xl sm:text-4xl inline-block">
-                            {p.discount > 0 ? formattedPrice + "," : formattedPrice}
-                        </h1>
-                        {p.discount > 0 && (
-                            <span className="text-green-400 ml-1.5 mt-1 sm:mt-2.5 text-xl sm:text-2xl">
-                                a save of {p.discount}%
-                            </span>
-                        )}
-                    </div>
-
-                    <div className="flex flex-col">
-                        <h2 className="text-neutral-300">Colors:</h2>
-                        <ColorSelect colors={p.colors} searchParams={sp} />
-                    </div>
-
-                    <PropsTable p={p} className="mt-3" />
-
-                    <hr />
-
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold">About this item:</h1>
-                        <ul className="list-disc list-inside flex flex-col gap-1 mt-3 text-lg">
-                            {aboutList}
-                        </ul>
-                    </div>
-                </article>
-
-                {/* Purchase Bar Section */}
-                <PurchaseBar
-                    p={p}
-                    searchParams={sp}
-                    className="w-full lg:w-72 mt-8 lg:mt-0 bg-[#21272f] border-2 border-[#373c43] rounded-2xl p-5 flex flex-col gap-4 mx-auto lg:mx-0"
-                    didReview={didUserReview}
-                />
+                {/* Review Section */}
+                <div className="mt-12 lg:mt-16">
+                    <WriteReview
+                        review={userReview}
+                        searchParams={sp}
+                        productId={p.id}
+                        productName={p.name}
+                        userId={userId || ""}
+                    />
+                </div>
             </div>
-            <WriteReview review={userReview} searchParams={sp} productId={p.id} productName={p.name} userId={userId || ""} />
         </div>
     );
 }

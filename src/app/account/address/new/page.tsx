@@ -52,7 +52,6 @@ const Field = ({ label, name, type = "text", placeholder, required = true, child
 export default async function Page() {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Not authenticated");
-    const userId = session.user.id;
 
     async function handleSubmit(formData: FormData) {
         "use server";

@@ -8,57 +8,120 @@ type PurchaseBarProps = {
     didReview: boolean;
     className?: string;
 }
+
 export default function PurchaseBar({ p, searchParams, didReview, className }: PurchaseBarProps) {
     const formattedPrice = salePrice(p.price, p.discount);
     const isReviewShown = searchParams.review === "shown";
     const ReviewShownParams = updateSearchParams(searchParams, "review", "shown");
     const ReviewHiddenParams = updateSearchParams(searchParams, "review", null);
+
     return (
         <div className={className}>
-            <span className="flex">
-                <h1 className="text-3xl font-extralight">{formattedPrice}{p.discount > 0 && ","}</h1>
-                <b className="text-green-400 inline ml-1.5 mt-2.5 text-xl">{p.discount > 0 && `${p.discount}% off!`}</b>
-            </span>
-            <aside className="text-sm text-gray-400">{p.shipping.freeShipping ? "Free Shipping!"
-                : `${p.shipping.cost} Shipping & Import Charges to Your Country`}</aside>
-            <b className="text-lg">delivery in {p.shipping.estimatedDays} days</b>
-            <h2 className="text-2xl text-green-500">In Stock</h2>
-            <input type="number" min="1" max={p.stock / 2} className="w-48 h-12 border-2 border-gray-300 rounded-md text-center" />
-            <span className="w-56 flex flex-col items-center mt-6 gap-4">
-                <button
-                    className="block bg-[#ffb100] w-52 py-1 rounded-lg font-bold text-black hover:font-extrabold duration-100 cursor-pointer mt-2"
-                >Add to Cart</button>
-                <button
-                    className="block bg-[#E67514] w-52 py-1 rounded-lg font-bold text-black hover:font-extrabold duration-100 cursor-pointer mt-2"
-                >Buy Now</button>
-            </span>
-            <table>
-                <tbody className="flex flex-col gap-4">
-                    <tr className="flex gap-5">
-                        <td className="text-gray-400">Ships from</td>
-                        <td>Windly.com</td>
-                    </tr>
-                    <tr className="flex gap-5">
-                        <td className="text-gray-400">Sold By</td>
-                        <td>{p.brand}</td>
-                    </tr>
-                    <tr className="flex gap-5">
-                        <td className="text-gray-400">Returns</td>
-                        <td className="underline text-blue-300">
-                            <Link href="https://www.amazon.com/gp/help/customer/display.html?nodeId=GKM69DUUYKQWKWX7&ref_=dp_ret_policy">
-                                30-day refund/replacement
-                            </Link>
-                        </td>
-                    </tr>
-                    <tr className="flex gap-5">
-                        <td className="text-gray-400">Payment</td>
-                        <td>Secure transaction</td>
-                    </tr>
-                </tbody>
-            </table>
-            <hr className="mt-4 mr-2"></hr>
-            <Link className="w-52 h-9 rounded-lg mt-6 cursor-pointer border-2 border-gray-300 self-center flex items-center justify-center"
-                href={isReviewShown ? `?${ReviewHiddenParams.toString()}` : `?${ReviewShownParams.toString()}`} replace={true} >
+            <div className="space-y-2">
+                <div className="flex items-baseline gap-2">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-100">{formattedPrice}</h2>
+                    {p.discount > 0 && (
+                        <span className="text-green-400 text-lg font-semibold">
+                            {p.discount}% OFF
+                        </span>
+                    )}
+                </div>
+
+                <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M12 11L4 7" />
+                        </svg>
+                        <span className="text-sm text-gray-300">
+                            {p.shipping.freeShipping ? (
+                                <span className="text-green-400 font-semibold">Free Shipping!</span>
+                            ) : (
+                                `$${p.shipping.cost} shipping`
+                            )}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm text-gray-300">
+                            Delivery in <span className="font-semibold text-blue-300">{p.shipping.estimatedDays} days</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div className="flex items-center gap-2 p-3 bg-green-500/10 rounded-lg border border-green-400/20">
+                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-green-300 font-semibold">In Stock</span>
+                <span className="text-gray-400 text-sm">({p.stock} available)</span>
+            </div>
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Quantity:</label>
+                <div className="relative">
+                    <input
+                        type="number"
+                        min="1"
+                        max={Math.min(p.stock, 10)}
+                        defaultValue="1"
+                        className="w-full h-12 px-4 bg-gray-700 border border-gray-600 rounded-lg text-center text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
+                    />
+                    <div className="absolute right-14 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
+                        / {Math.min(p.stock, 10)}
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                <button className="w-full h-12 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-lg transition-all duration-200 hover:from-[#e0a000] hover:to-[#e08500] hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0">
+                    Add to Cart
+                </button>
+                <button className="w-full h-12 bg-gradient-to-r from-[#E67514] to-[#cc5500] text-black font-bold rounded-lg transition-all duration-200 hover:from-[#d06600] hover:to-[#b84400] hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0">
+                    Buy Now
+                </button>
+            </div>
+
+            <div className="space-y-3 pt-4 border-t border-gray-600/50">
+                <div className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Ships from</span>
+                        <span className="text-gray-200 font-medium">Windly.com</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Sold by</span>
+                        <span className="text-gray-200 font-medium">{p.brand}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Returns</span>
+                        <Link
+                            href="https://www.amazon.com/gp/help/customer/display.html?nodeId=GKM69DUUYKQWKWX7&ref_=dp_ret_policy"
+                            className="text-blue-300 hover:text-blue-200 transition-colors duration-200 font-medium"
+                        >
+                            30-day refund
+                        </Link>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Payment</span>
+                        <div className="flex items-center gap-1">
+                            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <span className="text-gray-200 font-medium">Secure</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Review Button */}
+            <Link
+                className="w-full h-12 rounded-lg mt-4 border-2 border-gray-500 hover:border-gray-400 flex items-center justify-center text-gray-200 hover:text-white transition-all duration-200 font-medium hover:bg-gray-700/30"
+                href={isReviewShown ? `?${ReviewHiddenParams.toString()}` : `?${ReviewShownParams.toString()}`}
+                replace={true}
+            >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
                 {didReview && !isReviewShown ? "Edit Review" : !didReview && !isReviewShown ? "Write Review" : "Hide Review"}
             </Link>
         </div>

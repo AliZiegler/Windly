@@ -13,9 +13,10 @@ interface ColorSelectProps {
 
 export default function ColorSelect({ colors, searchParams }: ColorSelectProps) {
     const firstColor = colors[0];
+    const selectedColor = searchParams.color as string;
 
     return (
-        <span className="flex gap-2 mt-2">
+        <div className="flex flex-wrap gap-3">
             {colors.map((color: { colorName: string; colorHex: string }) => {
                 let params
                 if (color.colorName === firstColor.colorName) {
@@ -23,6 +24,9 @@ export default function ColorSelect({ colors, searchParams }: ColorSelectProps) 
                 } else {
                     params = updateSearchParams(searchParams, "color", urlString(color.colorName))
                 }
+
+                const isSelected = selectedColor === urlString(color.colorName) ||
+                    (!selectedColor && color.colorName === firstColor.colorName);
 
                 return (
                     <Fragment key={color.colorName}>
@@ -32,16 +36,32 @@ export default function ColorSelect({ colors, searchParams }: ColorSelectProps) 
                             data-tooltip-place="bottom"
                             href={`?${params.toString()}`}
                             replace
+                            className="group relative"
                         >
-                            <div
-                                className="w-16 h-16 rounded-md border border-white"
-                                style={{ backgroundColor: color.colorHex }}
-                            />
+                            <div className={`
+                                relative w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 transition-all duration-200
+                                ${isSelected
+                                    ? 'border-blue-400 shadow-lg shadow-blue-400/30 scale-110'
+                                    : 'border-gray-400 hover:border-gray-300 hover:scale-105'
+                                }
+                                group-hover:shadow-lg
+                            `}>
+                                <div
+                                    className="w-full h-full rounded-full"
+                                    style={{ backgroundColor: color.colorHex }}
+                                />
+                                {isSelected && (
+                                    <div className="absolute inset-0 rounded-full border-2 border-white/30" />
+                                )}
+                            </div>
                         </Link>
-                        <Tooltip id={color.colorName} />
+                        <Tooltip
+                            id={color.colorName}
+                            className="!bg-gray-800 !text-gray-100 !border !border-gray-600 !rounded-lg !px-3 !py-2"
+                        />
                     </Fragment>
                 );
             })}
-        </span>
+        </div>
     );
 }
