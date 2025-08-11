@@ -31,7 +31,7 @@ export default function ReviewDetails({ productName, name, fReview }: ReviewDeta
     const isUpdated = createdAt.getTime() !== updatedAt.getTime();
 
     return (
-        <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
+        <div className="w-full mx-auto p-4 sm:p-6">
             <div className="mb-6">
                 <h1 className="font-bold text-2xl sm:text-3xl text-white">Review Details</h1>
             </div>

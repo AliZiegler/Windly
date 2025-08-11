@@ -63,7 +63,6 @@ export const userTable = sqliteTable("user", {
     gender: text("gender"),
     birthday: text("birthday"), // use date format: YYYY-MM-DD
     phone: text("phone"),
-    orders: text("orders").default("[]"), // JSON array: [{ id, date, productId, quantity, price }]
     addressId: int("address_id"),
     cartId: int("cart_id"), //default cart id
 })

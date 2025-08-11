@@ -54,66 +54,73 @@ export default function EditableField({
     }
 
     return (
-        <li className={className}>
-            <span className="flex flex-col m-2.5">
-                <h2 className="text-lg font-light">{label}</h2>
+        <div className={className}>
+            <div className="flex-1">
+                <h2 className="text-lg font-light text-[#FCECDD] mb-1">{label}</h2>
                 {isEditing ? (
-                    options ? (
-                        <select
-                            value={fieldValue}
-                            onChange={(e) => setFieldValue(e.target.value)}
-                            className="text-[#FCECDD] font-bold outline-none bg-transparent border-b border-[#FCECDD]"
-                        >
-                            <option value="">Select {label}</option>
-                            {options.map(option => (
-                                <option key={option} value={option} className="bg-[#393e46] text-[#FCECDD]">
-                                    {option}
-                                </option>
-                            ))}
-                        </select>
-                    ) : (
-                        <span className="flex gap-1.5 justify-center items-center">
-                            <p className="text-[#FCECDD] font-bold">{field === "phone" && "+964 "}</p>
-                            <input
-                                type={inputType}
+                    <div className="space-y-3">
+                        {options ? (
+                            <select
                                 value={fieldValue}
                                 onChange={(e) => setFieldValue(e.target.value)}
-                                placeholder={placeholder}
-                                className="text-[#FCECDD] font-bold outline-none bg-transparent border-b border-[#FCECDD]"
-                            />
-                        </span>
-                    )
+                                className="w-full sm:w-auto bg-[#2d323a] text-[#FCECDD] font-bold outline-none border-b-2 border-[#FCECDD] focus:border-[#00d4aa] transition-colors px-2 py-1"
+                            >
+                                {options.map(option => (
+                                    <option key={option} value={option} className="bg-[#2d323a] text-[#FCECDD]">
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : (
+                            <div className="flex items-center gap-1">
+                                {field === "phone" && (
+                                    <span className="text-[#FCECDD] font-bold">+964 </span>
+                                )}
+                                <input
+                                    type={inputType}
+                                    value={fieldValue}
+                                    onChange={(e) => setFieldValue(e.target.value)}
+                                    placeholder={placeholder}
+                                    className="w-full sm:w-auto bg-transparent text-[#FCECDD] font-bold outline-none border-b-2 border-[#FCECDD] focus:border-[#00d4aa] transition-colors px-2 py-1"
+                                />
+                            </div>
+                        )}
+
+                        <div className="flex flex-col sm:flex-row gap-2">
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                className="bg-[#32363d] hover:bg-[#404752] w-full sm:w-20 h-9 rounded-md font-bold cursor-pointer disabled:opacity-50 transition-colors text-[#FCECDD]"
+                            >
+                                {isSaving ? "..." : "Save"}
+                            </button>
+                            <button
+                                onClick={handleCancel}
+                                disabled={isSaving}
+                                className="bg-gray-600 hover:bg-gray-500 w-full sm:w-20 h-9 rounded-md font-bold cursor-pointer disabled:opacity-50 transition-colors text-[#FCECDD]"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
                 ) : (
-                    <p className="text-[#FCECDD] font-bold">{field === "phone" && "+964 "}{fieldValue || "-"}</p>
+                    <p className="text-[#FCECDD] font-bold">
+                        {field === "phone" && fieldValue && "+964 "}
+                        {fieldValue || "-"}
+                    </p>
                 )}
-            </span>
-            <div className="flex gap-2 ml-auto">
-                {isEditing ? (
-                    <span className="pr-3 flex flex-col sm:flex-row my-2 gap-3">
-                        <button
-                            onClick={handleSave}
-                            disabled={isSaving}
-                            className="bg-[#32363d] w-20 h-9 rounded-md font-bold cursor-pointer disabled:opacity-50"
-                        >
-                            {isSaving ? "..." : "Save"}
-                        </button>
-                        <button
-                            onClick={handleCancel}
-                            disabled={isSaving}
-                            className="bg-gray-500 w-20 h-9 rounded-md font-bold cursor-pointer disabled:opacity-50"
-                        >
-                            Cancel
-                        </button>
-                    </span>
-                ) : (
+            </div>
+
+            {!isEditing && (
+                <div className="flex-shrink-0 mt-4 sm:mt-0">
                     <button
                         onClick={handleEdit}
-                        className="bg-[#32363d] w-20 h-9 rounded-md font-bold cursor-pointer mr-3"
+                        className="bg-[#32363d] hover:bg-[#404752] w-full sm:w-20 h-9 rounded-md font-bold cursor-pointer transition-colors text-[#FCECDD]"
                     >
                         Edit
                     </button>
-                )}
-            </div>
-        </li>
+                </div>
+            )}
+        </div>
     );
 }
