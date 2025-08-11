@@ -35,12 +35,12 @@ export default function CartItemControls({
 
     return (
         <div className="flex flex-col gap-3">
-            {/* Quantity Controls */}
             <div className="flex items-center gap-2">
                 <button
                     onClick={() => updateQuantity(currentQuantity - 1)}
                     disabled={currentQuantity <= 1 || isPending}
-                    className="w-8 h-8 rounded-lg border border-gray-600 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    className="w-8 h-8 rounded-lg border border-gray-600 text-white font-bold disabled:opacity-50 
+                    disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
                     style={{ backgroundColor: "#1e252d" }}
                     onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = "#252c35")}
                     onMouseLeave={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = "#1e252d")}
@@ -55,7 +55,7 @@ export default function CartItemControls({
                 <button
                     onClick={() => updateQuantity(currentQuantity + 1)}
                     disabled={currentQuantity >= maxQuantity || isPending}
-                    className="w-8 h-8 rounded-lg border border-gray-600 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    className="w-8 h-8 rounded-lg border border-gray-600 text-white font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                     style={{ backgroundColor: "#1e252d" }}
                     onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = "#252c35")}
                     onMouseLeave={(e) => !e.currentTarget.disabled && (e.currentTarget.style.backgroundColor = "#1e252d")}
@@ -64,11 +64,10 @@ export default function CartItemControls({
                 </button>
             </div>
 
-            {/* Remove Button */}
             <button
                 onClick={removeItem}
                 disabled={isPending}
-                className="flex items-center justify-center gap-1 px-3 py-2 text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-300/50 rounded-lg transition-all duration-200 disabled:opacity-50 text-sm font-medium"
+                className="flex items-center justify-center gap-1 px-3 py-2 text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-300/50 rounded-lg transition-all duration-200 disabled:opacity-50 text-sm font-medium cursor-pointer"
                 style={{ backgroundColor: "transparent" }}
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -3,8 +3,10 @@ import Link from "next/link";
 import Stars from "@/app/components/productDetails/AllRatings";
 import { urlString, applyDiscount } from "@/app/components/global/Atoms.ts";
 import { DisplayProduct } from "@/app/components/global/Types";
+import { addToCart } from "@/app/actions/CartActions";
 
 export default function Product({
+    id,
     name,
     img,
     price,
@@ -27,6 +29,10 @@ export default function Product({
     const formattedPrice = formatCurrency(finalPrice);
     const originalPrice = formatCurrency(numericPrice);
     const productUrl = `/${urlString(name)}`;
+    async function handleAddToCart() {
+        "use server"
+        await addToCart(id, undefined, 1);
+    }
 
     return (
         <article className="group flex flex-col bg-[#1e232b] rounded-lg shadow-md transition-all
@@ -80,9 +86,10 @@ export default function Product({
                                 {formattedPrice}
                             </span>
                         </div>
-                        <form >
+                        <form action={handleAddToCart}>
                             <button
-                                className="inline-flex items-center justify-center bg-[#FCECDD] text-black font-medium rounded-md
+                                type="submit"
+                                className="inline-flex items-center justify-center bg-[#FCECDD] cursor-pointer text-black font-medium rounded-md
                             transition-all duration-200 hover:bg-[#f9d7b8] hover:scale-105 focus:outline-none focus:ring-2
                             focus:ring-[#f9d7b8] focus:ring-offset-1 focus:ring-offset-[#1e232b] active:scale-95 text-xs px-2 
                             py-1 flex-shrink-0 min-w-[50px] max-w-[90px]"

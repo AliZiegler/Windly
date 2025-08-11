@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 export function updateSearchParams(
     input: URLSearchParams | Record<string, string | string[] | undefined>,
     key: string,

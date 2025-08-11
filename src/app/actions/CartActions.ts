@@ -23,8 +23,8 @@ async function requireAuth(): Promise<string> {
     return session.user.id;
 }
 
-export async function setUserCartId(userId: string, cartId: number) {
-    "use server"
+export async function setUserCartId(cartId: number) {
+    const userId = await requireAuth();
     try {
         await db.update(userTable)
             .set({ cartId })
@@ -37,7 +37,6 @@ export async function setUserCartId(userId: string, cartId: number) {
 }
 
 export async function createCart() {
-    "use server"
     const userId = await requireAuth();
     const now = nowISO();
 
@@ -70,7 +69,6 @@ export async function updateCartItemQuantity(
     productId: number,
     quantity: number
 ) {
-    "use server"
     try {
         if (quantity < 1) {
             return await removeFromCart(cartId, productId);
@@ -89,7 +87,6 @@ export async function updateCartItemQuantity(
 }
 
 export async function removeFromCart(cartId: number, productId: number) {
-    "use server"
     try {
         await db.delete(cartItemTable)
             .where(cartItemCondition(cartId, productId));
@@ -103,15 +100,13 @@ export async function removeFromCart(cartId: number, productId: number) {
 }
 
 export async function addToCart(
-    cartId: number | undefined,
     productId: number,
+    cartId: number | undefined,
     quantity: number = 1
 ) {
-    "use server"
     try {
         let finalCartId = cartId;
 
-        // If no cartId is provided, check the user's record for a default cartId.
         if (!finalCartId) {
             const userId = await requireAuth();
             const user = await db.select().from(userTable).where(eq(userTable.id, userId)).limit(1);
@@ -119,12 +114,12 @@ export async function addToCart(
             if (user.length > 0 && user[0].cartId) {
                 finalCartId = user[0].cartId;
             } else {
-                // If the user has no cartId, create a new cart.
                 const result = await createCart();
                 if (!result.success || !result.cartId) {
                     return { success: false, error: "Failed to create a new cart." };
                 }
                 finalCartId = result.cartId;
+                await setUserCartId(finalCartId);
             }
         }
 
@@ -160,7 +155,6 @@ export async function addToCart(
 }
 
 export async function clearCart(cartId: number) {
-    "use server"
     try {
         await db.delete(cartItemTable)
             .where(eq(cartItemTable.cartId, cartId));
@@ -174,7 +168,6 @@ export async function clearCart(cartId: number) {
 }
 
 export async function getCartItemCount(cartId: number): Promise<number> {
-    "use server"
     try {
         const items = await db.select()
             .from(cartItemTable)

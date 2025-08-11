@@ -65,7 +65,7 @@ export const userTable = sqliteTable("user", {
     phone: text("phone"),
     orders: text("orders").default("[]"), // JSON array: [{ id, date, productId, quantity, price }]
     addressId: int("address_id"),
-    cartId: int("cart_id"),
+    cartId: int("cart_id"), //default cart id
 })
 export const wishlistTable = sqliteTable("wishlist", {
     productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),

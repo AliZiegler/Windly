@@ -77,16 +77,8 @@ export default function CartSummary({
                 >
                     Proceed to Checkout
                 </Link>
-
-                <Link
-                    href="/checkout/express"
-                    className="block w-full py-3 border-2 border-blue-400 text-blue-400 font-semibold rounded-xl text-center hover:bg-blue-400/10 transition-all duration-200"
-                >
-                    Express Checkout
-                </Link>
             </div>
 
-            {/* Security & Guarantees */}
             <div className="border-t border-gray-600/50 pt-4 space-y-3">
                 <div className="flex items-center gap-2 text-sm text-gray-300">
                     <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
