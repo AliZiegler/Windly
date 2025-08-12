@@ -2,7 +2,6 @@ import Link from "next/link";
 
 interface CartSummaryProps {
     subtotal: number;
-    tax: number;
     shipping: number;
     total: number;
     itemCount: number;
@@ -10,7 +9,6 @@ interface CartSummaryProps {
 
 export default function CartSummary({
     subtotal,
-    tax,
     shipping,
     total,
     itemCount
@@ -58,10 +56,6 @@ export default function CartSummary({
                     </div>
                 )}
 
-                <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Tax</span>
-                    <span className="font-medium text-gray-100">${tax.toFixed(2)}</span>
-                </div>
 
                 <div className="border-t border-gray-600/50 pt-4 flex justify-between items-center">
                     <span className="text-lg font-bold text-gray-100">Total</span>
@@ -69,11 +63,13 @@ export default function CartSummary({
                 </div>
             </div>
 
-            {/* Checkout Buttons */}
             <div className="space-y-3">
                 <Link
                     href="/checkout"
-                    className="block w-full py-4 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl text-center hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 transform hover:-translate-y-0.5 text-lg"
+                    className="block w-full py-4 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black 
+                    font-bold rounded-xl text-center hover:from-[#e0a000] hover:to-[#e08500] transition-all 
+                    duration-200 transform hover:-translate-y-0.5 text-lg"
+                    prefetch
                 >
                     Proceed to Checkout
                 </Link>
@@ -82,7 +78,8 @@ export default function CartSummary({
             <div className="border-t border-gray-600/50 pt-4 space-y-3">
                 <div className="flex items-center gap-2 text-sm text-gray-300">
                     <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <span>Secure 256-bit SSL encryption</span>
                 </div>
@@ -102,12 +99,16 @@ export default function CartSummary({
                 </div>
             </div>
 
-            {/* Promo Code */}
             <div className="border-t border-gray-600/50 pt-4">
                 <details className="group">
-                    <summary className="flex items-center justify-between cursor-pointer text-blue-400 hover:text-blue-300 font-medium transition-colors duration-200">
-                        <span>Have a promo code?</span>
-                        <svg className="w-4 h-4 transform group-open:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <summary
+                        className="flex items-center justify-between cursor-pointer text-blue-400 
+                        hover:text-blue-300 font-medium transition-colors duration-200">
+                        <span>Have a coupon?</span>
+                        <svg className="w-4 h-4 transform group-open:rotate-180 transition-transform duration-200"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                     </summary>
@@ -115,11 +116,13 @@ export default function CartSummary({
                         <div className="flex gap-2">
                             <input
                                 type="text"
-                                placeholder="Enter promo code"
-                                className="flex-1 px-3 py-2 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                                placeholder="Enter coupon"
+                                className="flex-1 px-3 py-2 border border-gray-600 rounded-lg text-white text-sm focus:outline-none 
+                                focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                                 style={{ backgroundColor: "#1e252d" }}
                             />
-                            <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200 text-sm">
+                            <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium 
+                                rounded-lg transition-colors duration-200 text-sm cursor-pointer">
                                 Apply
                             </button>
                         </div>

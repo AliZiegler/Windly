@@ -47,27 +47,32 @@ export function urlString(str: string): string {
 export function reverseUrlString(str: string): string {
     return str.replace(/-/g, " ").replace(/and/g, "&");
 }
-export function applyDiscount(price: number, discountPercentage: number): number {
-    if (price < 0) {
+export function applyDiscount(priceInCents: number, discountPercentage: number): number {
+    if (priceInCents < 0) {
         throw new Error("Price cannot be negative");
     }
     if (discountPercentage < 0 || discountPercentage > 100) {
         throw new Error("Discount percentage must be between 0 and 100");
     }
-    const discountAmount = (price * discountPercentage) / 100;
-    return (price - discountAmount);
+
+    const discountAmount = priceInCents * (discountPercentage / 100);
+    return Math.round(priceInCents - discountAmount);
 }
-export function formatPrice(price: number): string {
-    return price.toLocaleString("en-US", {
+
+export function formatPrice(priceInCents: number): string {
+    const priceInDollars = priceInCents / 100;
+    return priceInDollars.toLocaleString("en-US", {
         style: "currency",
         currency: "USD",
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
 }
+
 export function salePrice(price: number, discountPercentage: number): string {
-    const salePrice = applyDiscount(price, discountPercentage);
-    return formatPrice(salePrice);
+    const priceInCents = Math.round(price * 100);
+    const salePriceInCents = applyDiscount(priceInCents, discountPercentage);
+    return formatPrice(salePriceInCents);
 }
 export function capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);

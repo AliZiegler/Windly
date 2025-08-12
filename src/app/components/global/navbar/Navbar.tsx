@@ -7,7 +7,6 @@ import CartIcon from "@/app/components/global/navbar/CartIcon.tsx";
 export default function Navbar() {
     return (
         <nav className="w-full bg-[#393E46]">
-            {/* Desktop Layout */}
             <div className="hidden md:flex justify-evenly items-center w-full h-[80px]">
                 <WindlyLogo />
 
@@ -20,7 +19,6 @@ export default function Navbar() {
                 </span>
             </div>
 
-            {/* Mobile Layout */}
             <div className="md:hidden">
                 <div className="flex justify-between items-center px-4 py-3 h-[70px]">
                     <WindlyLogo />
