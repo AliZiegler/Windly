@@ -146,7 +146,10 @@ export default async function CartPage() {
                                 <div key={item.productId} className="border border-gray-600/50 rounded-2xl p-4 sm:p-6" style={{ backgroundColor: "#2a313c" }}>
                                     <div className="flex flex-col sm:flex-row gap-4">
                                         <Link href={`/${urlString(item.productName)}`} className="flex-shrink-0">
-                                            <div className="relative w-full sm:w-24 h-32 sm:h-24 rounded-lg overflow-hidden" style={{ backgroundColor: "#1e252d" }}>
+                                            <div
+                                                className="relative w-24 aspect-square rounded-lg overflow-hidden"
+                                                style={{ backgroundColor: "#1e252d" }}
+                                            >
                                                 <Image
                                                     src={item.productImg || "/images/placeholder.png"}
                                                     alt={item.productImgAlt || item.productName}

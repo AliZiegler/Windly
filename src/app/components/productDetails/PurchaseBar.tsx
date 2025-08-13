@@ -1,6 +1,20 @@
 import Link from "next/link";
+import AddAndBuy from "./Add&Buy";
 import { ProductType } from "@/app/components/global/Types";
 import { salePrice, updateSearchParams } from "@/app/components/global/Atoms";
+import { addToCart } from "@/app/actions/CartActions";
+import { redirect } from "next/navigation";
+
+async function handleAddToCart(productId: number, quantity: number) {
+    "use server"
+    await addToCart(productId, undefined, quantity);
+}
+
+async function handleBuyNow(productId: number, quantity: number) {
+    "use server"
+    await addToCart(productId, undefined, quantity);
+    redirect("/cart");
+}
 
 type PurchaseBarProps = {
     p: ProductType;
@@ -9,7 +23,7 @@ type PurchaseBarProps = {
     className?: string;
 }
 
-export default function PurchaseBar({ p, searchParams, didReview, className }: PurchaseBarProps) {
+export default function PurchaseBar({ p, searchParams, didReview, className, }: PurchaseBarProps) {
     const formattedPrice = salePrice(p.price, p.discount);
     const isReviewShown = searchParams.review === "shown";
     const ReviewShownParams = updateSearchParams(searchParams, "review", "shown");
@@ -57,31 +71,7 @@ export default function PurchaseBar({ p, searchParams, didReview, className }: P
                 <span className="text-green-300 font-semibold">In Stock</span>
                 <span className="text-gray-400 text-sm">({p.stock} available)</span>
             </div>
-            <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Quantity:</label>
-                <div className="relative">
-                    <input
-                        type="number"
-                        min="1"
-                        max={Math.min(p.stock, 10)}
-                        defaultValue="1"
-                        className="w-full h-12 px-4 bg-gray-700 border border-gray-600 rounded-lg text-center text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
-                    />
-                    <div className="absolute right-14 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
-                        / {Math.min(p.stock, 10)}
-                    </div>
-                </div>
-            </div>
-
-            <div className="space-y-3">
-                <button className="w-full h-12 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-lg transition-all duration-200 hover:from-[#e0a000] hover:to-[#e08500] hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0">
-                    Add to Cart
-                </button>
-                <button className="w-full h-12 bg-gradient-to-r from-[#E67514] to-[#cc5500] text-black font-bold rounded-lg transition-all duration-200 hover:from-[#d06600] hover:to-[#b84400] hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0">
-                    Buy Now
-                </button>
-            </div>
-
+            <AddAndBuy stock={p.stock} productId={p.id} buyAction={handleBuyNow} addAction={handleAddToCart} />
             <div className="space-y-3 pt-4 border-t border-gray-600/50">
                 <div className="space-y-3 text-sm">
                     <div className="flex justify-between items-center">
@@ -113,7 +103,6 @@ export default function PurchaseBar({ p, searchParams, didReview, className }: P
                 </div>
             </div>
 
-            {/* Review Button */}
             <Link
                 className="w-full h-12 rounded-lg mt-4 border-2 border-gray-500 hover:border-gray-400 flex items-center justify-center text-gray-200 hover:text-white transition-all duration-200 font-medium hover:bg-gray-700/30"
                 href={isReviewShown ? `?${ReviewHiddenParams.toString()}` : `?${ReviewShownParams.toString()}`}

@@ -109,7 +109,11 @@ export async function addToCart(
 
         if (!finalCartId) {
             const userId = await requireAuth();
-            const user = await db.select().from(userTable).where(eq(userTable.id, userId)).limit(1);
+            const user = await db
+                .select()
+                .from(userTable)
+                .where(eq(userTable.id, userId))
+                .limit(1);
 
             if (user.length > 0 && user[0].cartId) {
                 finalCartId = user[0].cartId;
@@ -123,27 +127,35 @@ export async function addToCart(
             }
         }
 
-        const existingItem = await db.select()
+        if (typeof finalCartId !== "number") {
+            return { success: false, error: "Cart ID is invalid." };
+        }
+
+        const existingItem = await db
+            .select()
             .from(cartItemTable)
             .where(cartItemCondition(finalCartId, productId))
             .limit(1);
 
         if (existingItem.length > 0) {
-            await db.update(cartItemTable)
+            const bothQuantities = existingItem[0].quantity + quantity;
+            const finalQuantity = bothQuantities > 10 ? 10 : bothQuantities;
+
+            await db
+                .update(cartItemTable)
                 .set({
-                    quantity: existingItem[0].quantity + quantity,
-                    updatedAt: nowISO()
+                    quantity: finalQuantity,
+                    updatedAt: nowISO(),
                 })
                 .where(cartItemCondition(finalCartId, productId));
         } else {
-            await db.insert(cartItemTable)
-                .values({
-                    cartId: finalCartId,
-                    productId,
-                    quantity,
-                    createdAt: nowISO(),
-                    updatedAt: nowISO()
-                });
+            await db.insert(cartItemTable).values({
+                cartId: finalCartId,
+                productId,
+                quantity: Math.min(quantity, 10),
+                createdAt: nowISO(),
+                updatedAt: nowISO(),
+            });
         }
 
         revalidatePath("/cart");

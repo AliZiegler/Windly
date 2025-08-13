@@ -57,7 +57,7 @@ export function applyDiscount(price: number, discountPercentage: number): number
     }
 
     const discountAmount = price * (discountPercentage / 100);
-    return parseFloat((price - discountAmount).toFixed(2));
+    return Number((price - discountAmount).toFixed(2));
 }
 
 export function formatPrice(price: number): string {

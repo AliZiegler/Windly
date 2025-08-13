@@ -2,7 +2,7 @@ import WriteReview from "@/app/components/productDetails/WriteReview";
 import { db } from "@/lib/db";
 import { parseProduct } from "@/lib/mappers";
 import { getProductReviews } from "@/app/actions/UserActions";
-import { productTable, reviewTable, wishlistTable } from "@/db/schema";
+import { productTable, reviewTable, wishlistTable, } from "@/db/schema";
 import { auth } from "@/auth";
 import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -203,7 +203,6 @@ export default async function Page(
                         </article>
                     </div>
 
-                    {/* Purchase Sidebar */}
                     <div className="lg:col-span-3 xl:col-span-3">
                         <div className="sticky top-6">
                             <PurchaseBar
@@ -216,7 +215,6 @@ export default async function Page(
                     </div>
                 </div>
 
-                {/* Review Section */}
                 <div className="mt-12 lg:mt-16">
                     <WriteReview
                         review={userReview}
