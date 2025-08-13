@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { urlString, CATEGORIES } from "@/app/components/global/Atoms";
+import { urlString, CATEGORIES, homeOnlySearchParams } from "@/app/components/global/Atoms";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-interface SearchProps {
+type SearchProps = {
     className?: string;
     placeholder?: string;
     onSearchChange?: (search: string, category: string) => void;

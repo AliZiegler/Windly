@@ -27,9 +27,9 @@ export default function SortBy() {
             <b>Sort By:</b>
             <span className="flex justify-center mr-5">
                 <select
-                    value={sort}
+                    defaultValue={sort}
                     onChange={changeSort}
-                    className="w-40 h-9 bg-[#697565] cursor-pointer text-left pl-3"
+                    className="w-40 h-9 bg-[#697565] rounded-l-md cursor-pointer text-left pl-3"
                 >
                     <option value="relevance">Relevance</option>
                     <option value="price">Price</option>
@@ -38,7 +38,7 @@ export default function SortBy() {
                 </select>
                 <button
                     onClick={flipReverse}
-                    className="bg-[#FEBA17] h-9 w-10 flex items-center hover:bg-[#e3a001] cursor-pointer justify-center"
+                    className="bg-[#FEBA17] h-9 w-10 rounded-r-md flex items-center hover:bg-[#e3a001] cursor-pointer justify-center"
                 >
                     <Image
                         src="/images/reverseIcon.png"

@@ -32,6 +32,7 @@ export function updateSearchParams(
     return new URLSearchParams(filtered);
 }
 export const ORIGINAL_MAX_PRICE = 12000;
+export const homeOnlySearchParams = ["price", "discount", "sort", "reverse", "rating", "search", "category"];
 export function spacesToDashes(str: string): string {
     return str.replace(/\s+/g, "-");
 }
@@ -47,21 +48,20 @@ export function urlString(str: string): string {
 export function reverseUrlString(str: string): string {
     return str.replace(/-/g, " ").replace(/and/g, "&");
 }
-export function applyDiscount(priceInCents: number, discountPercentage: number): number {
-    if (priceInCents < 0) {
+export function applyDiscount(price: number, discountPercentage: number): number {
+    if (price < 0) {
         throw new Error("Price cannot be negative");
     }
     if (discountPercentage < 0 || discountPercentage > 100) {
         throw new Error("Discount percentage must be between 0 and 100");
     }
 
-    const discountAmount = priceInCents * (discountPercentage / 100);
-    return Math.round(priceInCents - discountAmount);
+    const discountAmount = price * (discountPercentage / 100);
+    return parseFloat((price - discountAmount).toFixed(2));
 }
 
-export function formatPrice(priceInCents: number): string {
-    const priceInDollars = priceInCents / 100;
-    return priceInDollars.toLocaleString("en-US", {
+export function formatPrice(price: number): string {
+    return price.toLocaleString("en-US", {
         style: "currency",
         currency: "USD",
         minimumFractionDigits: 2,
@@ -70,9 +70,8 @@ export function formatPrice(priceInCents: number): string {
 }
 
 export function salePrice(price: number, discountPercentage: number): string {
-    const priceInCents = Math.round(price * 100);
-    const salePriceInCents = applyDiscount(priceInCents, discountPercentage);
-    return formatPrice(salePriceInCents);
+    const discountedPrice = applyDiscount(price, discountPercentage);
+    return formatPrice(discountedPrice);
 }
 export function capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);

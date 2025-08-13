@@ -37,13 +37,14 @@ export default async function CartPage() {
         );
     }
 
-    const userCart = await db
+    const rawUserCart = await db
         .select()
         .from(cartTable)
         .where(and(eq(cartTable.userId, session.user.id), eq(cartTable.status, "active")))
         .limit(1);
+    const userCart = rawUserCart[0];
 
-    if (!userCart.length) {
+    if (!userCart) {
         return (
             <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "#222831" }}>
                 <div className="max-w-6xl mx-auto">
@@ -97,7 +98,7 @@ export default async function CartPage() {
         })
         .from(cartItemTable)
         .innerJoin(productTable, eq(cartItemTable.productId, productTable.id))
-        .where(eq(cartItemTable.cartId, userCart[0].id));
+        .where(eq(cartItemTable.cartId, userCart.id));
 
     if (!cartItems.length) {
         return (
@@ -111,14 +112,13 @@ export default async function CartPage() {
         );
     }
 
-    // Calculate subtotal in cents
-    const subtotalCents = cartItems.reduce((sum, item) => {
-        const discountedCents = applyDiscount(Math.round(item.productPrice * 100), item.productDiscount);
+    const subtotalPrice = cartItems.reduce((sum, item) => {
+        const discountedCents = applyDiscount(Math.round(item.productPrice), item.productDiscount);
         return sum + discountedCents * item.quantity;
     }, 0);
 
-    const shippingCents = subtotalCents > 5000 ? 0 : 999;
-    const totalCents = subtotalCents + shippingCents;
+    const shippingPrice = subtotalPrice > 50 ? 0 : 10;
+    const totalPrice = subtotalPrice + shippingPrice;
 
     return (
         <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "#222831" }}>
@@ -139,7 +139,7 @@ export default async function CartPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-4">
                         {cartItems.map((item) => {
-                            const itemPriceCents = applyDiscount(Math.round(item.productPrice * 100), item.productDiscount);
+                            const itemPriceCents = applyDiscount(Math.round(item.productPrice), item.productDiscount);
                             const itemTotalCents = itemPriceCents * item.quantity;
 
                             return (
@@ -175,16 +175,13 @@ export default async function CartPage() {
 
                                                 <div className="flex flex-row sm:flex-col items-center sm:items-end gap-4">
                                                     <CartItemControls
-                                                        cartId={userCart[0].id}
+                                                        cartId={userCart.id}
                                                         productId={item.productId}
                                                         quantity={item.quantity}
                                                         maxQuantity={Math.min(item.productStock, 10)}
                                                     />
                                                     <div className="text-right">
                                                         <div className="text-lg font-bold text-gray-100">{formatPrice(itemTotalCents)}</div>
-                                                        {item.quantity > 1 && (
-                                                            <div className="text-sm text-gray-400">{formatPrice(itemPriceCents)} each</div>
-                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -198,9 +195,9 @@ export default async function CartPage() {
                     <div className="lg:col-span-1">
                         <div className="sticky top-6">
                             <CartSummary
-                                subtotal={subtotalCents / 100}
-                                shipping={shippingCents / 100}
-                                total={totalCents / 100}
+                                subtotal={subtotalPrice}
+                                shipping={shippingPrice}
+                                total={totalPrice}
                                 itemCount={cartItems.length}
                             />
                         </div>
