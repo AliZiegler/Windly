@@ -14,7 +14,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Google({
             authorization: {
                 params: {
-                    prompt: "consent",
                     access_type: "offline",
                     response_type: "code",
                 },

@@ -1,7 +1,7 @@
 import WriteReview from "@/app/components/productDetails/WriteReview";
 import { db } from "@/lib/db";
 import { parseProduct } from "@/lib/mappers";
-import { getProductReviews } from "@/app/actions/UserActions";
+import { getProductReviews } from "@/app/actions/ReviewActions";
 import { productTable, reviewTable, wishlistTable, } from "@/db/schema";
 import { auth } from "@/auth";
 import { eq, and } from "drizzle-orm";

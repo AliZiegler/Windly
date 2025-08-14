@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Stars from '@/app/components/global/ReactStars';
-import { updateReview } from '@/app/actions/UserActions';
+import { updateReview } from '@/app/actions/ReviewActions';
 import { z } from 'zod';
 
 const ReviewUpdateSchema = z.object({

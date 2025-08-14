@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { urlString } from "@/app/components/global/Atoms";
 import Link from "next/link";
-import { addReview, updateReview } from "@/app/actions/UserActions";
+import { addReview, updateReview } from "@/app/actions/ReviewActions";
 import { z } from "zod";
 
 type WriteReviewProps = {

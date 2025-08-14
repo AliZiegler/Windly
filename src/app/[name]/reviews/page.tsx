@@ -1,12 +1,18 @@
 import { reverseUrlString } from "@/app/components/global/Atoms"
-import { getProductReviews, getUserHelpfulReviewsIds, markReviewHelpful } from "@/app/actions/UserActions"
+import { getProductReviews, getUserHelpfulReviewsIds, markReviewHelpful } from "@/app/actions/ReviewActions"
 import { auth } from "@/auth"
 import Image from "next/image"
 import Stars from "@/app/components/global/ReactStars"
 import Link from "next/link"
+import ReviewsFilters from "@/app/components/productDetails/ReviewsFilters"
 
 type Params = {
     params: Promise<{ name: string }>
+    searchParams: Promise<{
+        sort?: string
+        rating?: string
+        search?: string
+    }>
 }
 
 async function handleHelpfulAction(formData: FormData) {
@@ -29,19 +35,24 @@ async function handleHelpfulAction(formData: FormData) {
     }
 }
 
-export default async function ReviewsPage({ params }: Params) {
+export default async function ReviewsPage({ params, searchParams }: Params) {
     const { name } = await params
+    const { sort, rating, search } = await searchParams
     const session = await auth()
     const userId = session?.user?.id
-    const userHelpfulReviewsIds = await getUserHelpfulReviewsIds(userId)
-    const helpfulIds = userHelpfulReviewsIds.reviews?.map(review => review.reviewId)
+    let userHelpfulReviewsIds = null
+    let helpfulIds = null
+    if (userId) {
+        userHelpfulReviewsIds = await getUserHelpfulReviewsIds(userId)
+        helpfulIds = userHelpfulReviewsIds.reviews?.map(review => review.reviewId)
+    }
     const productName = reverseUrlString(name)
     const raw = await getProductReviews(productName)
     const reviews = raw.reviews
 
     if (!raw.success) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#222831" }}>
                 <div className="text-center p-8 bg-red-500/10 border border-red-400/30 rounded-2xl max-w-md">
                     <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -55,7 +66,7 @@ export default async function ReviewsPage({ params }: Params) {
 
     if (!reviews || reviews.length === 0) {
         return (
-            <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+            <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "#222831" }}>
                 <div className="max-w-6xl mx-auto">
                     <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
                         <Link href={`/${name}`} className="flex items-center gap-4 group">
@@ -101,6 +112,45 @@ export default async function ReviewsPage({ params }: Params) {
         )
     }
 
+    // Apply filters and search
+    let filteredReviews = [...reviews];
+
+    // Search filter
+    if (search) {
+        filteredReviews = filteredReviews.filter(review =>
+            review.review.toLowerCase().includes(search.toLowerCase()) ||
+            review.userName.toLowerCase().includes(search.toLowerCase())
+        );
+    }
+
+    // Rating filter
+    if (rating && rating !== 'all') {
+        const ratingNum = parseInt(rating);
+        filteredReviews = filteredReviews.filter(review => Math.floor(review.rating) === ratingNum);
+    }
+
+    // Sort reviews
+    switch (sort) {
+        case 'newest':
+            filteredReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            break;
+        case 'oldest':
+            filteredReviews.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            break;
+        case 'highest':
+            filteredReviews.sort((a, b) => b.rating - a.rating);
+            break;
+        case 'lowest':
+            filteredReviews.sort((a, b) => a.rating - b.rating);
+            break;
+        case 'helpful':
+            filteredReviews.sort((a, b) => b.helpfulCount - a.helpfulCount);
+            break;
+        default:
+            // Default to newest
+            filteredReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+
     const overallRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
     const currentPath = `/${name}/reviews`
     const writeReviewPath = `/${name}?review=shown`
@@ -111,7 +161,7 @@ export default async function ReviewsPage({ params }: Params) {
         percentage: (reviews.filter(review => Math.floor(review.rating) === star).length / reviews.length) * 100
     }))
 
-    const displayReviews = reviews.map((review) => {
+    const displayReviews = filteredReviews.map((review) => {
         const createdAt = new Date(review.createdAt)
         const isHelpful = helpfulIds?.includes(review.id)
         const timeAgo = getTimeAgo(createdAt)
@@ -145,8 +195,16 @@ export default async function ReviewsPage({ params }: Params) {
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
                     <div className="flex items-center gap-2 text-sm text-gray-400">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V9a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                        <svg
+                            className="w-4 h-4"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                        >
+                            <path d="M26,12H20V6a3.0033,3.0033,0,0,0-3-3H14.8672a2.0094,2.0094,0,0,0-1.98,1.7173l-.8453,5.9165L8.4648,
+                                        16H2V30H23a7.0078,7.0078,0,0,0,7-7V16A4.0045,4.0045,0,0,0,26,12ZM8,28H4V18H8Zm20-5a5.0057,5.0057,0,0,
+                                        1-5,5H10V17.3027l3.9578-5.9365L14.8672,5H17a1.0008,1.0008,0,0,1,1,1v8h8a2.0025,2.0025,0,0,1,2,2Z" />
+                            <rect width="32" height="32" fill="none" />
                         </svg>
                         <span>{review.helpfulCount} people found this helpful</span>
                     </div>
@@ -162,8 +220,16 @@ export default async function ReviewsPage({ params }: Params) {
                                     : 'border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white hover:bg-gray-700/30'
                                     }`}
                             >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V9a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                <svg
+                                    className="w-4 h-4"
+                                    viewBox="0 0 32 32"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="currentColor"
+                                >
+                                    <path d="M26,12H20V6a3.0033,3.0033,0,0,0-3-3H14.8672a2.0094,2.0094,0,0,0-1.98,1.7173l-.8453,5.9165L8.4648,
+                                        16H2V30H23a7.0078,7.0078,0,0,0,7-7V16A4.0045,4.0045,0,0,0,26,12ZM8,28H4V18H8Zm20-5a5.0057,5.0057,0,0,
+                                        1-5,5H10V17.3027l3.9578-5.9365L14.8672,5H17a1.0008,1.0008,0,0,1,1,1v8h8a2.0025,2.0025,0,0,1,2,2Z" />
+                                    <rect width="32" height="32" fill="none" />
                                 </svg>
                                 <span className="font-medium">
                                     {isHelpful ? 'Helpful ✓' : 'Helpful'}
@@ -207,9 +273,9 @@ export default async function ReviewsPage({ params }: Params) {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 ">
                     <div className="lg:col-span-1">
-                        <div className="border flex flex-col items-center border-gray-700/50 rounded-2xl p-6 text-center" style={{ backgroundColor: "#2a313c" }}>
+                        <div className="border flex flex-col items-center justify-center lg:min-h-[242px] border-gray-700/50 rounded-2xl p-6 text-center" style={{ backgroundColor: "#2a313c" }}>
                             <div className="text-5xl font-bold text-gray-100 mb-2">
                                 {overallRating.toFixed(1)}
                             </div>
@@ -246,16 +312,47 @@ export default async function ReviewsPage({ params }: Params) {
                     </div>
                 </div>
 
+                {/* Filters and Search */}
+                <ReviewsFilters
+                    productName={name}
+                    totalReviews={reviews.length}
+                    filteredCount={filteredReviews.length}
+                    currentSort={sort}
+                    currentRating={rating}
+                    currentSearch={search}
+                />
+
                 <div className="space-y-6">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold text-gray-100">
-                            All Reviews ({reviews.length})
+                            {filteredReviews.length === reviews.length
+                                ? `All Reviews (${reviews.length})`
+                                : `Showing ${filteredReviews.length} of ${reviews.length} reviews`
+                            }
                         </h2>
                     </div>
 
-                    <div className="space-y-6">
-                        {displayReviews}
-                    </div>
+                    {filteredReviews.length === 0 ? (
+                        <div className="text-center py-16">
+                            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full flex items-center justify-center">
+                                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-200 mb-2">No reviews match your filters</h3>
+                            <p className="text-gray-400 mb-6">Try adjusting your search or filter criteria</p>
+                            <Link
+                                href={`/${name}/reviews`}
+                                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-medium rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
+                            >
+                                Clear Filters
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            {displayReviews}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

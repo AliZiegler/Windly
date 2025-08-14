@@ -223,7 +223,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                         <p className="text-gray-400 mb-4">No saved addresses found</p>
                                         <Link
                                             href="/account/addresses"
-                                            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                                            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white 
+                                                font-medium rounded-lg transition-colors"
                                         >
                                             Add Address
                                         </Link>
@@ -231,8 +232,6 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                 )}
                             </div>
                         )}
-
-                        {/* Step 3: Payment */}
                         {currentStep === 3 && (
                             <div className="border border-gray-600/50 rounded-2xl p-6 mb-6" style={{ backgroundColor: "#2a313c" }}>
                                 <h2 className="text-xl font-bold text-gray-100 mb-6">Payment Method</h2>
