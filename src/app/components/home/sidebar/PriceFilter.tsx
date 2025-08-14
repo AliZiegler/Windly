@@ -37,7 +37,7 @@ export default function PriceFilter() {
             </p>
             <input
                 type="range"
-                className="w-44 h-3 cursor-pointer"
+                className="w-full h-3 cursor-pointer"
                 value={maxPrice / 25}
                 onChange={handlePriceChange}
                 onPointerUp={handleMouseUp}

@@ -136,7 +136,7 @@ export default function MobileSidebar() {
                                 ×
                             </button>
                         </div>
-                        <div className="p-4">
+                        <div className="p-2 bg-[#272d36]">
                             <Sidebar />
                         </div>
                     </div>

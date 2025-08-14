@@ -29,7 +29,7 @@ export default function DiscountFilter() {
             <p>{minDiscount}% - 100%</p>
             <input
                 type="range"
-                className="w-44 h-3 cursor-pointer"
+                className="w-full h-3 cursor-pointer"
                 value={minDiscount}
                 onChange={(e) => setMinDiscount(e.target.valueAsNumber)}
                 onPointerUp={handleMouseUp}
