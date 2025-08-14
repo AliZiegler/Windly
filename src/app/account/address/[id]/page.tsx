@@ -1,6 +1,6 @@
 "use server"
 import { ReactNode, InputHTMLAttributes } from "react";
-import { updateAddress } from "@/app/actions/UserActions";
+import { updateAddress } from "@/app/actions/AddressActions";
 import { UpdateAddress } from "@/app/components/global/Types";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

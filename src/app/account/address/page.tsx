@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm"
 import { addressTable, userTable } from "@/db/schema"
 import { capitalizeFirstLetter } from "@/app/components/global/Atoms"
 import Link from "next/link"
-import { deleteAddress, setUserAddress } from "@/app/actions/UserActions"
+import { deleteAddress, setUserAddress } from "@/app/actions/AddressActions"
 import { redirect } from "next/navigation"
 
 export default async function Page() {
