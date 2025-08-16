@@ -1,0 +1,341 @@
+import { auth } from '@/auth';
+import { db } from '@/lib/db';
+import { eq, and } from 'drizzle-orm';
+import { cartTable, cartItemTable, productTable } from '@/db/schema';
+import Link from 'next/link';
+import { formatPrice } from '@/app/components/global/Atoms';
+import { notFound } from 'next/navigation';
+
+interface OrderItem {
+    productId: number;
+    productName: string;
+    productPrice: number;
+    quantity: number;
+    subtotal: number;
+}
+
+interface OrderDetails {
+    id: number;
+    createdAt: string;
+    updatedAt: string;
+    displayStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+    items: OrderItem[];
+    total: number;
+    itemCount: number;
+}
+
+export default async function OrderDetailsPage({
+    params
+}: {
+    params: Promise<{ id: string }>
+}) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return (
+            <div className="flex items-center justify-center min-h-[200px]">
+                <div className="text-gray-400 text-lg">Not logged in</div>
+            </div>
+        );
+    }
+    const parm = await params;
+    const orderId = parseInt(parm.id);
+    if (isNaN(orderId)) {
+        notFound();
+    }
+
+    const [order] = await db
+        .select({
+            id: cartTable.id,
+            createdAt: cartTable.createdAt,
+            updatedAt: cartTable.updatedAt,
+            userId: cartTable.userId,
+        })
+        .from(cartTable)
+        .where(
+            and(
+                eq(cartTable.id, orderId),
+                eq(cartTable.userId, session.user.id),
+                eq(cartTable.status, 'ordered')
+            )
+        );
+
+    if (!order) {
+        notFound();
+    }
+
+    const orderItems = await db
+        .select({
+            productId: cartItemTable.productId,
+            productName: productTable.name,
+            productPrice: productTable.price,
+            quantity: cartItemTable.quantity,
+        })
+        .from(cartItemTable)
+        .innerJoin(productTable, eq(cartItemTable.productId, productTable.id))
+        .where(eq(cartItemTable.cartId, orderId));
+
+    const items: OrderItem[] = orderItems.map(item => ({
+        ...item,
+        subtotal: item.productPrice * item.quantity,
+    }));
+
+    const total = items.reduce((sum, item) => sum + item.subtotal, 0);
+    const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+    const orderDate = new Date(order.updatedAt);
+    const daysSinceOrder = Math.floor((Date.now() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    let displayStatus: OrderDetails['displayStatus'];
+    if (daysSinceOrder === 0) {
+        displayStatus = 'pending';
+    } else if (daysSinceOrder <= 2) {
+        displayStatus = 'processing';
+    } else if (daysSinceOrder <= 7) {
+        displayStatus = 'shipped';
+    } else {
+        displayStatus = 'delivered';
+    }
+
+    const orderDetails: OrderDetails = {
+        id: order.id,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        displayStatus,
+        items,
+        total,
+        itemCount,
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'delivered':
+                return 'text-green-400 bg-green-500/20 border-green-500/30';
+            case 'shipped':
+                return 'text-blue-400 bg-blue-500/20 border-blue-500/30';
+            case 'processing':
+                return 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30';
+            case 'pending':
+                return 'text-orange-400 bg-orange-500/20 border-orange-500/30';
+            case 'cancelled':
+                return 'text-red-400 bg-red-500/20 border-red-500/30';
+            default:
+                return 'text-gray-400 bg-gray-500/20 border-gray-500/30';
+        }
+    };
+
+    const getStatusIcon = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'delivered':
+                return (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                );
+            case 'shipped':
+                return (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M12 11L4 7" />
+                    </svg>
+                );
+            case 'processing':
+                return (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                );
+            case 'pending':
+                return (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                );
+            case 'cancelled':
+                return (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                );
+            default:
+                return null;
+        }
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${day}/${month}/${year} at ${hours}:${minutes}`;
+    };
+
+    const statusColor = getStatusColor(orderDetails.displayStatus);
+    const statusIcon = getStatusIcon(orderDetails.displayStatus);
+
+    return (
+        <div className="flex flex-col w-full gap-6 overflow-hidden">
+
+            <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                    <Link
+                        href="/account/orders"
+                        className="text-gray-400 hover:text-white transition-colors duration-200"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </Link>
+                    <h1 className="font-bold text-xl sm:text-2xl">Order #{orderDetails.id}</h1>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${statusColor}`}>
+                            {statusIcon}
+                            {orderDetails.displayStatus.charAt(0).toUpperCase() + orderDetails.displayStatus.slice(1)}
+                        </span>
+                    </div>
+                    <div className="text-sm text-gray-400">
+                        <div>Ordered: {formatDate(orderDetails.updatedAt)}</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div className="bg-[#1e232b] rounded-lg p-4 sm:p-6 border border-[#2a3038]">
+                <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="text-center sm:text-left">
+                        <div className="text-2xl font-bold text-white">{orderDetails.itemCount}</div>
+                        <div className="text-sm text-gray-400">Total Items</div>
+                    </div>
+                    <div className="text-center sm:text-left">
+                        <div className="text-2xl font-bold text-white">{orderDetails.items.length}</div>
+                        <div className="text-sm text-gray-400">Unique Products</div>
+                    </div>
+                    <div className="text-center sm:text-left">
+                        <div className="text-2xl font-bold text-[#00CAFF]">{formatPrice(orderDetails.total)}</div>
+                        <div className="text-sm text-gray-400">Total Amount</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div className="bg-[#1e232b] rounded-lg border border-[#2a3038] overflow-hidden">
+                <div className="p-4 sm:p-6 border-b border-[#2a3038]">
+                    <h2 className="text-lg font-semibold">Order Items</h2>
+                </div>
+
+
+                <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-[#1c2129]">
+                            <tr>
+                                <th className="text-left p-4 text-sm font-semibold">Product</th>
+                                <th className="text-center p-4 text-sm font-semibold">Quantity</th>
+                                <th className="text-right p-4 text-sm font-semibold">Unit Price</th>
+                                <th className="text-right p-4 text-sm font-semibold">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {orderDetails.items.map((item) => (
+                                <tr key={item.productId} className="border-t border-[#2a3038] hover:bg-[#1c2129] transition-colors duration-200">
+                                    <td className="p-4">
+                                        <div className="font-medium text-gray-200">{item.productName}</div>
+                                        <div className="text-xs text-gray-400">ID: {item.productId}</div>
+                                    </td>
+                                    <td className="p-4 text-center">
+                                        <span className="bg-[#2a3038] px-2 py-1 rounded text-sm font-medium">
+                                            {item.quantity}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 text-right font-medium">{formatPrice(item.productPrice)}</td>
+                                    <td className="p-4 text-right font-bold text-[#00CAFF]">{formatPrice(item.subtotal)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                        <tfoot className="bg-[#1c2129] border-t-2 border-[#2a3038]">
+                            <tr>
+                                <td colSpan={3} className="p-4 text-right font-semibold">Total:</td>
+                                <td className="p-4 text-right font-bold text-xl text-[#00CAFF]">{formatPrice(orderDetails.total)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div className="md:hidden divide-y divide-[#2a3038]">
+                    {orderDetails.items.map((item) => (
+                        <div key={item.productId} className="p-4">
+                            <div className="flex justify-between items-start mb-2">
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="font-medium text-gray-200 leading-tight">{item.productName}</h3>
+                                    <p className="text-xs text-gray-400 mt-1">ID: {item.productId}</p>
+                                </div>
+                                <div className="ml-3 text-right flex-shrink-0">
+                                    <div className="font-bold text-[#00CAFF]">{formatPrice(item.subtotal)}</div>
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <div className="flex items-center gap-4">
+                                    <span className="text-gray-400">Qty: <span className="text-white font-medium">{item.quantity}</span></span>
+                                    <span className="text-gray-400">Unit: <span className="text-white font-medium">{formatPrice(item.productPrice)}</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    <div className="p-4 bg-[#1c2129]">
+                        <div className="flex justify-between items-center">
+                            <span className="font-semibold text-lg">Total:</span>
+                            <span className="font-bold text-xl text-[#00CAFF]">{formatPrice(orderDetails.total)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-[#1e232b] rounded-lg p-4 sm:p-6 border border-[#2a3038]">
+                <h2 className="text-lg font-semibold mb-4">Order Status</h2>
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${['pending', 'processing', 'shipped', 'delivered'].includes(orderDetails.displayStatus)
+                        ? 'border-green-500/30 bg-green-500/20 text-green-400'
+                        : 'border-gray-500/30 bg-gray-500/20 text-gray-400'
+                        }`}>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-sm font-medium">Order Placed</span>
+                    </div>
+
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${['processing', 'shipped', 'delivered'].includes(orderDetails.displayStatus)
+                        ? 'border-green-500/30 bg-green-500/20 text-green-400'
+                        : 'border-gray-500/30 bg-gray-500/20 text-gray-400'
+                        }`}>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span className="text-sm font-medium">Processing</span>
+                    </div>
+
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${['shipped', 'delivered'].includes(orderDetails.displayStatus)
+                        ? 'border-green-500/30 bg-green-500/20 text-green-400'
+                        : 'border-gray-500/30 bg-gray-500/20 text-gray-400'
+                        }`}>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M12 11L4 7" />
+                        </svg>
+                        <span className="text-sm font-medium">Shipped</span>
+                    </div>
+
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${orderDetails.displayStatus === 'delivered'
+                        ? 'border-green-500/30 bg-green-500/20 text-green-400'
+                        : 'border-gray-500/30 bg-gray-500/20 text-gray-400'
+                        }`}>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                        </svg>
+                        <span className="text-sm font-medium">Delivered</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

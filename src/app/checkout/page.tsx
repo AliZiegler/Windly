@@ -1,5 +1,7 @@
 import { signIn, auth } from "@/auth";
 import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
+import { orderCart } from "@/app/actions/CartActions";
 import { cartTable, cartItemTable, productTable, addressTable, userTable } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import Image from "next/image";
@@ -76,7 +78,6 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
         );
     }
 
-    // Get cart items with product details
     const cartItems = await db
         .select({
             cartId: cartItemTable.cartId,
@@ -93,6 +94,11 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
         .from(cartItemTable)
         .innerJoin(productTable, eq(cartItemTable.productId, productTable.id))
         .where(eq(cartItemTable.cartId, userCart.id));
+    async function handleOrder() {
+        "use server";
+        await orderCart(userCart.id);
+        redirect("/");
+    }
 
     if (!cartItems.length) {
         return (
@@ -222,7 +228,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                     <div className="text-center py-8">
                                         <p className="text-gray-400 mb-4">No saved addresses found</p>
                                         <Link
-                                            href="/account/addresses"
+                                            href="/account/address/new"
                                             className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white 
                                                 font-medium rounded-lg transition-colors"
                                         >
@@ -300,14 +306,17 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                     Continue
                                 </Link>
                             ) : (
-                                <button className="px-8 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200">
-                                    Place Order
-                                </button>
+                                <form action={handleOrder}>
+                                    <button
+                                        className="px-8 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold 
+                                        rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200">
+                                        Place Order
+                                    </button>
+                                </form>
                             )}
                         </div>
                     </div>
 
-                    {/* Order Summary Sidebar */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-6">
                             <div className="border border-gray-600/50 rounded-2xl p-6 space-y-6" style={{ backgroundColor: "#2a313c" }}>

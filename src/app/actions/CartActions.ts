@@ -191,3 +191,13 @@ export async function getCartItemCount(cartId: number): Promise<number> {
         return 0;
     }
 }
+export async function orderCart(cartId: number) {
+    try {
+        await db.update(cartTable).set({ updatedAt: nowISO(), status: "ordered" }).where(eq(cartTable.id, cartId));
+        await createCart();
+        return { success: true };
+    } catch (error) {
+        console.error("Error ordering cart:", error);
+        return { success: false, error: "Failed to order cart" };
+    }
+}

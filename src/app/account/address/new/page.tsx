@@ -1,6 +1,6 @@
 "use server";
 import { ReactNode, InputHTMLAttributes } from "react";
-import { addAddress } from "@/app/actions/UserActions";
+import { addAddress } from "@/app/actions/AddressActions";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { iraqiProvinces } from "@/app/components/global/Atoms";
