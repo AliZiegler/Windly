@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { applyDiscount, formatPrice, } from "@/app/components/global/Atoms";
 import CheckoutSteps from "@/app/components/checkout/CheckoutSteps";
+import PaymentForm from "@/app/components/checkout/PaymentForm";
 
 async function SignIn() {
     "use server";
@@ -152,7 +153,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2">
 
-                        {/* Step 1: Order Review */}
+
                         {currentStep === 1 && (
                             <div className="border border-gray-600/50 rounded-2xl p-6 mb-6" style={{ backgroundColor: "#2a313c" }}>
                                 <h2 className="text-xl font-bold text-gray-100 mb-6">Review Your Order</h2>
@@ -192,7 +193,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                             </div>
                         )}
 
-                        {/* Step 2: Shipping */}
+
                         {currentStep === 2 && (
                             <div className="border border-gray-600/50 rounded-2xl p-6 mb-6" style={{ backgroundColor: "#2a313c" }}>
                                 <h2 className="text-xl font-bold text-gray-100 mb-6">Shipping Information</h2>
@@ -239,53 +240,9 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                             </div>
                         )}
                         {currentStep === 3 && (
-                            <div className="border border-gray-600/50 rounded-2xl p-6 mb-6" style={{ backgroundColor: "#2a313c" }}>
-                                <h2 className="text-xl font-bold text-gray-100 mb-6">Payment Method</h2>
-
-                                <div className="space-y-4">
-                                    <div className="border border-gray-600/30 rounded-xl p-4" style={{ backgroundColor: "#1e252d" }}>
-                                        <div className="flex items-center gap-3 mb-4">
-                                            <input type="radio" name="payment" value="card" defaultChecked className="text-blue-600" />
-                                            <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1M5 5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5z" />
-                                            </svg>
-                                            <span className="font-medium text-gray-100">Credit/Debit Card</span>
-                                        </div>
-
-                                        <div className="space-y-4 ml-8">
-                                            <input
-                                                type="text"
-                                                placeholder="Card Number"
-                                                className="w-full p-3 border border-gray-600/50 rounded-lg text-gray-100 focus:border-blue-400 focus:outline-none transition-colors"
-                                                style={{ backgroundColor: "#222831" }}
-                                            />
-                                            <input
-                                                type="text"
-                                                placeholder="Cardholder Name"
-                                                className="w-full p-3 border border-gray-600/50 rounded-lg text-gray-100 focus:border-blue-400 focus:outline-none transition-colors"
-                                                style={{ backgroundColor: "#222831" }}
-                                            />
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <input
-                                                    type="text"
-                                                    placeholder="MM/YY"
-                                                    className="p-3 border border-gray-600/50 rounded-lg text-gray-100 focus:border-blue-400 focus:outline-none transition-colors"
-                                                    style={{ backgroundColor: "#222831" }}
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="CVC"
-                                                    className="p-3 border border-gray-600/50 rounded-lg text-gray-100 focus:border-blue-400 focus:outline-none transition-colors"
-                                                    style={{ backgroundColor: "#222831" }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <PaymentForm />
                         )}
 
-                        {/* Navigation Buttons */}
                         <div className="flex justify-between">
                             <Link
                                 href={currentStep > 1 ? `/checkout?step=${currentStep - 1}` : "/cart"}
