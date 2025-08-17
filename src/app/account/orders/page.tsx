@@ -4,6 +4,7 @@ import { eq, desc, sql, and } from 'drizzle-orm';
 import { cartTable, cartItemTable, productTable } from '@/db/schema';
 import Link from 'next/link';
 import { formatPrice } from '@/app/components/global/Atoms';
+import { Box, Check, Clock, RefreshCcw, X } from 'lucide-react';
 
 interface OrderWithItems {
     id: number;
@@ -100,33 +101,23 @@ export default async function Orders() {
         switch (status.toLowerCase()) {
             case 'delivered':
                 return (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <Check className="w-4 h-4" />
                 );
             case 'shipped':
                 return (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M12 11L4 7" />
-                    </svg>
+                    <Box className="w-4 h-4" />
                 );
             case 'processing':
                 return (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
+                    <RefreshCcw className="w-4 h-4 animate-spin" />
                 );
             case 'pending':
                 return (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <Clock className="w-4 h-4" />
                 );
             case 'cancelled':
                 return (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <X className="w-4 h-4" />
                 );
             default:
                 return null;

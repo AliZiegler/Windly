@@ -14,6 +14,7 @@ import PropsTable from "@/app/components/productDetails/PropsTable";
 import PurchaseBar from "@/app/components/productDetails/PurchaseBar";
 import AllReviews from "@/app/components/productDetails/AllRatings";
 import Heart from "@/app/components/global/Heart";
+import { DollarSign, ExternalLink } from "lucide-react";
 
 export default async function Page(
     {
@@ -117,9 +118,7 @@ export default async function Page(
                                     <span className="mr-1">Visit the</span>
                                     <span className="font-semibold">{p.brand}</span>
                                     <span className="ml-1">store</span>
-                                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
+                                    <ExternalLink className="ml-2 w-4 h-4" />
                                 </Link>
                             </div>
                             <div className="flex items-center justify-between">
@@ -160,9 +159,7 @@ export default async function Page(
                                 </div>
                                 {p.discount > 0 && (
                                     <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-500/10 border border-green-400/20">
-                                        <svg className="w-4 h-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                                        </svg>
+                                        <DollarSign className="w-4 h-4 text-green-400 mr-2" />
                                         <span className="text-green-300 font-medium text-sm">
                                             You save ${((p.price * p.discount) / 100).toFixed(2)}
                                         </span>

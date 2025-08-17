@@ -5,7 +5,8 @@ import { eq } from "drizzle-orm";
 import { urlString } from "@/app/components/global/Atoms";
 import Image from "next/image";
 import Link from "next/link";
-import Heart from "@/app/components/global/Heart";
+import HeartButton from "@/app/components/global/Heart";
+import { Heart } from "lucide-react";
 
 export default async function Page() {
     const session = await auth();
@@ -37,10 +38,7 @@ export default async function Page() {
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-8">My Wishlist</h1>
                     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
                         <div className="w-24 h-24 sm:w-32 sm:h-32 mb-6 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full flex items-center justify-center">
-                            <svg className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
+                            <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
                         </div>
                         <h2 className="text-xl sm:text-2xl font-semibold text-gray-200 mb-2">Your wishlist is empty</h2>
                         <p className="text-gray-400 max-w-md">Start adding products you love to see them here</p>
@@ -58,7 +56,7 @@ export default async function Page() {
             {/* Heart Icon - Top Right */}
             <div className="absolute top-4 right-4 z-10">
                 <div className="p-2 bg-black/20 backdrop-blur-sm rounded-full transition-all duration-200 hover:bg-black/40">
-                    <Heart productId={item.productId} isWishlisted={true} size={20} />
+                    <HeartButton productId={item.productId} isWishlisted={true} size={20} />
                 </div>
             </div>
 

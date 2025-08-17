@@ -1,3 +1,4 @@
+import { CreditCard } from 'lucide-react';
 import { z } from 'zod';
 
 export const paymentSchema = z.object({
@@ -48,10 +49,7 @@ export default function PaymentForm() {
                 <div className="space-y-4">
                     <div className="border border-gray-600/30 rounded-xl p-4" style={{ backgroundColor: "#1e252d" }}>
                         <div className="flex items-center gap-3 mb-4">
-                            <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M3 10h18M7 15h1m4 0h1M5 5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5z" />
-                            </svg>
+                            <CreditCard className="w-6 h-6 text-blue-400" />
                             <span className="font-medium text-gray-100">Credit/Debit Card</span>
                         </div>
                         <div className="space-y-4 ml-8">

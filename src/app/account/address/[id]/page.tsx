@@ -9,6 +9,7 @@ import { addressTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { iraqiProvinces } from "@/app/components/global/Atoms";
 import { z } from "zod"
+import { Check, MapPin, UserRound } from "lucide-react";
 const inputClass =
     "w-full px-4 py-3 bg-[#2a2f38] border border-[#4a5568] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00CAFF] focus:border-transparent transition-all duration-200";
 const labelClass = "block text-sm font-medium text-gray-300";
@@ -100,10 +101,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 <div className={sectionClass}>
                     <div className={sectionHeaderClass}>
                         <h2 className="font-bold text-lg sm:text-xl text-white flex items-center gap-3">
-                            <svg className="w-5 h-5 text-[#00CAFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
+                            <UserRound className="w-5 h-5 text-[#00CAFF]" />
                             Contact Information
                         </h2>
                     </div>
@@ -126,11 +124,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 <div className={sectionClass}>
                     <div className={sectionHeaderClass}>
                         <h2 className="font-bold text-lg sm:text-xl text-white flex items-center gap-3">
-                            <svg className="w-5 h-5 text-[#00CAFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
+                            <MapPin className="w-5 h-5 text-[#00CAFF]" />
                             Address Details
                         </h2>
                     </div>
@@ -170,9 +164,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                         className="inline-flex cursor-pointer items-center justify-center bg-[#ffb100] hover:bg-[#e09d00] text-black 
                         font-semibold px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 
                         focus:ring-[#ffb100] focus:ring-offset-2 focus:ring-offset-[#222831] active:scale-95 min-w-[160px]">
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check className="w-5 h-5 mr-2" />
                         Save Address
                     </button>
                 </div>
