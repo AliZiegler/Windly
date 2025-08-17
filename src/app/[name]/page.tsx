@@ -29,7 +29,7 @@ export default async function Page(
     const rawP = await db.select().from(productTable).where(eq(productTable.name, productName)).limit(1);
     if (!rawP || rawP.length === 0) {
         console.log(`Product not found: "${productName}"`);
-        return redirect("/");
+        return redirect("/page/not-found");
     }
     const p = parseProduct(rawP[0])
     if (!p) return redirect("/");

@@ -1,7 +1,7 @@
 "use client";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { updateSearchParams } from "@/app/components/global/Atoms";
+import { ArrowDownUp } from "lucide-react";
 
 export default function SortBy() {
     const router = useRouter();
@@ -29,7 +29,7 @@ export default function SortBy() {
                 <select
                     defaultValue={sort}
                     onChange={changeSort}
-                    className="w-full h-9 bg-[#697565] rounded-l-md cursor-pointer text-left pl-3"
+                    className="w-full h-9 bg-[#697565] hover:bg-[#4e5c5a] duration-200 hover:font-bold rounded-l-md cursor-pointer text-left pl-3"
                 >
                     <option value="relevance">Relevance</option>
                     <option value="price">Price</option>
@@ -38,13 +38,12 @@ export default function SortBy() {
                 </select>
                 <button
                     onClick={flipReverse}
-                    className="bg-[#FEBA17] h-9 w-14 rounded-r-md flex items-center hover:bg-[#e3a001] cursor-pointer justify-center"
+                    className="group bg-[#FEBA17] h-9 w-14 rounded-r-md flex items-center hover:bg-[#e3a001] cursor-pointer justify-center"
                 >
-                    <Image
-                        src="/images/reverseIcon.png"
-                        alt="reverseIcon"
-                        width={25}
-                        height={25}
+                    <ArrowDownUp
+                        size={25}
+                        color="black"
+                        className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
                     />
                 </button>
             </span>

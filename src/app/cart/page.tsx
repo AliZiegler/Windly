@@ -7,6 +7,7 @@ import Link from "next/link";
 import { applyDiscount, formatPrice, urlString } from "@/app/components/global/Atoms";
 import CartItemControls from "@/app/components/cart/CartItemControls";
 import CartSummary from "@/app/components/cart/CartSummary";
+import { UserRound, ShoppingCart, ShoppingBasket, ChevronLeft } from "lucide-react";
 
 async function SignIn() {
     "use server";
@@ -20,9 +21,7 @@ export default async function CartPage() {
         return (
             <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#222831" }}>
                 <div className="text-center p-8 border border-gray-600/50 rounded-2xl max-w-md" style={{ backgroundColor: "#2a313c" }}>
-                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <UserRound size={60} color="#99a1af" className="mx-auto mb-4" />
                     <h2 className="text-2xl font-semibold text-gray-200 mb-4">Sign In Required</h2>
                     <p className="text-gray-400 mb-6">Please sign in to view your cart</p>
                     <form action={SignIn}>
@@ -56,14 +55,7 @@ export default async function CartPage() {
                     </div>
                     <div className="text-center py-16">
                         <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center bg-[#2a313c]">
-                            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 32 32">
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={1.5}
-                                    d="M29.46 10.14A2.94 2.94 0 0 0 27.1 9H10.22L8.76 6.35A2.67 2.67 0 0 0 6.41 5H3a1 1 0 0 0 0 2h3.41a.68.68 0 0 1 .6.31l1.65 3 .86 9.32a3.84 3.84 0 0 0 4 3.38h10.37a3.92 3.92 0 0 0 3.85-2.78l2.17-7.82a2.58 2.58 0 0 0-.45-2.27z"
-                                />
-                            </svg>
+                            <ShoppingCart size={40} color="#99a1af" />
                         </div>
                         <h2 className="text-2xl font-bold text-gray-200 mb-2">Your cart is empty</h2>
                         <p className="text-gray-400 mb-8 max-w-md mx-auto">Looks like you have not added any items to your cart yet</p>
@@ -72,9 +64,7 @@ export default async function CartPage() {
                             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black 
                             font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 transform hover:-translate-y-0.5"
                         >
-                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M8 11h8m-4 0v6m-4-6h8" />
-                            </svg>
+                            <ShoppingBasket size={20} color="black" />
                             Start Shopping
                         </Link>
                     </div>
@@ -128,10 +118,8 @@ export default async function CartPage() {
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-2">Shopping Cart</h1>
                         <p className="text-gray-400">{cartItems.length} item{cartItems.length !== 1 ? "s" : ""} in your cart</p>
                     </div>
-                    <Link href="/" className="flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
+                    <Link href="/" className="group flex items-center gap-1.5 text-blue-400 hover:text-blue-300 font-medium">
+                        <ChevronLeft size={18} className="text-blue-400 group-hover:text-blue-300" />
                         Continue Shopping
                     </Link>
                 </div>

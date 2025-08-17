@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { urlString, CATEGORIES, homeOnlySearchParams } from "@/app/components/global/Atoms";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Search } from "lucide-react";
 
 type SearchProps = {
     className?: string;
@@ -11,7 +11,7 @@ type SearchProps = {
     onSearchChange?: (search: string, category: string) => void;
 }
 
-export default function Search({
+export default function SearchBar({
     className = "",
     placeholder = "Search…",
     onSearchChange,
@@ -118,13 +118,10 @@ export default function Search({
                 transition-all duration-200 group"
                 aria-label="Search"
             >
-                <Image
-                    src="/images/searchIcon.png"
-                    alt=""
-                    width={40}
-                    height={40}
-                    className="cursor-pointer group-hover:scale-110 transition-transform duration-200 w-[25px] h-[25px] md:w-[40px] md:h-[40px]"
-                    priority={false}
+                <Search
+                    size={40}
+                    color="black"
+                    className="absolute cursor-pointer group-hover:scale-110 transition-transform duration-200 w-[25px] h-[25px] md:w-[40px] md:h-[40px]"
                 />
             </button>
         </form>

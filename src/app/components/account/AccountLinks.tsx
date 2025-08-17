@@ -1,42 +1,73 @@
 "use client";
-import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import {
+    User,
+    Heart,
+    MapPin,
+    Star,
+    ShoppingBag,
+    Shield
+} from "lucide-react";
 
-export default function AccontLinks() {
+export default function AccountLinks() {
     const router = useRouter();
     const pathname = usePathname();
-    const secondpath = pathname.split("/")[2];
-    const selected = secondpath || "account";
-    const [path, setPath] = useState(selected);
-    const links = ["Account Information", "Wishlist", "Address", "Reviews", "Orders"];
+    const secondPath = pathname.split("/")[2];
 
-    const optionLinks = links.map((link) => (
-        <option key={link} value={link} className="bg-[#1e232b] text-white">
-            {link}
-        </option>
-    ))
+    const links = [
+        { name: "Account Information", value: "account", href: "/account", icon: User },
+        { name: "Wishlist", value: "wishlist", href: "/account/wishlist", icon: Heart },
+        { name: "Address Book", value: "address", href: "/account/address", icon: MapPin },
+        { name: "Reviews", value: "reviews", href: "/account/reviews", icon: Star },
+        { name: "Orders", value: "orders", href: "/account/orders", icon: ShoppingBag },
+        { name: "Admin Panel", value: "admin", href: "/admin", icon: Shield }
+    ];
+
+    const getCurrentSelection = () => {
+        if (pathname === "/account") return "account";
+        if (pathname.startsWith("/admin")) return "admin";
+        return secondPath || "account";
+    };
+
+    const currentValue = getCurrentSelection();
+    const currentLink = links.find(link => link.value === currentValue) || links[0];
+    const CurrentIcon = currentLink.icon;
 
     function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
-        const newPath = event.target.value;
-        if (newPath === path) return;
-        if (newPath === "Account Information") {
-            setPath("account");
-            router.push("/account");
-            return;
+        const newValue = event.target.value;
+        if (newValue === currentValue) return;
+
+        const selectedLink = links.find(link => link.value === newValue);
+        if (selectedLink) {
+            router.push(selectedLink.href);
         }
-        setPath(newPath);
-        router.push(`/account/${newPath.toLowerCase()}`);
     }
 
     return (
-        <button className="w-60 h-10 rounded-md text-black">
-            <select
-                className="text-center bg-[#393e46] text-white border-none outline-none w-full h-full rounded-md"
-                defaultValue={path}
-                onChange={handleChange}
-            >
-                {optionLinks}
-            </select>
-        </button>
-    )
+        <div className="w-80 max-w-[90vw]">
+            <div className="relative">
+                <div className="flex items-center gap-3 mb-2 px-2">
+                    <CurrentIcon size={18} className="text-blue-400" />
+                    <span className="text-white font-medium">{currentLink.name}</span>
+                </div>
+
+                <select
+                    className="w-full h-12 px-4 bg-[#393e46] text-white border border-gray-600 rounded-lg cursor-pointer 
+                    focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    value={currentValue}
+                    onChange={handleChange}
+                >
+                    {links.map((link) => (
+                        <option
+                            key={link.value}
+                            value={link.value}
+                            className="bg-[#393e46] text-white py-2"
+                        >
+                            {link.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+        </div>
+    );
 }

@@ -5,6 +5,7 @@ import Image from "next/image"
 import Stars from "@/app/components/global/ReactStars"
 import Link from "next/link"
 import ReviewsFilters from "@/app/components/productDetails/ReviewsFilters"
+import { CircleAlert, MessageSquareMore, Search, SquarePen, Star, ThumbsUp } from "lucide-react"
 
 type Params = {
     params: Promise<{ name: string }>
@@ -54,9 +55,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
         return (
             <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#222831" }}>
                 <div className="text-center p-8 bg-red-500/10 border border-red-400/30 rounded-2xl max-w-md">
-                    <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <CircleAlert size={60} color="#ff6467" className="mx-auto mb-4" />
                     <h1 className="text-2xl font-bold text-red-300 mb-2">Failed to Load Reviews</h1>
                     <p className="text-gray-400">Please try again later</p>
                 </div>
@@ -89,9 +88,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
 
                     <div className="text-center py-16">
                         <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full flex items-center justify-center">
-                            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                            </svg>
+                            <MessageSquareMore size={40} className="text-gray-400" />
                         </div>
                         <h2 className="text-2xl font-bold text-gray-200 mb-2">No Reviews Yet</h2>
                         <p className="text-gray-400 mb-8 max-w-md mx-auto">
@@ -101,9 +98,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
                             href={`/${name}?review=shown`}
                             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 transform hover:-translate-y-0.5"
                         >
-                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
+                            <SquarePen className="w-5 h-5 mr-2" />
                             Write First Review
                         </Link>
                     </div>
@@ -112,10 +107,8 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
         )
     }
 
-    // Apply filters and search
     let filteredReviews = [...reviews];
 
-    // Search filter
     if (search) {
         filteredReviews = filteredReviews.filter(review =>
             review.review.toLowerCase().includes(search.toLowerCase()) ||
@@ -195,17 +188,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
                     <div className="flex items-center gap-2 text-sm text-gray-400">
-                        <svg
-                            className="w-4 h-4"
-                            viewBox="0 0 32 32"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                        >
-                            <path d="M26,12H20V6a3.0033,3.0033,0,0,0-3-3H14.8672a2.0094,2.0094,0,0,0-1.98,1.7173l-.8453,5.9165L8.4648,
-                                        16H2V30H23a7.0078,7.0078,0,0,0,7-7V16A4.0045,4.0045,0,0,0,26,12ZM8,28H4V18H8Zm20-5a5.0057,5.0057,0,0,
-                                        1-5,5H10V17.3027l3.9578-5.9365L14.8672,5H17a1.0008,1.0008,0,0,1,1,1v8h8a2.0025,2.0025,0,0,1,2,2Z" />
-                            <rect width="32" height="32" fill="none" />
-                        </svg>
+                        <ThumbsUp className="w-4 h-4" />
                         <span>{review.helpfulCount} people found this helpful</span>
                     </div>
 
@@ -220,17 +203,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
                                     : 'border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white hover:bg-gray-700/30'
                                     }`}
                             >
-                                <svg
-                                    className="w-4 h-4"
-                                    viewBox="0 0 32 32"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor"
-                                >
-                                    <path d="M26,12H20V6a3.0033,3.0033,0,0,0-3-3H14.8672a2.0094,2.0094,0,0,0-1.98,1.7173l-.8453,5.9165L8.4648,
-                                        16H2V30H23a7.0078,7.0078,0,0,0,7-7V16A4.0045,4.0045,0,0,0,26,12ZM8,28H4V18H8Zm20-5a5.0057,5.0057,0,0,
-                                        1-5,5H10V17.3027l3.9578-5.9365L14.8672,5H17a1.0008,1.0008,0,0,1,1,1v8h8a2.0025,2.0025,0,0,1,2,2Z" />
-                                    <rect width="32" height="32" fill="none" />
-                                </svg>
+                                <ThumbsUp className="w-4 h-4" />
                                 <span className="font-medium">
                                     {isHelpful ? 'Helpful ✓' : 'Helpful'}
                                 </span>
@@ -266,9 +239,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
                         href={writeReviewPath}
                         className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg"
                     >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
+                        <SquarePen className="w-5 h-5" />
                         Write Your Review
                     </Link>
                 </div>
@@ -294,9 +265,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
                                     <div key={star} className="flex items-center gap-4">
                                         <div className="flex items-center gap-1 w-12">
                                             <span className="text-sm text-gray-300">{star}</span>
-                                            <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
+                                            <Star className="w-4 h-4 text-yellow-400" fill="currentColor" strokeWidth={0.5} />
                                         </div>
                                         <div className="flex-1 rounded-full h-2" style={{ backgroundColor: "#1a1f26" }}>
                                             <div
@@ -335,9 +304,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
                     {filteredReviews.length === 0 ? (
                         <div className="text-center py-16">
                             <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full flex items-center justify-center">
-                                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
+                                <Search className="w-12 h-12 text-gray-400" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-200 mb-2">No reviews match your filters</h3>
                             <p className="text-gray-400 mb-6">Try adjusting your search or filter criteria</p>

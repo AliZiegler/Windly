@@ -9,6 +9,7 @@ import Link from "next/link";
 import { applyDiscount, formatPrice, } from "@/app/components/global/Atoms";
 import CheckoutSteps from "@/app/components/checkout/CheckoutSteps";
 import PaymentForm from "@/app/components/checkout/PaymentForm";
+import { UserRound, ShoppingCart, ChevronLeft, LockKeyhole, CircleCheck, FastForward } from "lucide-react";
 
 async function SignIn() {
     "use server";
@@ -25,9 +26,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
         return (
             <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#222831" }}>
                 <div className="text-center p-8 border border-gray-600/50 rounded-2xl max-w-md" style={{ backgroundColor: "#2a313c" }}>
-                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <UserRound size={64} className="mx-auto mb-4" />
                     <h2 className="text-2xl font-semibold text-gray-200 mb-4">Sign In Required</h2>
                     <p className="text-gray-400 mb-6">Please sign in to proceed with checkout</p>
                     <form action={SignIn}>
@@ -55,14 +54,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center py-16">
                         <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "#2a313c" }}>
-                            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 32 32">
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={1.5}
-                                    d="M29.46 10.14A2.94 2.94 0 0 0 27.1 9H10.22L8.76 6.35A2.67 2.67 0 0 0 6.41 5H3a1 1 0 0 0 0 2h3.41a.68.68 0 0 1 .6.31l1.65 3 .86 9.32a3.84 3.84 0 0 0 4 3.38h10.37a3.92 3.92 0 0 0 3.85-2.78l2.17-7.82a2.58 2.58 0 0 0-.45-2.27z"
-                                />
-                            </svg>
+                            <ShoppingCart size={40} color="gray" />
                         </div>
                         <h2 className="text-2xl font-bold text-gray-200 mb-2">Your cart is empty</h2>
                         <p className="text-gray-400 mb-8 max-w-md mx-auto">Add some items to your cart before proceeding to checkout</p>
@@ -141,9 +133,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                         <p className="text-gray-400">{cartItems.length} item{cartItems.length !== 1 ? "s" : ""} ready for checkout</p>
                     </div>
                     <Link href="/cart" className="flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
+                        <ChevronLeft size={16} />
                         Back to Cart
                     </Link>
                 </div>
@@ -249,9 +239,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                 className="flex items-center gap-2 px-6 py-3 border border-gray-600/50 rounded-xl text-gray-300 hover:text-gray-100 hover:border-gray-500 transition-all duration-200"
                                 style={{ backgroundColor: "#2a313c" }}
                             >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
+                                <ChevronLeft size={16} />
                                 {currentStep === 1 ? "Back to Cart" : "Previous"}
                             </Link>
 
@@ -338,25 +326,18 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
                                 <div className="border-t border-gray-600/50 pt-4 space-y-3">
                                     <div className="flex items-center gap-2 text-sm text-gray-300">
-                                        <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
+                                        <LockKeyhole size={15} color="#05df72" />
                                         <span>Secure 256-bit SSL encryption</span>
                                     </div>
 
                                     <div className="flex items-center gap-2 text-sm text-gray-300">
-                                        <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M12 11L4 7" />
-                                        </svg>
-                                        <span>Fast & reliable shipping</span>
+                                        <CircleCheck size={15} color="#51a2ff" />
+                                        <span>30-day money back guarantee</span>
                                     </div>
 
                                     <div className="flex items-center gap-2 text-sm text-gray-300">
-                                        <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>30-day money back guarantee</span>
+                                        <FastForward size={15} color="#fdc700" />
+                                        <span>Fast & reliable shipping</span>
                                     </div>
                                 </div>
                             </div>

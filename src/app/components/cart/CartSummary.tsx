@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check, CircleCheck, CircleAlert, LockKeyhole, FastForward, ChevronDown } from "lucide-react";
 
 interface CartSummaryProps {
     subtotal: number;
@@ -40,18 +41,14 @@ export default function CartSummary({
 
                 {shipping === 0 && subtotal >= 50 && (
                     <div className="flex items-center gap-2 text-sm text-green-400">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check size={16} color="#05df72" />
                         <span>Free shipping on orders over $50</span>
                     </div>
                 )}
 
                 {shipping > 0 && subtotal < 50 && (
                     <div className="flex items-center gap-2 text-sm text-blue-400">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <CircleAlert size={15} color="#51a2ff" />
                         <span>Add ${(50 - subtotal).toFixed(2)} more for free shipping</span>
                     </div>
                 )}
@@ -77,24 +74,17 @@ export default function CartSummary({
 
             <div className="border-t border-gray-600/50 pt-4 space-y-3">
                 <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
+                    <LockKeyhole size={15} color="#05df72" />
                     <span>Secure 256-bit SSL encryption</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <CircleCheck size={15} color="#51a2ff" />
                     <span>30-day money back guarantee</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M12 11L4 7" />
-                    </svg>
+                    <FastForward size={15} color="#fdc700" />
                     <span>Fast & reliable shipping</span>
                 </div>
             </div>
@@ -105,12 +95,7 @@ export default function CartSummary({
                         className="flex items-center justify-between cursor-pointer text-blue-400 
                         hover:text-blue-300 font-medium transition-colors duration-200">
                         <span>Have a coupon?</span>
-                        <svg className="w-4 h-4 transform group-open:rotate-180 transition-transform duration-200"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <ChevronDown size={16} />
                     </summary>
                     <div className="mt-3 space-y-3">
                         <div className="flex gap-2">

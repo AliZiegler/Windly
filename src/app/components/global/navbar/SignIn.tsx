@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { signIn, auth } from "@/auth";
+import { CircleUserRound } from "lucide-react";
 
 export default async function SignIn() {
     const session = await auth();
@@ -18,11 +19,10 @@ export default async function SignIn() {
                 >
                     <button type="submit" className="transition-transform hover:scale-105">
                         <div className={`${sizeClasses} relative`}>
-                            <Image
-                                src="/images/loginIcon.png"
-                                alt="login icon"
-                                fill
-                                className="object-contain cursor-pointer"
+                            <CircleUserRound
+                                size={60}
+                                strokeWidth={1}
+                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                             />
                         </div>
                     </button>

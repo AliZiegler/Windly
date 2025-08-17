@@ -1,5 +1,6 @@
 "use client";
 
+import { Search, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
@@ -65,11 +66,7 @@ export default function ReviewsFilters({
                     <label className="block text-sm font-medium text-gray-300 mb-2">Search</label>
                     <form onSubmit={handleSearch} className="relative">
                         <div className="relative">
-                            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
                                 value={searchInput}
@@ -85,9 +82,7 @@ export default function ReviewsFilters({
                                     onClick={() => setSearchInput('')}
                                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                                 >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <X size={20} />
                                 </button>
                             )}
                         </div>
@@ -158,9 +153,7 @@ export default function ReviewsFilters({
                         border-gray-600/50 hover:border-gray-500 rounded-lg transition-all duration-200 disabled:opacity-50"
                         style={{ backgroundColor: "#1e252d" }}
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <X size={20} />
                         Clear Filters
                     </button>
                 )}
@@ -178,9 +171,7 @@ export default function ReviewsFilters({
                                 }}
                                 className="hover:text-blue-200"
                             >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X size={16} />
                             </button>
                         </span>
                     )}
@@ -191,9 +182,7 @@ export default function ReviewsFilters({
                                 onClick={() => updateFilters('rating', 'all')}
                                 className="hover:text-yellow-200"
                             >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X size={16} />
                             </button>
                         </span>
                     )}
@@ -204,9 +193,7 @@ export default function ReviewsFilters({
                                 onClick={() => updateFilters('helpful', 'false')}
                                 className="hover:text-green-200"
                             >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X size={16} />
                             </button>
                         </span>
                     )}

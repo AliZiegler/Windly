@@ -1,5 +1,5 @@
-import Image from "next/image"
 import { signOut } from "@/auth"
+import { LogOut } from "lucide-react"
 
 export default async function SignOut({ className }: { className?: string }) {
     return (
@@ -11,13 +11,7 @@ export default async function SignOut({ className }: { className?: string }) {
                 }}
             >
                 <button type="submit" className={className || "cursor-pointer h-8 w-32 bg-red-500 rounded-md flex items-center gap-2 pl-1"}>
-                    <Image
-                        src="/images/logoutIcon.webp"
-                        alt="login icon"
-                        width={30}
-                        height={30}
-                        className="cursor-pointer"
-                    />
+                    <LogOut size={25} color="black" />
                     <b>Sign Out</b>
                 </button>
             </form>

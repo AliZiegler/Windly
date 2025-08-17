@@ -1,6 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
 import { updateCartItemQuantity, removeFromCart } from "@/app/actions/CartActions";
+import { Trash2 } from "lucide-react";
 
 interface CartItemControlsProps {
     cartId: number;
@@ -70,9 +71,7 @@ export default function CartItemControls({
                 className="flex items-center justify-center gap-1 px-3 py-2 text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-300/50 rounded-lg transition-all duration-200 disabled:opacity-50 text-sm font-medium cursor-pointer"
                 style={{ backgroundColor: "transparent" }}
             >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+                <Trash2 size={16} />
                 {isPending ? "Processing..." : "Remove"}
             </button>
         </div>
