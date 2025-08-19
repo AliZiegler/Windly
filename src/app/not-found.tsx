@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 export default function NotFound() {
     return (
         <div className="text-center text-4xl mt-10">

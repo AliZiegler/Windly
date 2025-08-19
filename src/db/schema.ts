@@ -63,8 +63,9 @@ export const userTable = sqliteTable("user", {
     gender: text("gender"),
     birthday: text("birthday"), // use date format: YYYY-MM-DD
     phone: text("phone"),
-    addressId: int("address_id"),
+    addressId: int("address_id"), //default address id
     cartId: int("cart_id"), //default cart id
+    role: text("status", { enum: ["user", "seller", "admin"] }).notNull().default("user"),
 })
 export const wishlistTable = sqliteTable("wishlist", {
     productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),

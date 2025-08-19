@@ -6,10 +6,12 @@ import { userTable, productTable, wishlistTable } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 
 const ALLOWED_FIELDS = ['name', 'phone', 'birthday', 'gender'] as const;
+const ALLOWED_ROLES = ['user', 'seller'] as const;
 type AllowedField = typeof ALLOWED_FIELDS[number];
+type AllowedRole = typeof ALLOWED_ROLES[number];
 export async function requireAuth(): Promise<string> {
     const session = await auth();
-    if (!session?.user?.id) throw new Error("Unauthorized");
+    if (!session?.user?.id) throw new Error("Unauthorized, Signin first");
     return session.user.id;
 }
 
@@ -132,4 +134,42 @@ export async function updateWishlist(productId: number) {
         };
     }
 }
-
+export async function isAdmin(userId: string) {
+    const [userRole] = await db.select({ role: userTable.role }).from(userTable).where(eq(userTable.id, userId));
+    return userRole.role === 'admin';
+}
+export async function setUserRole(role: AllowedRole) {
+    const userId = await requireAuth()
+    try {
+        if (!ALLOWED_ROLES.includes(role)) {
+            throw new Error(`Invalid role. Allowed roles: ${ALLOWED_ROLES.join(', ')}`);
+        }
+        await db.update(userTable).set({ role: role }).where(eq(userTable.id, userId));
+        revalidatePath("/account");
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating user role:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Unknown error"
+        };
+    }
+}
+export async function makeAdmin(userId: string) {
+    const callerId = await requireAuth()
+    const isCallerAdmin = isAdmin(callerId)
+    if (!isCallerAdmin) {
+        return { success: false, error: "You are not an admin" };
+    }
+    try {
+        await db.update(userTable).set({ role: 'admin' }).where(eq(userTable.id, userId));
+        revalidatePath("/account");
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating user role:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Unknown error"
+        };
+    }
+}
