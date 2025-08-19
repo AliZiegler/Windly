@@ -5,7 +5,7 @@
       "name": "windly",
       "dependencies": {
         "@auth/drizzle-adapter": "^1.10.0",
-        "@libsql/client": "^0.15.11",
+        "@libsql/client": "^0.15.12",
         "@types/react-stars": "^2.2.4",
         "@vercel/analytics": "^1.5.0",
         "dotenv": "^17.2.1",
@@ -243,9 +243,9 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.29", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-uw6guiW/gcAGPDhLmd77/6lW8QLeiV5RUTsAX46Db6oLhGaVj4lhnPwb184s1bkc8kdVg/+h988dro8GRDpmYQ=="],
 
-    "@libsql/client": ["@libsql/client@0.15.11", "", { "dependencies": { "@libsql/core": "^0.15.11", "@libsql/hrana-client": "^0.7.0", "js-base64": "^3.7.5", "libsql": "^0.5.15", "promise-limit": "^2.7.0" } }, "sha512-JB8RWRs+cAbHX35/dQ9wD3m4W5EVGevq1fFqiHKTT4Pa5HR7WrcGRVT+8NL2M7gtTlOvyPh9zzms2DPLBCswig=="],
+    "@libsql/client": ["@libsql/client@0.15.12", "", { "dependencies": { "@libsql/core": "^0.15.12", "@libsql/hrana-client": "^0.7.0", "js-base64": "^3.7.5", "libsql": "^0.5.15", "promise-limit": "^2.7.0" } }, "sha512-JIqB0XsNrqYqBQZuhcgZdTcQoNOoQ5AMF+1yxc7vcZrLtm42QJwRazmTuBfyDwtWASEmVgjxeaLF4NT1iyVX8g=="],
 
-    "@libsql/core": ["@libsql/core@0.15.11", "", { "dependencies": { "js-base64": "^3.7.5" } }, "sha512-DQDYnEhCSYOsx30ASlOGuOqcQhvwELhOS2qM4dnIP+ZhKki2epZU1j5VZSNeQlrQXHkByMcWBy+wt7tBNx/9uA=="],
+    "@libsql/core": ["@libsql/core@0.15.12", "", { "dependencies": { "js-base64": "^3.7.5" } }, "sha512-S3tF6885ZizVjfym7f8SevL2VId/+DzxiKmP5zFbrhA8oMLh2XH8bYXChmhab7o9qUSHx+XjK4jCFpUwR5g+Ig=="],
 
     "@libsql/darwin-arm64": ["@libsql/darwin-arm64@0.5.15", "", { "os": "darwin", "cpu": "arm64" }, "sha512-BD4c4WHUu988PmJCtF1WNKoSmY4nAg4T6ZRaigt6fKY2qlS/+9uSB8LSqIIq3WwqxQm9SuJijMGMKDoH6dEFdA=="],
 

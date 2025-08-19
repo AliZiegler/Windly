@@ -109,7 +109,7 @@ export const cartTable = sqliteTable("cart", {
     userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
     updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-    status: text("status", { enum: ['active', 'ordered'] }).notNull().default('active'),
+    status: text("status", { enum: ['active', 'ordered', 'shipped', 'delivered', 'cancelled'] }).notNull().default('active'),
 });
 
 export const cartItemTable = sqliteTable("cart_item", {

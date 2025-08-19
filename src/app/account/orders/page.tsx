@@ -1,20 +1,12 @@
 import { auth } from '@/auth';
 import { db } from '@/lib/db';
-import { eq, desc, sql, and } from 'drizzle-orm';
+import { eq, desc, sql, and, inArray } from 'drizzle-orm';
 import { cartTable, cartItemTable, productTable } from '@/db/schema';
+import { setCartStatus } from '@/app/actions/CartActions';
 import Link from 'next/link';
 import { formatPrice } from '@/app/components/global/Atoms';
 import { Box, Check, Clock, RefreshCcw, X } from 'lucide-react';
 
-interface OrderWithItems {
-    id: number;
-    createdAt: string;
-    updatedAt: string;
-    total: number;
-    itemCount: number;
-    firstItemName: string;
-    displayStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-}
 
 export default async function Orders() {
     const session = await auth();
@@ -32,6 +24,7 @@ export default async function Orders() {
             createdAt: cartTable.createdAt,
             updatedAt: cartTable.updatedAt,
             itemCount: sql<number>`count(${cartItemTable.productId})`,
+            status: cartTable.status,
             total: sql<number>`sum(${productTable.price} * ${cartItemTable.quantity})`,
             firstItemName: sql<string>`(
                 SELECT ${productTable.name} 
@@ -44,29 +37,12 @@ export default async function Orders() {
         .from(cartTable)
         .leftJoin(cartItemTable, eq(cartTable.id, cartItemTable.cartId))
         .leftJoin(productTable, eq(cartItemTable.productId, productTable.id))
-        .where(and(eq(cartTable.userId, session.user.id), eq(cartTable.status, 'ordered')))
+        .where(and(eq(cartTable.userId, session.user.id), inArray(cartTable.status, ['ordered', 'shipped', 'delivered', 'cancelled'])))
         .groupBy(cartTable.id)
-        .orderBy(desc(cartTable.createdAt));
+        .orderBy(desc(cartTable.id));
 
-    const ordersWithStatus: OrderWithItems[] = orders.map(order => {
-        const orderDate = new Date(order.updatedAt);
-        const daysSinceOrder = Math.floor((Date.now() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
 
-        let displayStatus: OrderWithItems['displayStatus'];
-        if (daysSinceOrder === 0) {
-            displayStatus = 'pending';
-        } else if (daysSinceOrder <= 2) {
-            displayStatus = 'processing';
-        } else {
-            displayStatus = 'shipped';
-        }
-        return {
-            ...order,
-            displayStatus
-        };
-    });
-
-    if (ordersWithStatus.length === 0) {
+    if (orders.length === 0) {
         return (
             <div className="flex flex-col w-full items-center justify-center min-h-[300px] text-center">
                 <div className="text-4xl mb-4 opacity-50">📦</div>
@@ -74,7 +50,8 @@ export default async function Orders() {
                 <p className="text-gray-400 mb-4">You haven&apos;t placed any orders yet.</p>
                 <Link
                     href="/"
-                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
+                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] 
+                    text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
                 >
                     Start Shopping
                 </Link>
@@ -88,7 +65,7 @@ export default async function Orders() {
                 return 'text-blue-400 bg-blue-500/20 border-blue-500/30';
             case 'processing':
                 return 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30';
-            case 'pending':
+            case 'ordered':
                 return 'text-orange-400 bg-orange-500/20 border-orange-500/30';
             case 'cancelled':
                 return 'text-red-400 bg-red-500/20 border-red-500/30';
@@ -107,11 +84,7 @@ export default async function Orders() {
                 return (
                     <Box className="w-4 h-4" />
                 );
-            case 'processing':
-                return (
-                    <RefreshCcw className="w-4 h-4 animate-spin" />
-                );
-            case 'pending':
+            case 'ordered':
                 return (
                     <Clock className="w-4 h-4" />
                 );
@@ -124,15 +97,15 @@ export default async function Orders() {
         }
     };
 
-    const displayOrders = ordersWithStatus.map((order) => {
+    const displayOrders = orders.map((order) => {
         const date = new Date(order.updatedAt);
         const day = String(date.getDate()).padStart(2, "0");
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const year = date.getFullYear();
         const formattedDate = `${day}/${month}/${year}`;
 
-        const statusColor = getStatusColor(order.displayStatus);
-        const statusIcon = getStatusIcon(order.displayStatus);
+        const statusColor = getStatusColor(order.status);
+        const statusIcon = getStatusIcon(order.status);
 
         const itemsText = order.itemCount === 1
             ? order.firstItemName
@@ -152,7 +125,7 @@ export default async function Orders() {
                     <div className="flex justify-center">
                         <span className={`inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium border ${statusColor}`}>
                             {statusIcon}
-                            {order.displayStatus.charAt(0).toUpperCase() + order.displayStatus.slice(1)}
+                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>
                     </div>
                 </td>
@@ -184,7 +157,7 @@ export default async function Orders() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <h1 className="font-bold text-xl sm:text-2xl">My Orders</h1>
                 <div className="flex items-center gap-2 text-sm text-gray-400">
-                    <span>{ordersWithStatus.length} order{ordersWithStatus.length !== 1 ? 's' : ''}</span>
+                    <span>{orders.length} order{orders.length !== 1 ? 's' : ''}</span>
                 </div>
             </div>
 
@@ -209,15 +182,15 @@ export default async function Orders() {
 
             {/* Mobile Cards */}
             <div className="md:hidden space-y-4">
-                {ordersWithStatus.map((order) => {
+                {orders.map((order) => {
                     const date = new Date(order.createdAt);
                     const day = String(date.getDate()).padStart(2, "0");
                     const month = String(date.getMonth() + 1).padStart(2, "0");
                     const year = date.getFullYear();
                     const formattedDate = `${day}/${month}/${year}`;
 
-                    const statusColor = getStatusColor(order.displayStatus);
-                    const statusIcon = getStatusIcon(order.displayStatus);
+                    const statusColor = getStatusColor(order.status);
+                    const statusIcon = getStatusIcon(order.status);
 
                     const itemsText = order.itemCount === 1
                         ? order.firstItemName
@@ -231,7 +204,7 @@ export default async function Orders() {
                                         <span className="font-mono text-sm font-medium text-gray-200">#{order.id}</span>
                                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${statusColor}`}>
                                             {statusIcon}
-                                            {order.displayStatus.charAt(0).toUpperCase() + order.displayStatus.slice(1)}
+                                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                                         </span>
                                     </div>
                                     <p className="text-xs text-gray-400">{formattedDate}</p>

@@ -9,7 +9,7 @@ import Link from "next/link";
 import { applyDiscount, formatPrice, } from "@/app/components/global/Atoms";
 import CheckoutSteps from "@/app/components/checkout/CheckoutSteps";
 import PaymentForm from "@/app/components/checkout/PaymentForm";
-import { UserRound, ShoppingCart, ChevronLeft, LockKeyhole, CircleCheck, FastForward } from "lucide-react";
+import { UserRound, ShoppingCart, ChevronLeft, LockKeyhole, CircleCheck, Package } from "lucide-react";
 
 async function SignIn() {
     "use server";
@@ -62,6 +62,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                             href="/"
                             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black 
                             font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 transform hover:-translate-y-0.5"
+                            prefetch
                         >
                             Start Shopping
                         </Link>
@@ -100,7 +101,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                     <div className="text-center py-16">
                         <h2 className="text-2xl font-bold text-gray-200 mb-2">Your cart is empty</h2>
                         <p className="text-gray-400 mb-8">Add some items to your cart before proceeding to checkout</p>
-                        <Link href="/" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl">
+                        <Link prefetch href="/" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] 
+                            text-black font-bold rounded-xl">
                             Start Shopping
                         </Link>
                     </div>
@@ -132,7 +134,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-2">Checkout</h1>
                         <p className="text-gray-400">{cartItems.length} item{cartItems.length !== 1 ? "s" : ""} ready for checkout</p>
                     </div>
-                    <Link href="/cart" className="flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium">
+                    <Link prefetch href="/cart" className="flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium">
                         <ChevronLeft size={16} />
                         Back to Cart
                     </Link>
@@ -218,7 +220,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                 ) : (
                                     <div className="text-center py-8">
                                         <p className="text-gray-400 mb-4">No saved addresses found</p>
-                                        <Link
+                                        <Link prefetch
                                             href="/account/address/new"
                                             className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white 
                                                 font-medium rounded-lg transition-colors"
@@ -234,9 +236,10 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                         )}
 
                         <div className="flex justify-between">
-                            <Link
+                            <Link prefetch
                                 href={currentStep > 1 ? `/checkout?step=${currentStep - 1}` : "/cart"}
-                                className="flex items-center gap-2 px-6 py-3 border border-gray-600/50 rounded-xl text-gray-300 hover:text-gray-100 hover:border-gray-500 transition-all duration-200"
+                                className="flex items-center gap-2 px-6 py-3 border border-gray-600/50 rounded-xl text-gray-300 
+                                hover:text-gray-100 hover:border-gray-500 transition-all duration-200"
                                 style={{ backgroundColor: "#2a313c" }}
                             >
                                 <ChevronLeft size={16} />
@@ -245,6 +248,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
                             {currentStep < 3 ? (
                                 <Link
+                                    prefetch
                                     href={`/checkout?step=${currentStep + 1}`}
                                     className="px-8 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
                                 >
@@ -336,7 +340,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                     </div>
 
                                     <div className="flex items-center gap-2 text-sm text-gray-300">
-                                        <FastForward size={15} color="#fdc700" />
+                                        <Package size={15} color="#fdc700" />
                                         <span>Fast & reliable shipping</span>
                                     </div>
                                 </div>

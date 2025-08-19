@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { updateSearchParams } from "@/app/components/global/Atoms";
+import { BadgePercent } from "lucide-react";
 
 export default function DiscountFilter() {
     const router = useRouter();
@@ -24,8 +25,11 @@ export default function DiscountFilter() {
     }, [paramsDiscount]);
 
     return (
-        <section>
-            <b>Discount</b>
+        <section className="flex flex-col gap-2.5">
+            <span className="flex gap-2 items-center">
+                <b>Discount</b>
+                <BadgePercent className="size-6 md:size-[20px]" strokeWidth={1.5} />
+            </span>
             <p>{minDiscount}% - 100%</p>
             <input
                 type="range"

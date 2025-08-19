@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { updateSearchParams, ORIGINAL_MAX_PRICE } from "@/app/components/global/Atoms";
+import { BadgeDollarSign } from "lucide-react";
 
 export default function PriceFilter() {
     const router = useRouter();
@@ -28,8 +29,11 @@ export default function PriceFilter() {
     }, [paramsPrice]);
 
     return (
-        <section>
-            <b>Price</b>
+        <section className="flex flex-col gap-2.5">
+            <span className="flex items-center gap-2">
+                <b>Price</b>
+                <BadgeDollarSign className="size-6 md:size-[20px]" strokeWidth={1.5} />
+            </span>
             <p>
                 $0 - ${!maxPrice || maxPrice >= ORIGINAL_MAX_PRICE
                     ? `${ORIGINAL_MAX_PRICE}+`

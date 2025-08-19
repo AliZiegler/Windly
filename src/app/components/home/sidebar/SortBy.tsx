@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { updateSearchParams } from "@/app/components/global/Atoms";
-import { ArrowDownUp } from "lucide-react";
+import { ArrowDownUp, ArrowDownAZ } from "lucide-react";
 
 export default function SortBy() {
     const router = useRouter();
@@ -23,8 +23,11 @@ export default function SortBy() {
         }
     }
     return (
-        <section className="flex flex-col gap-2">
-            <b>Sort By:</b>
+        <section className="flex flex-col gap-2.5">
+            <span className="flex items-center gap-2">
+                <b>Sort By</b>
+                <ArrowDownAZ className="size-6 md:size-[20px]" strokeWidth={1.5} />
+            </span>
             <span className="flex justify-center">
                 <select
                     defaultValue={sort}

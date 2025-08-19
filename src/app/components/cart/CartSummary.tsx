@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, CircleCheck, CircleAlert, LockKeyhole, FastForward, ChevronDown } from "lucide-react";
+import { Check, CircleCheck, CircleAlert, LockKeyhole, Package, ChevronDown } from "lucide-react";
 
 interface CartSummaryProps {
     subtotal: number;
@@ -84,7 +84,7 @@ export default function CartSummary({
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <FastForward size={15} color="#fdc700" />
+                    <Package size={15} color="#fdc700" />
                     <span>Fast & reliable shipping</span>
                 </div>
             </div>

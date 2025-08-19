@@ -1,5 +1,6 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
     User,
     Heart,
@@ -23,19 +24,29 @@ export default function AccountLinks() {
         { name: "Admin Panel", value: "admin", href: "/admin", icon: Shield }
     ];
 
-    const getCurrentSelection = () => {
+    const [selectedValue, setSelectedValue] = useState(() => {
         if (pathname === "/account") return "account";
         if (pathname.startsWith("/admin")) return "admin";
         return secondPath || "account";
-    };
+    });
 
-    const currentValue = getCurrentSelection();
-    const currentLink = links.find(link => link.value === currentValue) || links[0];
+    useEffect(() => {
+        const getCurrentSelection = () => {
+            if (pathname === "/account") return "account";
+            if (pathname.startsWith("/admin")) return "admin";
+            return secondPath || "account";
+        };
+        setSelectedValue(getCurrentSelection());
+    }, [pathname, secondPath]);
+
+    const currentLink = links.find(link => link.value === selectedValue) || links[0];
     const CurrentIcon = currentLink.icon;
 
     function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
         const newValue = event.target.value;
-        if (newValue === currentValue) return;
+        if (newValue === selectedValue) return;
+
+        setSelectedValue(newValue);
 
         const selectedLink = links.find(link => link.value === newValue);
         if (selectedLink) {
@@ -50,11 +61,10 @@ export default function AccountLinks() {
                     <CurrentIcon size={18} className="text-blue-400" />
                     <span className="text-white font-medium">{currentLink.name}</span>
                 </div>
-
                 <select
                     className="w-full h-12 px-4 bg-[#393e46] text-white border border-gray-600 rounded-lg cursor-pointer 
                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    value={currentValue}
+                    value={selectedValue}
                     onChange={handleChange}
                 >
                     {links.map((link) => (

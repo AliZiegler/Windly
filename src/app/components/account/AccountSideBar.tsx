@@ -22,12 +22,17 @@ export default function AccountSideBar() {
     const liLinks = links.map((link) => {
         const IconComponent = link.icon;
         return (
-            <li key={link.name} className="border-b-1 border-gray-400 py-3 hover:font-extrabold transition-all 
-                duration-200 hover:bg-gray-800/30 hover:px-2 rounded-md">
+            <li
+                key={link.name}
+                className="border-b border-gray-400 py-3 transition-all duration-200 rounded-md
+             hover:font-extrabold hover:bg-gray-800/30 hover:px-2
+             focus:font-extrabold focus:bg-gray-800/30 focus:px-2
+             active:font-extrabold active:bg-gray-800/30 active:px-2"
+            >
                 <Link
                     href={link.href}
                     prefetch
-                    className="flex items-center gap-3 text-[#FCECDD] hover:text-white transition-colors duration-200"
+                    className="flex items-center gap-3 text-[#FCECDD] hover:text-white focus:text-white transition-colors duration-200"
                 >
                     <IconComponent size={18} className="flex-shrink-0" />
                     <span>{link.name}</span>

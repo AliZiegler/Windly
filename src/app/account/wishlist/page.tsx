@@ -33,10 +33,10 @@ export default async function Page() {
 
     if (wishlistItems.length === 0) {
         return (
-            <div className="min-h-screen p-4 sm:p-6 lg:p-8">
-                <div className="max-w-7xl mx-auto">
+            <div className="min-h-screen w-full p-4 sm:p-6 lg:p-8">
+                <div className="max-w-7xl w-full">
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-8">My Wishlist</h1>
-                    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+                    <div className="flex flex-col items-center justify-center w-full min-h-[60vh] text-center">
                         <div className="w-24 h-24 sm:w-32 sm:h-32 mb-6 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full flex items-center justify-center">
                             <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
                         </div>
@@ -53,14 +53,12 @@ export default async function Page() {
             key={item.productId}
             className="group relative bg-gradient-to-br from-[#2d3440] to-[#252a35] border border-gray-600/50 rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-400/30"
         >
-            {/* Heart Icon - Top Right */}
             <div className="absolute top-4 right-4 z-10">
                 <div className="p-2 bg-black/20 backdrop-blur-sm rounded-full transition-all duration-200 hover:bg-black/40">
                     <HeartButton productId={item.productId} isWishlisted={true} size={20} />
                 </div>
             </div>
 
-            {/* Product Image */}
             <Link href={`/${urlString(item.productName)}`} className="block mb-4">
                 <div className="relative aspect-square w-full bg-gray-800/50 rounded-xl overflow-hidden group-hover:shadow-lg transition-all duration-300">
                     <Image
@@ -74,7 +72,6 @@ export default async function Page() {
                 </div>
             </Link>
 
-            {/* Product Name */}
             <Link
                 href={`/${urlString(item.productName)}`}
                 className="block text-base sm:text-lg font-medium text-gray-200 hover:text-[#00CAFF] transition-colors duration-200 line-clamp-2"

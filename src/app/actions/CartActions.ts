@@ -201,3 +201,21 @@ export async function orderCart(cartId: number) {
         return { success: false, error: "Failed to order cart" };
     }
 }
+export async function cancelOrder(cartId: number) {
+    try {
+        await db.update(cartTable).set({ updatedAt: nowISO(), status: "cancelled" }).where(eq(cartTable.id, cartId));
+        return { success: true };
+    } catch (error) {
+        console.error("Error canceling order:", error);
+        return { success: false, error: "Failed to cancel order" };
+    }
+}
+export async function setCartStatus(cartId: number, status: "active" | "ordered" | "shipped" | "delivered" | "cancelled") {
+    try {
+        await db.update(cartTable).set({ updatedAt: nowISO(), status }).where(eq(cartTable.id, cartId));
+        return { success: true };
+    } catch (error) {
+        console.error("Error setting cart status:", error);
+        return { success: false, error: "Failed to set cart status" };
+    }
+}
