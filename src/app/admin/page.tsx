@@ -1,222 +1,97 @@
-import { auth } from "@/auth";
-import { isAdmin } from "@/app/actions/UserActions";
+import { db } from "@/lib/db";
+import { productTable, userTable, cartTable, cartItemTable } from "@/db/schema";
+import { desc, sql, inArray } from "drizzle-orm";
+import Link from "next/link";
 import {
     Package,
     Users,
     ShoppingCart,
     Star,
-    MapPin,
-    MessageSquare,
-    TrendingUp,
-    Settings,
     Plus,
     Search,
     Filter,
     Edit,
     Trash2,
     Eye,
+    DollarSign,
 } from "lucide-react";
 
-export default async function AdminPanel() {
-    // Mock authentication and admin check for demonstration purposes
-    // In a real application, these would be handled by your backend
-    const session = { user: { id: "12345" } }; // Mock session
-    const userId = session?.user?.id || "null";
-    const isUserAdmin = true; // Mock admin status
+export default async function AdminDashboard() {
+    const products = await db.select().from(productTable).orderBy(desc(productTable.id));
+    const users = await db.select().from(userTable).orderBy(desc(userTable.createdAt));
 
-    if (!userId || !isUserAdmin) {
-        return (
-            <main className="text-center text-4xl mt-10 bg-[#222831] text-white min-h-screen">
-                <h1 className="text-[100px] mb-20">🫨</h1>
-                <h2 className="mb-10">Stop Right There!!</h2>
-                <p>This Page Is Only Accessible To Mr. Ziegler</p>
-            </main>
-        );
+    const [productCount] = await db.select({ count: sql<number>`count(*)` }).from(productTable);
+    const [userCount] = await db.select({ count: sql<number>`count(*)` }).from(userTable);
+
+    let orderCount = { count: 0 };
+    let totalRevenue = 0;
+
+    try {
+        [orderCount] = await db.select({ count: sql<number>`count(*)` }).from(cartTable).
+            where(inArray(cartTable.status, ['ordered', 'shipped', 'delivered', 'cancelled']));
+
+        const [revenueResult] = await db
+            .select({
+                total: sql<number>`sum(${cartItemTable.quantity} * ${productTable.price})`
+            })
+            .from(cartTable)
+            .innerJoin(cartItemTable, sql`${cartTable.id} = ${cartItemTable.cartId}`)
+            .innerJoin(productTable, sql`${cartItemTable.productId} = ${productTable.id}`)
+            .where(inArray(cartTable.status, ['ordered', 'shipped', 'delivered']));
+
+        totalRevenue = revenueResult?.total || 0;
+    } catch (error) {
+        console.log("Some tables not available yet:", error);
     }
 
-    // Statistics data
     const stats = [
         {
             title: "Total Products",
-            value: "1,234",
-            change: "+12%",
+            value: productCount.count.toString(),
             icon: Package,
-            color: "text-green-400",
+            color: "text-blue-400",
         },
         {
             title: "Total Users",
-            value: "5,678",
-            change: "+8%",
+            value: userCount.count.toString(),
             icon: Users,
+            color: "text-green-400",
+        },
+        {
+            title: "Total Orders",
+            value: orderCount.count.toString(),
+            icon: ShoppingCart,
             color: "text-purple-400",
         },
         {
-            title: "Orders",
-            value: "892",
-            change: "+15%",
-            icon: ShoppingCart,
-            color: "text-cyan-400",
-        }, // Changed from blue to cyan
-        {
-            title: "Reviews",
-            value: "2,341",
-            change: "+5%",
-            icon: Star,
+            title: "Revenue",
+            value: `$${totalRevenue.toLocaleString()}`,
+            icon: DollarSign,
             color: "text-yellow-400",
         },
     ];
 
-    // Recent products data
-    const recentProducts = [
-        {
-            id: 1,
-            name: "EchoSpace Wireless Earbuds",
-            category: "Electronics",
-            price: "$3.59",
-            stock: 45,
-            status: "Active",
-        },
-        {
-            id: 2,
-            name: "AeroBook Pro Laptop",
-            category: "Computers",
-            price: "$174.79",
-            stock: 12,
-            status: "Active",
-        },
-        {
-            id: 3,
-            name: "TerraTrail Hiking Backpack",
-            category: "Outdoor",
-            price: "$774.39",
-            stock: 0,
-            status: "Out of Stock",
-        },
-        {
-            id: 4,
-            name: "BlendMaster Immersion Blender",
-            category: "Kitchen",
-            price: "$1,299.99",
-            stock: 8,
-            status: "Active",
-        },
-    ];
+    const recentProducts = products.map(product => ({
+        id: product.id,
+        name: product.name,
+        category: product.category || "General",
+        price: `$${product.price}`,
+        stock: product.stock?.toString() || "N/A",
+        status: product.stock && product.stock > 0 ? "Active" : "Out of Stock",
+    }));
 
-    // Recent users data
-    const recentUsers = [
-        {
-            id: 1,
-            name: "John Smith",
-            email: "john@example.com",
-            role: "user",
-            joined: "2024-08-15",
-        },
-        {
-            id: 2,
-            name: "Sarah Johnson",
-            email: "sarah@example.com",
-            role: "seller",
-            joined: "2024-08-14",
-        },
-        {
-            id: 3,
-            name: "Mike Brown",
-            email: "mike@example.com",
-            role: "user",
-            joined: "2024-08-13",
-        },
-        {
-            id: 4,
-            name: "Emma Davis",
-            email: "emma@example.com",
-            role: "user",
-            joined: "2024-08-12",
-        },
-    ];
+
+    const recentUsers = users.map(user => ({
+        id: user.id,
+        name: user.name || "Unknown User",
+        email: user.email || "No email",
+        role: user.role || "user",
+        joined: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Unknown",
+    }));
 
     return (
         <div className="min-h-screen bg-[#222831] text-white font-sans">
-            {/* Header (Navbar) */}
             <div className="flex">
-                {/* Sidebar */}
-                <aside className="w-64 bg-[#272d36] min-h-screen hidden lg:block">
-                    <nav className="p-4 sticky top-0 z-10">
-                        <ul className="space-y-2">
-                            <li>
-                                {/* Active link - changed from blue to teal */}
-                                <div className="w-full flex items-center px-3 py-2 rounded-lg bg-teal-600 text-white">
-                                    <TrendingUp className="w-5 h-5 mr-3" />
-                                    Dashboard
-                                </div>
-                            </li>
-                            <li>
-                                <div className="w-full flex items-center px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-700 hover:text-white cursor-pointer">
-                                    <Package className="w-5 h-5 mr-3" />
-                                    Products
-                                </div>
-                            </li>
-                            <li>
-                                <div className="w-full flex items-center px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-700 hover:text-white cursor-pointer">
-                                    <Users className="w-5 h-5 mr-3" />
-                                    Users
-                                </div>
-                            </li>
-                            <li>
-                                <div className="w-full flex items-center px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-700 hover:text-white cursor-pointer">
-                                    <ShoppingCart className="w-5 h-5 mr-3" />
-                                    Orders
-                                </div>
-                            </li>
-                            <li>
-                                <div className="w-full flex items-center px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-700 hover:text-white cursor-pointer">
-                                    <MessageSquare className="w-5 h-5 mr-3" />
-                                    Reviews
-                                </div>
-                            </li>
-                            <li>
-                                <div className="w-full flex items-center px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-700 hover:text-white cursor-pointer">
-                                    <MapPin className="w-5 h-5 mr-3" />
-                                    Addresses
-                                </div>
-                            </li>
-                            <li>
-                                <div className="w-full flex items-center px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-700 hover:text-white cursor-pointer">
-                                    <Settings className="w-5 h-5 mr-3" />
-                                    Settings
-                                </div>
-                            </li>
-                        </ul>
-                    </nav>
-                </aside>
-
-                {/* Mobile Navigation */}
-                <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#393e46] border-t border-gray-700">
-                    <div className="flex justify-around py-2">
-                        {/* Active link - changed from blue to teal */}
-                        <div className="flex flex-col items-center p-2 rounded-lg text-teal-400">
-                            <TrendingUp className="w-5 h-5 mb-1" />
-                            <span className="text-xs">Dashboard</span>
-                        </div>
-                        <div className="flex flex-col items-center p-2 rounded-lg text-slate-400 cursor-pointer">
-                            <Package className="w-5 h-5 mb-1" />
-                            <span className="text-xs">Products</span>
-                        </div>
-                        <div className="flex flex-col items-center p-2 rounded-lg text-slate-400 cursor-pointer">
-                            <Users className="w-5 h-5 mb-1" />
-                            <span className="text-xs">Users</span>
-                        </div>
-                        <div className="flex flex-col items-center p-2 rounded-lg text-slate-400 cursor-pointer">
-                            <ShoppingCart className="w-5 h-5 mb-1" />
-                            <span className="text-xs">Orders</span>
-                        </div>
-                        <div className="flex flex-col items-center p-2 rounded-lg text-slate-400 cursor-pointer">
-                            <MessageSquare className="w-5 h-5 mb-1" />
-                            <span className="text-xs">Reviews</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Main Content */}
                 <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8">
                     <div>
                         <div className="mb-8">
@@ -231,13 +106,10 @@ export default async function AdminPanel() {
                                 return (
                                     <div
                                         key={index}
-                                        className="bg-[#393e46] rounded-lg p-6 border border-gray-700"
+                                        className="bg-[#393e46] rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors"
                                     >
                                         <div className="flex items-center justify-between mb-4">
                                             <Icon className={`w-8 h-8 ${stat.color}`} />
-                                            <span className="text-green-400 text-sm font-medium">
-                                                {stat.change}
-                                            </span>
                                         </div>
                                         <h3 className="text-2xl font-bold text-white mb-1">
                                             {stat.value}
@@ -259,34 +131,38 @@ export default async function AdminPanel() {
                                 </div>
                                 <div className="p-6">
                                     <div className="space-y-4">
-                                        {recentProducts.map((product) => (
-                                            <div
-                                                key={product.id}
-                                                className="flex items-center justify-between"
-                                            >
-                                                <div>
-                                                    <p className="text-white font-medium">
-                                                        {product.name}
-                                                    </p>
-                                                    <p className="text-slate-400 text-sm">
-                                                        {product.category} • {product.price}
-                                                    </p>
+                                        {recentProducts.length > 0 ? (
+                                            recentProducts.slice(0, 5).map((product) => (
+                                                <div
+                                                    key={product.id}
+                                                    className="flex items-center justify-between"
+                                                >
+                                                    <div>
+                                                        <p className="text-white font-medium">
+                                                            {product.name}
+                                                        </p>
+                                                        <p className="text-slate-400 text-sm">
+                                                            {product.category} • {product.price}
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p
+                                                            className={`text-sm font-medium ${product.status === "Active"
+                                                                ? "text-green-400"
+                                                                : "text-red-400"
+                                                                }`}
+                                                        >
+                                                            {product.status}
+                                                        </p>
+                                                        <p className="text-slate-400 text-sm">
+                                                            Stock: {product.stock}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p
-                                                        className={`text-sm font-medium ${product.status === "Active"
-                                                            ? "text-green-400"
-                                                            : "text-red-400"
-                                                            }`}
-                                                    >
-                                                        {product.status}
-                                                    </p>
-                                                    <p className="text-slate-400 text-sm">
-                                                        Stock: {product.stock}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
+                                            ))
+                                        ) : (
+                                            <p className="text-slate-400 text-center py-4">No products found</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -300,32 +176,36 @@ export default async function AdminPanel() {
                                 </div>
                                 <div className="p-6">
                                     <div className="space-y-4">
-                                        {recentUsers.map((user) => (
-                                            <div
-                                                key={user.id}
-                                                className="flex items-center justify-between"
-                                            >
-                                                <div>
-                                                    <p className="text-white font-medium">{user.name}</p>
-                                                    <p className="text-slate-400 text-sm">{user.email}</p>
+                                        {recentUsers.length > 0 ? (
+                                            recentUsers.slice(0, 5).map((user) => (
+                                                <div
+                                                    key={user.id}
+                                                    className="flex items-center justify-between"
+                                                >
+                                                    <div>
+                                                        <p className="text-white font-medium">{user.name}</p>
+                                                        <p className="text-slate-400 text-sm">{user.email}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <span
+                                                            className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${user.role === "admin"
+                                                                ? "bg-red-900 text-red-300"
+                                                                : user.role === "seller"
+                                                                    ? "bg-orange-900 text-orange-300"
+                                                                    : "bg-green-900 text-green-300"
+                                                                }`}
+                                                        >
+                                                            {user.role}
+                                                        </span>
+                                                        <p className="text-slate-400 text-sm mt-1">
+                                                            {user.joined}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <span
-                                                        className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${user.role === "admin"
-                                                            ? "bg-red-900 text-red-300"
-                                                            : user.role === "seller"
-                                                                ? "bg-orange-900 text-orange-300" // Changed from blue to orange
-                                                                : "bg-green-900 text-green-300"
-                                                            }`}
-                                                    >
-                                                        {user.role}
-                                                    </span>
-                                                    <p className="text-slate-400 text-sm mt-1">
-                                                        {user.joined}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
+                                            ))
+                                        ) : (
+                                            <p className="text-slate-400 text-center py-4">No users found</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -340,8 +220,7 @@ export default async function AdminPanel() {
                                     </h3>
                                     <p className="text-slate-400">Manage your product inventory</p>
                                 </div>
-                                {/* Button - changed from blue to teal */}
-                                <button className="mt-4 sm:mt-0 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center">
+                                <button className="mt-4 sm:mt-0 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
                                     <Plus className="w-4 h-4 mr-2" />
                                     Add Product
                                 </button>
@@ -355,10 +234,11 @@ export default async function AdminPanel() {
                                             <input
                                                 type="text"
                                                 placeholder="Search products..."
-                                                className="pl-10 pr-4 py-2 w-full bg-[#393e46] border border-gray-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500" // Changed from blue to teal
+                                                className="pl-10 pr-4 py-2 w-full bg-[#222831] border border-gray-600 rounded-lg text-white 
+                                                placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                                             />
                                         </div>
-                                        <button className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center">
+                                        <button className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
                                             <Filter className="w-4 h-4 mr-2" />
                                             Filter
                                         </button>
@@ -366,88 +246,130 @@ export default async function AdminPanel() {
                                 </div>
 
                                 <div className="overflow-x-auto">
-                                    <table className="w-full">
-                                        <thead className="bg-gray-800">
-                                            <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                    Product
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                    Category
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                    Price
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                    Stock
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                    Status
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                    Actions
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-700">
-                                            {recentProducts.map((product) => (
-                                                <tr key={product.id} className="hover:bg-gray-800">
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex items-center">
-                                                            <div className="w-10 h-10 bg-gray-600 rounded-lg mr-3"></div>
-                                                            <div>
-                                                                <p className="text-white font-medium">
-                                                                    {product.name}
-                                                                </p>
-                                                                <p className="text-slate-400 text-sm">
-                                                                    ID: {product.id}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-slate-300">
-                                                        {product.category}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-slate-300">
-                                                        {product.price}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-slate-300">
-                                                        {product.stock}
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <span
-                                                            className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${product.status === "Active"
-                                                                ? "bg-green-900 text-green-300"
-                                                                : "bg-red-900 text-red-300"
-                                                                }`}
-                                                        >
-                                                            {product.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex items-center space-x-2">
-                                                            {/* Icon color - changed from blue to teal */}
-                                                            <button className="text-teal-400 hover:text-teal-300">
-                                                                <Eye className="w-4 h-4" />
-                                                            </button>
-                                                            <button className="text-slate-400 hover:text-slate-300">
-                                                                <Edit className="w-4 h-4" />
-                                                            </button>
-                                                            <button className="text-red-400 hover:text-red-300">
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                    <div className="min-w-full">
+                                        <div className="max-h-[600px] overflow-y-auto">
+                                            <div className="min-w-full">
+                                                <div className="max-h-[600px] overflow-y-auto">
+                                                    <table className="min-w-full divide-y divide-gray-700">
+                                                        <thead className="bg-gray-800 sticky top-0 z-10">
+                                                            <tr>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                                                                    Product
+                                                                </th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                                                                    Category
+                                                                </th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                                                                    Price
+                                                                </th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                                                                    Stock
+                                                                </th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                                                                    Status
+                                                                </th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                                                                    Actions
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="bg-gray-800">
+                                                            {recentProducts.length > 0 ? (
+                                                                recentProducts.map((product) => (
+                                                                    <tr key={product.id} className="hover:bg-gray-800 transition-colors">
+                                                                        <td className="px-6 py-4">
+                                                                            <div className="flex items-center">
+                                                                                <div
+                                                                                    className="w-10 h-10 bg-gray-600 rounded-lg mr-3 flex items-center justify-center">
+                                                                                    <Package className="w-5 h-5 text-gray-400" />
+                                                                                </div>
+                                                                                <div>
+                                                                                    <p className="text-white font-medium">
+                                                                                        {product.name}
+                                                                                    </p>
+                                                                                    <p className="text-slate-400 text-sm">ID: {product.id}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="px-6 py-4 text-slate-300">{product.category}</td>
+                                                                        <td className="px-6 py-4 text-slate-300">{product.price}</td>
+                                                                        <td className="px-6 py-4 text-slate-300">{product.stock}</td>
+                                                                        <td className="px-6 py-4">
+                                                                            <span
+                                                                                className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${product.status === "Active"
+                                                                                    ? "bg-green-900 text-green-300"
+                                                                                    : "bg-red-900 text-red-300"
+                                                                                    }`}
+                                                                            >
+                                                                                {product.status}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td className="px-6 py-4">
+                                                                            <div className="flex items-center space-x-2">
+                                                                                <button className="text-teal-400 hover:text-teal-300 transition-colors">
+                                                                                    <Eye className="w-4 h-4" />
+                                                                                </button>
+                                                                                <button className="text-slate-400 hover:text-slate-300 transition-colors">
+                                                                                    <Edit className="w-4 h-4" />
+                                                                                </button>
+                                                                                <button className="text-red-400 hover:text-red-300 transition-colors">
+                                                                                    <Trash2 className="w-4 h-4" />
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                ))
+                                                            ) : (
+                                                                <tr>
+                                                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
+                                                                        No products found
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Quick Actions */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <button className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
+                                <Link prefetch href="/admin/products">
+                                    <Package className="w-8 h-8 text-blue-400 mb-3" />
+                                    <h4 className="text-white font-medium mb-1">Manage Products</h4>
+                                    <p className="text-slate-400 text-sm">Add, edit, or remove products</p>
+                                </Link>
+                            </button>
+                            <button className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
+                                <Link prefetch href="/admin/orders">
+                                    <Users className="w-8 h-8 text-green-400 mb-3" />
+                                    <h4 className="text-white font-medium mb-1">User Management</h4>
+                                    <p className="text-slate-400 text-sm">View and manage users</p>
+                                </Link>
+                            </button>
+                            <button className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
+                                <Link prefetch href="/admin/carts">
+                                    <ShoppingCart className="w-8 h-8 text-purple-400 mb-3" />
+                                    <h4 className="text-white font-medium mb-1">Orders</h4>
+                                    <p className="text-slate-400 text-sm">Track and manage orders</p>
+                                </Link>
+                            </button>
+                            <button className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
+                                <Link prefetch href="/admin/reviews">
+                                    <Star className="w-8 h-8 text-yellow-400 mb-3" />
+                                    <h4 className="text-white font-medium mb-1">Reviews</h4>
+                                    <p className="text-slate-400 text-sm">Monitor product reviews</p>
+                                </Link>
+                            </button>
+                        </div>
                     </div>
-                </main>
-            </div>
-        </div>
+                </main >
+            </div >
+        </div >
     );
 }

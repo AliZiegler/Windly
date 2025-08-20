@@ -4,7 +4,7 @@ import {
     User,
     Heart,
     MapPin,
-    Star,
+    UserStar,
     ShoppingBag,
     Shield
 } from "lucide-react";
@@ -14,7 +14,7 @@ export default function AccountSideBar() {
         { name: "Account Information", href: "/account", icon: User },
         { name: "Wishlist", href: "/account/wishlist", icon: Heart },
         { name: "Address Book", href: "/account/address", icon: MapPin },
-        { name: "Reviews", href: "/account/reviews", icon: Star },
+        { name: "Reviews", href: "/account/reviews", icon: UserStar },
         { name: "Orders", href: "/account/orders", icon: ShoppingBag },
         { name: "Admin Panel", href: "/admin", icon: Shield }
     ];

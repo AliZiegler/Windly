@@ -2,10 +2,9 @@ import { auth } from '@/auth';
 import { db } from '@/lib/db';
 import { eq, desc, sql, and, inArray } from 'drizzle-orm';
 import { cartTable, cartItemTable, productTable } from '@/db/schema';
-import { setCartStatus } from '@/app/actions/CartActions';
 import Link from 'next/link';
 import { formatPrice } from '@/app/components/global/Atoms';
-import { Box, Check, Clock, RefreshCcw, X } from 'lucide-react';
+import { Box, Check, Clock, X } from 'lucide-react';
 
 
 export default async function Orders() {

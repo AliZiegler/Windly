@@ -27,8 +27,8 @@ export const productTable = sqliteTable("product", {
 
     tags: text().notNull(), // an array of strings, that you gonna json it
 
-    dateAdded: text().notNull(), // ISO date string
-    lastUpdated: text().notNull(), // ISO date string
+    dateAdded: text().notNull().default(sql`CURRENT_TIMESTAMP`),
+    lastUpdated: text().notNull().default(sql`CURRENT_TIMESTAMP`),
 
     featured: int().notNull().default(0),
 
@@ -66,6 +66,7 @@ export const userTable = sqliteTable("user", {
     addressId: int("address_id"), //default address id
     cartId: int("cart_id"), //default cart id
     role: text("status", { enum: ["user", "seller", "admin"] }).notNull().default("user"),
+    createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 })
 export const wishlistTable = sqliteTable("wishlist", {
     productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),
