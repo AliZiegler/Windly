@@ -68,8 +68,8 @@ export default function AdminSidebar() {
     return (
         <>
             {/* Desktop Sidebar */}
-            <div className="hidden lg:block w-72 h-screen text-[#FCECDD] border-r-1 border-gray-400 pr-3 pt-3">
-                <aside className="sticky top-6 z-10">
+            <div className="hidden lg:block w-72 text-[#FCECDD] border-r border-gray-400">
+                <aside className="sticky top-0 h-screen pr-3 pt-3 z-10">
                     <div className="mb-6">
                         <h2 className="text-2xl mb-2 font-semibold flex items-center gap-2">
                             <Shield size={24} className="text-blue-400" />

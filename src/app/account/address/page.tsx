@@ -84,9 +84,11 @@ export default async function Page() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex gap-2 flex-1">
+                    <div className="flex gap-3 flex-1">
                         <Link href={`/account/address/${address.id}`} className="flex-1">
-                            <button className="w-full bg-[#4a5568] flex items-center justify-center gap-2 hover:bg-[#5a6578] text-white font-medium px-4 py-2 rounded-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#4a5568] focus:ring-offset-2 focus:ring-offset-[#393e46] text-sm">
+                            <button className="w-full bg-[#4a5568] flex items-center justify-center gap-2 hover:bg-[#5a6578] text-white 
+                                font-medium px-4 py-2 rounded-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 
+                                focus:ring-[#4a5568] focus:ring-offset-2 focus:ring-offset-[#393e46] text-sm cursor-pointer">
                                 <SquarePen size={16} className="inline" />
                                 Edit
                             </button>
@@ -100,7 +102,7 @@ export default async function Page() {
                                 className={`w-full flex items-center justify-center gap-2 font-medium px-4 py-2 rounded-md transition-all duration-200 text-sm
                                       ${isDefault
                                         ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                        : 'bg-red-600 hover:bg-red-700 text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-[#393e46]'
+                                        : 'bg-red-600 hover:bg-red-700 text-white hover:scale-105 focus:outline-none focus:ring-2 cursor-pointer focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-[#393e46]'
                                     }`}
                             >
                                 <Trash2 size={16} className="inline" />
@@ -115,7 +117,8 @@ export default async function Page() {
                             <input type="hidden" name="addressId" value={address.id} />
                             <button
                                 type="submit"
-                                className="text-[#00CAFF] hover:text-[#00a8d9] font-medium text-sm underline hover:no-underline transition-all duration-200"
+                                className="text-[#00CAFF] hover:text-[#00a8d9] cursor-pointer font-medium text-sm underline
+                                hover:no-underline transition-all duration-200"
                             >
                                 Set as Default Address
                             </button>

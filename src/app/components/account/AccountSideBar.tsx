@@ -42,7 +42,7 @@ export default function AccountSideBar() {
     });
 
     return (
-        <div className="w-72 min-h-[400px] text-[#FCECDD] border-r-1 border-gray-400 pr-3">
+        <div className="w-72 min-h-[400px] text-[#FCECDD] border-r-1 border-gray-400 pr-3 sticky top-20">
             <div className="mb-6">
                 <h2 className="text-2xl mb-2 font-semibold flex items-center gap-2">
                     <User size={24} className="text-blue-400" />

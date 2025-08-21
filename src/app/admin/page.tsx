@@ -2,17 +2,13 @@ import { db } from "@/lib/db";
 import { productTable, userTable, cartTable, cartItemTable } from "@/db/schema";
 import { desc, sql, inArray } from "drizzle-orm";
 import Link from "next/link";
+import ProductsManagement from "../components/admin/dashboard/ProductsManagement";
 import {
     Package,
     Users,
     ShoppingCart,
     Star,
     Plus,
-    Search,
-    Filter,
-    Edit,
-    Trash2,
-    Eye,
     DollarSign,
 } from "lucide-react";
 
@@ -70,6 +66,23 @@ export default async function AdminDashboard() {
             color: "text-yellow-400",
         },
     ];
+    const divStats = stats.map((stat, index) => {
+        const Icon = stat.icon;
+        return (
+            <div
+                key={index}
+                className="bg-[#393e46] rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors"
+            >
+                <div className="flex items-center justify-between mb-4">
+                    <Icon className={`w-8 h-8 ${stat.color}`} />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-1">
+                    {stat.value}
+                </h3>
+                <p className="text-slate-400 text-sm">{stat.title}</p>
+            </div>
+        );
+    })
 
     const recentProducts = products.map(product => ({
         id: product.id,
@@ -88,6 +101,80 @@ export default async function AdminDashboard() {
         role: user.role || "user",
         joined: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Unknown",
     }));
+    const displayRecentProducts = recentProducts.slice(0, 5).map((product) => (
+        <div
+            key={product.id}
+            className="flex items-center justify-between"
+        >
+            <div>
+                <p className="text-white font-medium">
+                    {product.name}
+                </p>
+                <p className="text-slate-400 text-sm">
+                    {product.category} • {product.price}
+                </p>
+            </div>
+            <div className="text-right">
+                <p
+                    className={`text-sm font-medium ${product.status === "Active"
+                        ? "text-green-400"
+                        : "text-red-400"
+                        }`}
+                >
+                    {product.status}
+                </p>
+                <p className="text-slate-400 text-sm">
+                    Stock: {product.stock}
+                </p>
+            </div>
+        </div>
+    ))
+
+    const displayRecentUsers = recentUsers.slice(0, 5).map((user) => (
+        <div
+            key={user.id}
+            className="flex items-center justify-between"
+        >
+            <div>
+                <p className="text-white font-medium">{user.name}</p>
+                <p className="text-slate-400 text-sm">{user.email}</p>
+            </div>
+            <div className="text-right">
+                <span
+                    className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${user.role === "admin"
+                        ? "bg-red-900 text-red-300"
+                        : user.role === "seller"
+                            ? "bg-orange-900 text-orange-300"
+                            : "bg-green-900 text-green-300"
+                        }`}
+                >
+                    {user.role}
+                </span>
+                <p className="text-slate-400 text-sm mt-1">
+                    {user.joined}
+                </p>
+            </div>
+        </div>
+    ))
+
+    const quickActions = [
+        { name: "Products Management", href: "/admin/products", p: "Add, edit, or remove products", icon: Package, iconColor: "text-blue-400" },
+        { name: "User Management", href: "/admin/users", p: "View and manage users", icon: Users, iconColor: "text-green-400" },
+        { name: "Orders Management", href: "/admin/orders", p: "Track and manage orders", icon: ShoppingCart, iconColor: "text-purple-400" },
+        { name: "Reviews Management", href: "/admin/reviews", p: "Monitor product reviews", icon: Star, iconColor: "text-yellow-400" },
+    ]
+    const quickActionsButtons = quickActions.map((action) => {
+        const ActionIcon = action.icon;
+        return (
+            <button key={action.name} className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
+                <Link prefetch href={action.href}>
+                    <ActionIcon className={`w-8 h-8 mb-3 ${action.iconColor}`} />
+                    <h4 className="text-white font-medium mb-1">{action.name}</h4>
+                    <p className="text-slate-400 text-sm">{action.p}</p>
+                </Link>
+            </button>
+        )
+    })
 
     return (
         <div className="min-h-screen bg-[#222831] text-white font-sans">
@@ -99,110 +186,37 @@ export default async function AdminDashboard() {
                             <p className="text-slate-400">Welcome back, Mr. Ziegler</p>
                         </div>
 
-                        {/* Stats Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                            {stats.map((stat, index) => {
-                                const Icon = stat.icon;
-                                return (
-                                    <div
-                                        key={index}
-                                        className="bg-[#393e46] rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors"
-                                    >
-                                        <div className="flex items-center justify-between mb-4">
-                                            <Icon className={`w-8 h-8 ${stat.color}`} />
-                                        </div>
-                                        <h3 className="text-2xl font-bold text-white mb-1">
-                                            {stat.value}
-                                        </h3>
-                                        <p className="text-slate-400 text-sm">{stat.title}</p>
-                                    </div>
-                                );
-                            })}
+                            {divStats}
                         </div>
 
-                        {/* Recent Activity */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                            {/* Recent Products */}
                             <div className="bg-[#393e46] rounded-lg border border-gray-700">
                                 <div className="p-6 border-b border-gray-700">
                                     <h3 className="text-xl font-semibold text-white">
                                         Recent Products
                                     </h3>
                                 </div>
-                                <div className="p-6">
+                                <div className="p-6 bg-[#2e3238]">
                                     <div className="space-y-4">
                                         {recentProducts.length > 0 ? (
-                                            recentProducts.slice(0, 5).map((product) => (
-                                                <div
-                                                    key={product.id}
-                                                    className="flex items-center justify-between"
-                                                >
-                                                    <div>
-                                                        <p className="text-white font-medium">
-                                                            {product.name}
-                                                        </p>
-                                                        <p className="text-slate-400 text-sm">
-                                                            {product.category} • {product.price}
-                                                        </p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p
-                                                            className={`text-sm font-medium ${product.status === "Active"
-                                                                ? "text-green-400"
-                                                                : "text-red-400"
-                                                                }`}
-                                                        >
-                                                            {product.status}
-                                                        </p>
-                                                        <p className="text-slate-400 text-sm">
-                                                            Stock: {product.stock}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ))
+                                            displayRecentProducts
                                         ) : (
                                             <p className="text-slate-400 text-center py-4">No products found</p>
                                         )}
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Recent Users */}
-                            <div className="bg-[#393e46] rounded-lg border border-gray-700">
-                                <div className="p-6 border-b border-gray-700">
+                            <div className="bg-[#2e3238] rounded-lg border border-gray-700">
+                                <div className="p-6 bg-[#393e46] border-b border-gray-700">
                                     <h3 className="text-xl font-semibold text-white">
                                         Recent Users
                                     </h3>
                                 </div>
-                                <div className="p-6">
+                                <div className="p-6 bg-[#2e3238]">
                                     <div className="space-y-4">
                                         {recentUsers.length > 0 ? (
-                                            recentUsers.slice(0, 5).map((user) => (
-                                                <div
-                                                    key={user.id}
-                                                    className="flex items-center justify-between"
-                                                >
-                                                    <div>
-                                                        <p className="text-white font-medium">{user.name}</p>
-                                                        <p className="text-slate-400 text-sm">{user.email}</p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <span
-                                                            className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${user.role === "admin"
-                                                                ? "bg-red-900 text-red-300"
-                                                                : user.role === "seller"
-                                                                    ? "bg-orange-900 text-orange-300"
-                                                                    : "bg-green-900 text-green-300"
-                                                                }`}
-                                                        >
-                                                            {user.role}
-                                                        </span>
-                                                        <p className="text-slate-400 text-sm mt-1">
-                                                            {user.joined}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ))
+                                            displayRecentUsers
                                         ) : (
                                             <p className="text-slate-400 text-center py-4">No users found</p>
                                         )}
@@ -211,7 +225,6 @@ export default async function AdminDashboard() {
                             </div>
                         </div>
 
-                        {/* Products Management Section */}
                         <div className="mb-8">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
                                 <div>
@@ -225,147 +238,10 @@ export default async function AdminDashboard() {
                                     Add Product
                                 </button>
                             </div>
-
-                            <div className="bg-[#393e46] rounded-lg border border-gray-700">
-                                <div className="p-6 border-b border-gray-700">
-                                    <div className="flex flex-col sm:flex-row gap-4">
-                                        <div className="relative flex-1">
-                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                                            <input
-                                                type="text"
-                                                placeholder="Search products..."
-                                                className="pl-10 pr-4 py-2 w-full bg-[#222831] border border-gray-600 rounded-lg text-white 
-                                                placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                                            />
-                                        </div>
-                                        <button className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                                            <Filter className="w-4 h-4 mr-2" />
-                                            Filter
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="overflow-x-auto">
-                                    <div className="min-w-full">
-                                        <div className="max-h-[600px] overflow-y-auto">
-                                            <div className="min-w-full">
-                                                <div className="max-h-[600px] overflow-y-auto">
-                                                    <table className="min-w-full divide-y divide-gray-700">
-                                                        <thead className="bg-gray-800 sticky top-0 z-10">
-                                                            <tr>
-                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                                    Product
-                                                                </th>
-                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                                    Category
-                                                                </th>
-                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                                    Price
-                                                                </th>
-                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                                    Stock
-                                                                </th>
-                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                                    Status
-                                                                </th>
-                                                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                                                    Actions
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className="bg-gray-800">
-                                                            {recentProducts.length > 0 ? (
-                                                                recentProducts.map((product) => (
-                                                                    <tr key={product.id} className="hover:bg-gray-800 transition-colors">
-                                                                        <td className="px-6 py-4">
-                                                                            <div className="flex items-center">
-                                                                                <div
-                                                                                    className="w-10 h-10 bg-gray-600 rounded-lg mr-3 flex items-center justify-center">
-                                                                                    <Package className="w-5 h-5 text-gray-400" />
-                                                                                </div>
-                                                                                <div>
-                                                                                    <p className="text-white font-medium">
-                                                                                        {product.name}
-                                                                                    </p>
-                                                                                    <p className="text-slate-400 text-sm">ID: {product.id}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </td>
-                                                                        <td className="px-6 py-4 text-slate-300">{product.category}</td>
-                                                                        <td className="px-6 py-4 text-slate-300">{product.price}</td>
-                                                                        <td className="px-6 py-4 text-slate-300">{product.stock}</td>
-                                                                        <td className="px-6 py-4">
-                                                                            <span
-                                                                                className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${product.status === "Active"
-                                                                                    ? "bg-green-900 text-green-300"
-                                                                                    : "bg-red-900 text-red-300"
-                                                                                    }`}
-                                                                            >
-                                                                                {product.status}
-                                                                            </span>
-                                                                        </td>
-                                                                        <td className="px-6 py-4">
-                                                                            <div className="flex items-center space-x-2">
-                                                                                <button className="text-teal-400 hover:text-teal-300 transition-colors">
-                                                                                    <Eye className="w-4 h-4" />
-                                                                                </button>
-                                                                                <button className="text-slate-400 hover:text-slate-300 transition-colors">
-                                                                                    <Edit className="w-4 h-4" />
-                                                                                </button>
-                                                                                <button className="text-red-400 hover:text-red-300 transition-colors">
-                                                                                    <Trash2 className="w-4 h-4" />
-                                                                                </button>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                ))
-                                                            ) : (
-                                                                <tr>
-                                                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
-                                                                        No products found
-                                                                    </td>
-                                                                </tr>
-                                                            )}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <ProductsManagement recentProducts={recentProducts} />
                         </div>
-
-                        {/* Quick Actions */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <button className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
-                                <Link prefetch href="/admin/products">
-                                    <Package className="w-8 h-8 text-blue-400 mb-3" />
-                                    <h4 className="text-white font-medium mb-1">Manage Products</h4>
-                                    <p className="text-slate-400 text-sm">Add, edit, or remove products</p>
-                                </Link>
-                            </button>
-                            <button className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
-                                <Link prefetch href="/admin/orders">
-                                    <Users className="w-8 h-8 text-green-400 mb-3" />
-                                    <h4 className="text-white font-medium mb-1">User Management</h4>
-                                    <p className="text-slate-400 text-sm">View and manage users</p>
-                                </Link>
-                            </button>
-                            <button className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
-                                <Link prefetch href="/admin/carts">
-                                    <ShoppingCart className="w-8 h-8 text-purple-400 mb-3" />
-                                    <h4 className="text-white font-medium mb-1">Orders</h4>
-                                    <p className="text-slate-400 text-sm">Track and manage orders</p>
-                                </Link>
-                            </button>
-                            <button className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
-                                <Link prefetch href="/admin/reviews">
-                                    <Star className="w-8 h-8 text-yellow-400 mb-3" />
-                                    <h4 className="text-white font-medium mb-1">Reviews</h4>
-                                    <p className="text-slate-400 text-sm">Monitor product reviews</p>
-                                </Link>
-                            </button>
+                            {quickActionsButtons}
                         </div>
                     </div>
                 </main >
