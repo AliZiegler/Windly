@@ -24,8 +24,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
     if (!userId) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#222831" }}>
-                <div className="text-center p-8 border border-gray-600/50 rounded-2xl max-w-md" style={{ backgroundColor: "#2a313c" }}>
+            <div className="min-h-screen flex items-center justify-center p-4 bg-[#222831]">
+                <div className="text-center p-8 border border-gray-600/50 rounded-2xl max-w-md bg-[#2a313c]">
                     <UserRound size={64} className="mx-auto mb-4" />
                     <h2 className="text-2xl font-semibold text-gray-200 mb-4">Sign In Required</h2>
                     <p className="text-gray-400 mb-6">Please sign in to proceed with checkout</p>
@@ -50,10 +50,10 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
     if (!userCart) {
         return (
-            <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "#222831" }}>
+            <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-[#222831]">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center py-16">
-                        <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "#2a313c" }}>
+                        <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center bg-[#2a313c]">
                             <ShoppingCart size={40} color="gray" />
                         </div>
                         <h2 className="text-2xl font-bold text-gray-200 mb-2">Your cart is empty</h2>
@@ -96,7 +96,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
     if (!cartItems.length) {
         return (
-            <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "#222831" }}>
+            <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-[#222831]">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center py-16">
                         <h2 className="text-2xl font-bold text-gray-200 mb-2">Your cart is empty</h2>
@@ -127,7 +127,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     const totalPrice = subtotalPrice + shippingPrice;
 
     return (
-        <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "#222831" }}>
+        <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-[#222831]">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                     <div>
@@ -147,7 +147,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
 
                         {currentStep === 1 && (
-                            <div className="border border-gray-600/50 rounded-2xl p-6 mb-6" style={{ backgroundColor: "#2a313c" }}>
+                            <div className="border border-gray-600/50 rounded-2xl p-6 mb-6 bg-[#2a313c]">
                                 <h2 className="text-xl font-bold text-gray-100 mb-6">Review Your Order</h2>
                                 <div className="space-y-4">
                                     {cartItems.map((item) => {
@@ -155,8 +155,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                         const itemTotal = itemPrice * item.quantity;
 
                                         return (
-                                            <div key={item.productId} className="flex items-center gap-4 p-4 border border-gray-600/30 rounded-xl" style={{ backgroundColor: "#1e252d" }}>
-                                                <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0" style={{ backgroundColor: "#222831" }}>
+                                            <div key={item.productId} className="flex bg-[#1e252d] items-center gap-4 p-4 border border-gray-600/30 rounded-xl">
+                                                <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#222831]">
                                                     <Image
                                                         src={item.productImg || "/images/placeholder.png"}
                                                         alt={item.productImgAlt || item.productName}
@@ -187,18 +187,18 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
 
                         {currentStep === 2 && (
-                            <div className="border border-gray-600/50 rounded-2xl p-6 mb-6" style={{ backgroundColor: "#2a313c" }}>
+                            <div className="border border-gray-600/50 rounded-2xl p-6 mb-6 bg-[#2a313c]">
                                 <h2 className="text-xl font-bold text-gray-100 mb-6">Shipping Information</h2>
 
                                 {userAddresses.length > 0 ? (
                                     <div className="space-y-4 mb-6">
                                         {userAddresses.map((address) => (
-                                            <div key={address.id} className="border border-gray-600/30 rounded-xl p-4" style={{ backgroundColor: "#1e252d" }}>
+                                            <div key={address.id} className="border border-gray-600/30 rounded-xl p-4 bg-[#1e252d]">
                                                 <div className="flex items-start justify-between">
                                                     <div>
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <h3 className="font-semibold text-gray-100">{address.name}</h3>
-                                                            <span className="px-2 py-1 text-xs rounded-full capitalize text-gray-300" style={{ backgroundColor: "#222831" }}>
+                                                            <span className="px-2 py-1 text-xs rounded-full capitalize text-gray-300 bg-[#222831]">
                                                                 {address.addressType}
                                                             </span>
                                                         </div>
@@ -239,9 +239,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                             <Link prefetch
                                 href={currentStep > 1 ? `/checkout?step=${currentStep - 1}` : "/cart"}
                                 className="flex items-center gap-2 px-6 py-3 border border-gray-600/50 rounded-xl text-gray-300 
-                                hover:text-gray-100 hover:border-gray-500 transition-all duration-200"
-                                style={{ backgroundColor: "#2a313c" }}
-                            >
+                                hover:text-gray-100 hover:border-gray-500 transition-all duration-200 bg-[#2a313c]">
                                 <ChevronLeft size={16} />
                                 {currentStep === 1 ? "Back to Cart" : "Previous"}
                             </Link>
@@ -250,7 +248,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                 <Link
                                     prefetch
                                     href={`/checkout?step=${currentStep + 1}`}
-                                    className="px-8 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
+                                    className="px-8 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl 
+                                    hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
                                 >
                                     Continue
                                 </Link>
@@ -258,7 +257,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                 <form action={handleOrder}>
                                     <button
                                         className="px-8 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold 
-                                        rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200">
+                                        rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 cursor-pointer">
                                         Place Order
                                     </button>
                                 </form>
@@ -268,7 +267,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
                     <div className="lg:col-span-1">
                         <div className="sticky top-6">
-                            <div className="border border-gray-600/50 rounded-2xl p-6 space-y-6" style={{ backgroundColor: "#2a313c" }}>
+                            <div className="border border-gray-600/50 rounded-2xl p-6 space-y-6 bg-[#2a313c]">
                                 <div className="border-b border-gray-600/50 pb-4">
                                     <h2 className="text-xl font-bold text-gray-100">Order Summary</h2>
                                     <p className="text-gray-400 text-sm mt-1">
@@ -283,7 +282,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
                                         return (
                                             <div key={item.productId} className="flex items-center gap-3">
-                                                <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0" style={{ backgroundColor: "#1e252d" }}>
+                                                <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-[#1e252d]">
                                                     <Image
                                                         src={item.productImg || "/images/placeholder.png"}
                                                         alt={item.productImgAlt || item.productName}
@@ -349,6 +348,6 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

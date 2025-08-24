@@ -138,6 +138,10 @@ export async function isAdmin(userId: string) {
     const [userRole] = await db.select({ role: userTable.role }).from(userTable).where(eq(userTable.id, userId));
     return userRole.role === 'admin';
 }
+export async function isCallerAdmin() {
+    const userId = await requireAuth();
+    return isAdmin(userId);
+}
 export async function setUserRole(role: AllowedRole) {
     const userId = await requireAuth()
     try {

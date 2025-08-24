@@ -36,12 +36,11 @@ export default async function CartPage() {
         );
     }
 
-    const rawUserCart = await db
+    const [userCart] = await db
         .select()
         .from(cartTable)
         .where(and(eq(cartTable.userId, session.user.id), eq(cartTable.status, "active")))
         .limit(1);
-    const userCart = rawUserCart[0];
 
     if (!userCart) {
         return (

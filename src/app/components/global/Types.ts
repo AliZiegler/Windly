@@ -62,3 +62,4 @@ export type UpdateReview = {
     rating: number;
     review: string;
 }
+export type SearchParamsType = Promise<{ [key: string]: string | string[] | undefined }>;

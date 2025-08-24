@@ -178,6 +178,7 @@ export const sessionTable = sqliteTable("session", {
     expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
 });
 export type SelectProduct = typeof productTable.$inferSelect
+export type InsertProduct = typeof productTable.$inferInsert
 export type SelectUser = typeof userTable.$inferSelect
 export type SelectReview = typeof reviewTable.$inferSelect
 export type SelectAddress = typeof addressTable.$inferSelect

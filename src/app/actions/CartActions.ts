@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { cartTable, cartItemTable, userTable, InsertCart } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { cartTable, cartItemTable, userTable, InsertCart, productTable } from "@/db/schema";
+import { eq, and, sql } from "drizzle-orm";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
@@ -74,6 +74,20 @@ export async function updateCartItemQuantity(
             return await removeFromCart(cartId, productId);
         }
 
+        const [product] = await db
+            .select({ stock: productTable.stock })
+            .from(productTable)
+            .where(eq(productTable.id, productId))
+            .limit(1);
+
+        if (!product) {
+            return { success: false, error: "Product not found" };
+        }
+
+        if (product.stock < quantity) {
+            return { success: false, error: "Insufficient stock available" };
+        }
+
         await db.update(cartItemTable)
             .set({ quantity, updatedAt: nowISO() })
             .where(cartItemCondition(cartId, productId));
@@ -105,12 +119,26 @@ export async function addToCart(
     quantity: number = 1
 ) {
     try {
+        const [product] = await db
+            .select({ stock: productTable.stock })
+            .from(productTable)
+            .where(eq(productTable.id, productId))
+            .limit(1);
+
+        if (!product) {
+            return { success: false, error: "Product not found" };
+        }
+
+        if (product.stock < quantity) {
+            return { success: false, error: "Insufficient stock available" };
+        }
+
         let finalCartId = cartId;
 
         if (!finalCartId) {
             const userId = await requireAuth();
             const user = await db
-                .select()
+                .select({ cartId: userTable.cartId })
                 .from(userTable)
                 .where(eq(userTable.id, userId))
                 .limit(1);
@@ -123,7 +151,6 @@ export async function addToCart(
                     return { success: false, error: "Failed to create a new cart." };
                 }
                 finalCartId = result.cartId;
-                await setUserCartId(finalCartId);
             }
         }
 
@@ -132,14 +159,18 @@ export async function addToCart(
         }
 
         const existingItem = await db
-            .select()
+            .select({ quantity: cartItemTable.quantity })
             .from(cartItemTable)
             .where(cartItemCondition(finalCartId, productId))
             .limit(1);
 
         if (existingItem.length > 0) {
-            const bothQuantities = existingItem[0].quantity + quantity;
-            const finalQuantity = bothQuantities > 10 ? 10 : bothQuantities;
+            const newQuantity = existingItem[0].quantity + quantity;
+            const finalQuantity = Math.min(newQuantity, 10);
+
+            if (finalQuantity > product.stock) {
+                return { success: false, error: `Only ${product.stock} items available in stock` };
+            }
 
             await db
                 .update(cartItemTable)
@@ -149,10 +180,16 @@ export async function addToCart(
                 })
                 .where(cartItemCondition(finalCartId, productId));
         } else {
+            const finalQuantity = Math.min(quantity, 10);
+
+            if (finalQuantity > product.stock) {
+                return { success: false, error: `Only ${product.stock} items available in stock` };
+            }
+
             await db.insert(cartItemTable).values({
                 cartId: finalCartId,
                 productId,
-                quantity: Math.min(quantity, 10),
+                quantity: finalQuantity,
                 createdAt: nowISO(),
                 updatedAt: nowISO(),
             });
@@ -181,7 +218,7 @@ export async function clearCart(cartId: number) {
 
 export async function getCartItemCount(cartId: number): Promise<number> {
     try {
-        const items = await db.select()
+        const items = await db.select({ quantity: cartItemTable.quantity })
             .from(cartItemTable)
             .where(eq(cartItemTable.cartId, cartId));
 
@@ -191,31 +228,194 @@ export async function getCartItemCount(cartId: number): Promise<number> {
         return 0;
     }
 }
+
 export async function orderCart(cartId: number) {
     try {
-        await db.update(cartTable).set({ updatedAt: nowISO(), status: "ordered" }).where(eq(cartTable.id, cartId));
-        await createCart();
-        return { success: true };
+        const userId = await requireAuth();
+
+        return await db.transaction(async (tx) => {
+            const items = await tx
+                .select({
+                    productId: cartItemTable.productId,
+                    quantity: cartItemTable.quantity,
+                })
+                .from(cartItemTable)
+                .where(eq(cartItemTable.cartId, cartId));
+
+            if (items.length === 0) {
+                throw new Error("Cart is empty");
+            }
+
+            for (const item of items) {
+                const [product] = await tx
+                    .select({ stock: productTable.stock })
+                    .from(productTable)
+                    .where(eq(productTable.id, item.productId))
+                    .limit(1);
+
+                if (!product || product.stock < item.quantity) {
+                    throw new Error(`Insufficient stock for product ID: ${item.productId}`);
+                }
+            }
+
+            await tx
+                .update(cartTable)
+                .set({ updatedAt: nowISO(), status: "ordered" })
+                .where(eq(cartTable.id, cartId));
+
+            for (const item of items) {
+                await tx
+                    .update(productTable)
+                    .set({
+                        stock: sql`${productTable.stock} - ${item.quantity}`,
+                    })
+                    .where(eq(productTable.id, item.productId));
+            }
+
+            const now = nowISO();
+            const [newCart] = await tx.insert(cartTable)
+                .values({
+                    userId,
+                    createdAt: now,
+                    updatedAt: now,
+                } satisfies InsertCart)
+                .returning({ id: cartTable.id });
+
+            await tx.update(userTable)
+                .set({ cartId: newCart.id })
+                .where(eq(userTable.id, userId));
+
+            return { success: true, newCartId: newCart.id };
+        });
     } catch (error) {
         console.error("Error ordering cart:", error);
-        return { success: false, error: "Failed to order cart" };
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Failed to order cart"
+        };
     }
 }
+
 export async function cancelOrder(cartId: number) {
     try {
-        await db.update(cartTable).set({ updatedAt: nowISO(), status: "cancelled" }).where(eq(cartTable.id, cartId));
-        return { success: true };
+        return await db.transaction(async (tx) => {
+            const [cart] = await tx
+                .select({ status: cartTable.status })
+                .from(cartTable)
+                .where(eq(cartTable.id, cartId))
+                .limit(1);
+
+            if (!cart) {
+                throw new Error("Cart not found");
+            }
+
+            if (cart.status === "ordered" || cart.status === "shipped") {
+                const items = await tx
+                    .select({
+                        productId: cartItemTable.productId,
+                        quantity: cartItemTable.quantity,
+                    })
+                    .from(cartItemTable)
+                    .where(eq(cartItemTable.cartId, cartId));
+
+                for (const item of items) {
+                    await tx
+                        .update(productTable)
+                        .set({ stock: sql`${productTable.stock} + ${item.quantity}` })
+                        .where(eq(productTable.id, item.productId));
+                }
+            }
+
+            await tx
+                .update(cartTable)
+                .set({ updatedAt: nowISO(), status: "cancelled" })
+                .where(eq(cartTable.id, cartId));
+
+            return { success: true };
+        });
     } catch (error) {
         console.error("Error canceling order:", error);
-        return { success: false, error: "Failed to cancel order" };
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Failed to cancel order"
+        };
     }
 }
+
 export async function setCartStatus(cartId: number, status: "active" | "ordered" | "shipped" | "delivered" | "cancelled") {
     try {
-        await db.update(cartTable).set({ updatedAt: nowISO(), status }).where(eq(cartTable.id, cartId));
+        await db.update(cartTable)
+            .set({ updatedAt: nowISO(), status })
+            .where(eq(cartTable.id, cartId));
+
+        revalidatePath("/cart");
         return { success: true };
     } catch (error) {
         console.error("Error setting cart status:", error);
         return { success: false, error: "Failed to set cart status" };
+    }
+}
+
+export async function subtractCartItemsQuantities(cartId: number) {
+    try {
+        return await db.transaction(async (tx) => {
+            const items = await tx
+                .select({
+                    productId: cartItemTable.productId,
+                    quantity: cartItemTable.quantity,
+                })
+                .from(cartItemTable)
+                .where(eq(cartItemTable.cartId, cartId));
+
+            if (items.length === 0) {
+                throw new Error("No items found in cart");
+            }
+
+            for (const item of items) {
+                await tx
+                    .update(productTable)
+                    .set({
+                        stock: sql`${productTable.stock} - ${item.quantity}`,
+                    })
+                    .where(eq(productTable.id, item.productId));
+            }
+
+            return { success: true };
+        });
+    } catch (error) {
+        console.error("Error subtracting cart items quantities:", error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Failed to subtract cart items quantities"
+        };
+    }
+}
+
+export async function restoreCartItemsQuantities(cartId: number) {
+    try {
+        return await db.transaction(async (tx) => {
+            const items = await tx
+                .select({
+                    productId: cartItemTable.productId,
+                    quantity: cartItemTable.quantity,
+                })
+                .from(cartItemTable)
+                .where(eq(cartItemTable.cartId, cartId));
+
+            for (const item of items) {
+                await tx
+                    .update(productTable)
+                    .set({ stock: sql`${productTable.stock} + ${item.quantity}` })
+                    .where(eq(productTable.id, item.productId));
+            }
+
+            return { success: true };
+        });
+    } catch (error) {
+        console.error("Error restoring cart items quantities:", error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Failed to restore cart items quantities"
+        };
     }
 }
