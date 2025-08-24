@@ -50,7 +50,7 @@ export default async function AdminProducts() {
 
     const displayProducts = productsWithStats.map((product) => {
         const date = new Date(product.dateAdded);
-        const formattedDate = date.toLocaleDateString();
+        const formattedDate = date.toLocaleDateString("en-GB");
         const stockStatus = getStockStatus(product.stock);
         const finalPrice = product.price * (1 - product.discount / 100);
         const hasDiscount = product.discount > 0;
@@ -267,7 +267,7 @@ export default async function AdminProducts() {
                 <div className="lg:hidden">
                     {productsWithStats.map((product) => {
                         const date = new Date(product.dateAdded);
-                        const formattedDate = date.toLocaleDateString();
+                        const formattedDate = date.toLocaleDateString('en-GB');
                         const stockStatus = getStockStatus(product.stock);
                         const finalPrice = product.price * (1 - product.discount / 100);
                         const hasDiscount = product.discount > 0;
