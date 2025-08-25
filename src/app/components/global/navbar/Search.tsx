@@ -1,23 +1,26 @@
 "use client";
 
-import { urlString, CATEGORIES, homeOnlySearchParams } from "@/app/components/global/Atoms";
+import { urlString, homeOnlySearchParams } from "@/app/components/global/Atoms";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
 
 type SearchProps = {
+    categories: string[];
     className?: string;
     placeholder?: string;
     onSearchChange?: (search: string, category: string) => void;
 }
 
 export default function SearchBar({
+    categories,
     className = "",
     placeholder = "Search…",
     onSearchChange,
 }: SearchProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const ct = useMemo(() => ["All", ...(categories ?? [])], [categories]);
 
     const currentSearch = searchParams.get("search") ?? "";
     const currentCategory = searchParams.get("category") ?? "all";
@@ -29,12 +32,12 @@ export default function SearchBar({
     useEffect(() => {
         if (!sizerRef.current || !selectRef.current) return;
 
-        const label = CATEGORIES.find((cat) => urlString(cat) === selectedCategory) ?? selectedCategory;
+        const label = ct.find((cat) => urlString(cat) === selectedCategory) ?? selectedCategory;
         sizerRef.current.textContent = label;
 
         const measured = sizerRef.current.offsetWidth;
         selectRef.current.style.width = `${measured + 32}px`;
-    }, [selectedCategory]);
+    }, [selectedCategory, ct]);
 
     const handleSubmit = useCallback(
         (event: React.FormEvent<HTMLFormElement>) => {
@@ -88,7 +91,7 @@ export default function SearchBar({
                     border-gray-300 font-bold focus:outline-none focus:ring-2
                     focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-xs sm:text-sm md:text-base"
                 >
-                    {CATEGORIES.map((category) => (
+                    {ct.map((category) => (
                         <option key={category} value={urlString(category)}>
                             {category}
                         </option>

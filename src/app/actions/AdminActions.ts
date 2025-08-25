@@ -35,3 +35,20 @@ export async function updateProduct(productId: number, data: InsertProduct) {
     }
 
 }
+export async function getAllProductCategories() {
+    try {
+        const rows = await db
+            .selectDistinct({ category: productTable.category })
+            .from(productTable);
+
+        const categories = rows
+            .map(r => r.category)
+            .filter(Boolean)
+            .sort();
+
+        return categories;
+    } catch (error) {
+        console.error("Error fetching product categories:", error);
+        throw error;
+    }
+}

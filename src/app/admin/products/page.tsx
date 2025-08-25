@@ -1,12 +1,116 @@
 import { db } from "@/lib/db";
-import { eq, avg, count, sql } from "drizzle-orm";
+import { eq, avg, count, sql, like, and, or, gte, lte, asc, desc } from "drizzle-orm";
 import { productTable, reviewTable, cartItemTable } from "@/db/schema";
 import Link from "next/link";
 import { formatPrice } from "@/app/components/global/Atoms";
-import { Edit, Star, Package, TrendingUp, PackageMinus } from "lucide-react";
+import FilterForm from "@/app/components/admin/products/FilterForm";
+import {
+    Edit, Star, Package, TrendingUp, PackageMinus,
+    X
+} from "lucide-react";
 import Image from "next/image";
+import { Suspense } from "react";
+import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
+function normalizeParams(sp: ResolvedSearchParamsType) {
+    const toStr = (val: string | string[] | undefined): string | undefined =>
+        Array.isArray(val) ? val[0] : val;
 
-export default async function AdminProducts() {
+    return {
+        search: toStr(sp.search),
+        category: toStr(sp.category),
+        brand: toStr(sp.brand),
+        featured: toStr(sp.featured),
+        stockStatus: toStr(sp.stockStatus),
+        minPrice: toStr(sp.minPrice),
+        maxPrice: toStr(sp.maxPrice),
+    };
+}
+
+export default async function AdminProducts({
+    searchParams
+}: {
+    searchParams: SearchParamsType
+}) {
+    const sp = await searchParams;
+    const { search, category, brand, featured, stockStatus, minPrice, maxPrice } =
+        normalizeParams(sp);
+
+    const buildWhereClause = () => {
+        const conditions = [];
+
+        if (search) {
+            const searchTerm = `%${search}%`;
+            conditions.push(
+                or(
+                    like(productTable.name, searchTerm),
+                    like(productTable.sku, searchTerm),
+                    like(productTable.description, searchTerm)
+                )
+            );
+        }
+
+        if (category) conditions.push(eq(productTable.category, category));
+        if (brand) conditions.push(eq(productTable.brand, brand));
+        if (featured) conditions.push(eq(productTable.featured, parseInt(featured)));
+
+        if (stockStatus) {
+            switch (stockStatus) {
+                case "out":
+                    conditions.push(eq(productTable.stock, 0));
+                    break;
+                case "very-low":
+                    conditions.push(and(gte(productTable.stock, 1), lte(productTable.stock, 4)));
+                    break;
+                case "low":
+                    conditions.push(and(gte(productTable.stock, 5), lte(productTable.stock, 9)));
+                    break;
+                case "in-stock":
+                    conditions.push(and(gte(productTable.stock, 10), lte(productTable.stock, 49)));
+                    break;
+                case "well-stocked":
+                    conditions.push(gte(productTable.stock, 50));
+                    break;
+            }
+        }
+
+        if (minPrice) conditions.push(gte(productTable.price, parseFloat(minPrice)));
+        if (maxPrice) conditions.push(lte(productTable.price, parseFloat(maxPrice)));
+
+        return conditions.length > 0 ? and(...conditions) : undefined;
+    };
+
+    const buildOrderClause = () => {
+        const sortBy = sp.sortBy || 'dateAdded';
+        const sortOrder = sp.sortOrder || 'desc';
+
+        let column;
+        switch (sortBy) {
+            case 'name':
+                column = productTable.name;
+                break;
+            case 'price':
+                column = productTable.price;
+                break;
+            case 'stock':
+                column = productTable.stock;
+                break;
+            case 'avgRating':
+                column = avg(reviewTable.rating);
+                break;
+            case 'salesCount':
+                column = sql<number>`COALESCE((
+                    SELECT SUM(${cartItemTable.quantity}) 
+                    FROM ${cartItemTable} 
+                    WHERE ${cartItemTable.productId} = ${productTable.id}
+                ), 0)`;
+                break;
+            default:
+                column = productTable.dateAdded;
+        }
+
+        return sortOrder === 'asc' ? asc(column) : desc(column);
+    };
+
     const productsWithStats = await db
         .select({
             id: productTable.id,
@@ -33,12 +137,26 @@ export default async function AdminProducts() {
         .from(productTable)
         .leftJoin(reviewTable, eq(productTable.id, reviewTable.productId))
         .leftJoin(cartItemTable, eq(productTable.id, cartItemTable.productId))
+        .where(buildWhereClause())
         .groupBy(productTable.id)
-        .orderBy(sql`${productTable.dateAdded} DESC`);
+        .orderBy(buildOrderClause());
+
+    // Get all products for filter options (without filters applied)
+    const allProducts = await db
+        .select({
+            category: productTable.category,
+            brand: productTable.brand
+        })
+        .from(productTable)
+        .groupBy(productTable.category, productTable.brand);
+
+    const categories = [...new Set(allProducts.map(p => p.category))].sort();
+    const brands = [...new Set(allProducts.map(p => p.brand))].sort();
 
     const totalProducts = productsWithStats.length;
     const lowStockProducts = productsWithStats.filter(p => p.stock < 10).length;
     const featuredProducts = productsWithStats.filter(p => p.featured === 1).length;
+    const totalSales = productsWithStats.reduce((sum, p) => sum + p.salesCount, 0);
 
     const getStockStatus = (stock: number) => {
         if (stock === 0) return { text: 'Out of Stock', color: 'text-red-400 bg-red-500/20 border-red-500/30' };
@@ -75,9 +193,11 @@ export default async function AdminProducts() {
                             )}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <div className="font-medium text-gray-200 truncate">
+                            <Link
+                                href={`/admin/products/${product.id}`}
+                                className="font-medium hover:text-[#00CAFF] duration-200 text-gray-200 truncate block">
                                 {product.name}
-                            </div>
+                            </Link>
                             <div className="flex items-center gap-2 text-xs text-gray-400">
                                 <span className="font-mono">#{product.sku}</span>
                                 {product.featured === 1 && (
@@ -157,21 +277,29 @@ export default async function AdminProducts() {
             </tr>
         );
     });
+
     const theadElements = ['Product', 'Category', 'Price', 'Stock', 'Rating', 'Sales', 'Added', 'Action'];
     const leftAlignedHeaders = ['Product', 'Category', 'Price'];
     const displayTHeadElements = theadElements.map((element) => {
         const isTextLeft = leftAlignedHeaders.includes(element);
         return (
-            <th key={element} className={`p-3 text-sm font-semibold text-gray-300 ${isTextLeft ? 'text-left' : 'text-center'}`}>{element}</th>
+            <th key={element} className={`p-3 text-sm font-semibold text-gray-300 ${isTextLeft ? 'text-left' : 'text-center'}`}>
+                {element}
+            </th>
         )
-    })
+    });
 
     return (
         <div className="flex flex-col w-full gap-6 p-4 lg:p-6 overflow-hidden">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
                     <h1 className="font-bold text-2xl lg:text-3xl text-white mb-2">Product Management</h1>
-                    <p className="text-gray-400">Manage your product inventory and details</p>
+                    <p className="text-gray-400">
+                        Manage your product inventory and details
+                        {totalProducts > 0 && (
+                            <span className="ml-2">• {totalProducts} product{totalProducts !== 1 ? 's' : ''} found</span>
+                        )}
+                    </p>
                 </div>
                 <div className="flex items-center gap-4">
                     <Link
@@ -184,6 +312,15 @@ export default async function AdminProducts() {
                     </Link>
                 </div>
             </div>
+
+            {/* Search and Filters */}
+            <Suspense fallback={<div className="h-20 bg-[#1e232b] rounded-xl animate-pulse" />}>
+                <FilterForm
+                    searchParams={sp}
+                    categories={categories}
+                    brands={brands}
+                />
+            </Suspense>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -227,9 +364,7 @@ export default async function AdminProducts() {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-400 text-sm">Total Sales</p>
-                            <p className="text-2xl font-bold text-green-400">
-                                {productsWithStats.reduce((sum, p) => sum + p.salesCount, 0)}
-                            </p>
+                            <p className="text-2xl font-bold text-green-400">{totalSales}</p>
                         </div>
                         <div className="p-3 bg-green-500/20 rounded-lg">
                             <TrendingUp className="w-6 h-6 text-green-400" />
@@ -242,7 +377,9 @@ export default async function AdminProducts() {
             <div className="bg-[#1e232b] rounded-xl border border-[#2a3038] overflow-hidden">
                 <div className="p-4 border-b border-[#2a3038]">
                     <div className="flex items-center justify-between">
-                        <h2 className="font-semibold text-lg text-white">All Products</h2>
+                        <h2 className="font-semibold text-lg text-white">
+                            {Object.keys(sp).length > 0 ? 'Filtered Products' : 'All Products'}
+                        </h2>
                         <span className="text-sm text-gray-400">
                             {totalProducts} product{totalProducts !== 1 ? 's' : ''}
                         </span>
@@ -291,7 +428,11 @@ export default async function AdminProducts() {
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-medium text-gray-200 truncate">{product.name}</h3>
+                                        <Link
+                                            href={`/admin/products/${product.id}`}
+                                            className="font-medium text-gray-200 truncate hover:text-[#00CAFF] duration-200 block">
+                                            {product.name}
+                                        </Link>
                                         <div className="flex items-center gap-2 mt-1">
                                             <span className="text-xs text-gray-400 font-mono">#{product.sku}</span>
                                             {product.featured === 1 && (
@@ -368,19 +509,47 @@ export default async function AdminProducts() {
                 </div>
             </div>
 
+            {/* No Products Found */}
             {productsWithStats.length === 0 && (
-                <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
+                <div className="flex flex-col items-center justify-center min-h-[300px] text-center bg-[#1e232b] rounded-xl border border-[#2a3038]">
                     <div className="text-4xl mb-4 opacity-50">📦</div>
-                    <h2 className="font-bold text-xl mb-2 text-white">No Products Found</h2>
-                    <p className="text-gray-400 mb-4">Get started by adding your first product.</p>
-                    <Link
-                        href="/admin/products/new"
-                        className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] 
-                        text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
-                    >
-                        <Package className="w-5 h-5 mr-2" />
-                        Add Your First Product
-                    </Link>
+                    <h2 className="font-bold text-xl mb-2 text-white">
+                        {Object.keys(sp).length > 0 ? 'No Products Match Your Filters' : 'No Products Found'}
+                    </h2>
+                    <p className="text-gray-400 mb-4">
+                        {Object.keys(sp).length > 0
+                            ? 'Try adjusting your search criteria or clear the filters to see all products.'
+                            : 'Get started by adding your first product.'
+                        }
+                    </p>
+                    <div className="flex gap-3">
+                        {Object.keys(sp).length > 0 && (
+                            <Link
+                                href="/admin/products"
+                                className="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-500 
+                                         text-white font-medium rounded-lg transition-all duration-200"
+                            >
+                                <X className="w-4 h-4 mr-2" />
+                                Clear Filters
+                            </Link>
+                        )}
+                        <Link
+                            href="/admin/products/new"
+                            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] 
+                            text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
+                        >
+                            <Package className="w-5 h-5 mr-2" />
+                            {Object.keys(sp).length > 0 ? 'Add Product' : 'Add Your First Product'}
+                        </Link>
+                    </div>
+                </div>
+            )}
+
+            {/* Results Summary */}
+            {totalProducts > 0 && (
+                <div className="text-center text-sm text-gray-400 pb-4">
+                    Showing {totalProducts} product{totalProducts !== 1 ? 's' : ''}
+                    {Object.keys(sp).length > 0 && ' matching your filters'}
                 </div>
             )}
         </div>

@@ -63,3 +63,4 @@ export type UpdateReview = {
     review: string;
 }
 export type SearchParamsType = Promise<{ [key: string]: string | string[] | undefined }>;
+export type ResolvedSearchParamsType = { [key: string]: string | string[] | undefined };
