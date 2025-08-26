@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function WindlyLogo() {
     return (
-        <Link href="/" prefetch>
+        <Link title="Return to Home" href="/" prefetch>
             <Image
                 alt="Windly Logo"
                 src="/images/windlyLogo.png"

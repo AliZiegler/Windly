@@ -66,7 +66,7 @@ export const userTable = sqliteTable("user", {
     addressId: int("address_id"), //default address id
     cartId: int("cart_id"), //default cart id
     role: text("status", { enum: ["user", "seller", "admin"] }).notNull().default("user"),
-    createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 })
 export const wishlistTable = sqliteTable("wishlist", {
     productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),

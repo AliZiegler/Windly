@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useMemo, useEffect } from "react";
-import { Edit, Eye, Filter, Package, Search, Trash2, ChevronDown, X } from "lucide-react";
+import { Edit, Filter, Package, Search, ChevronDown, X } from "lucide-react";
+import Link from "next/link";
 
 type Product = {
     id: number;
@@ -90,15 +91,11 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
             </div>
 
             <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-700">
-                <button className="text-teal-400 hover:text-teal-300 transition-colors p-1">
-                    <Eye className="w-4 h-4" />
-                </button>
-                <button className="text-slate-400 hover:text-slate-300 transition-colors p-1">
-                    <Edit className="w-4 h-4" />
-                </button>
-                <button className="text-red-400 hover:text-red-300 transition-colors p-1">
-                    <Trash2 className="w-4 h-4" />
-                </button>
+                <Link href={`/admin/products/${product.id}`} className="text-slate-400 hover:text-slate-300 transition-colors p-1 cursor-pointer">
+                    <button>
+                        <Edit className="w-4 h-4" />
+                    </button>
+                </Link>
             </div>
         </div>
     );
@@ -114,14 +111,16 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
                         <div className="hidden sm:flex bg-[#222831] rounded-lg p-1">
                             <button
                                 onClick={() => setViewMode("table")}
-                                className={`px-3 py-1 rounded text-sm transition-colors ${viewMode === "table" ? "bg-teal-600 text-white" : "text-slate-400 hover:text-white"
+                                className={`px-3 py-1 rounded text-sm transition-colors ${viewMode === "table" ? "bg-teal-600 text-white" :
+                                    "text-slate-400 hover:text-white"
                                     }`}
                             >
                                 Table
                             </button>
                             <button
                                 onClick={() => setViewMode("cards")}
-                                className={`px-3 py-1 rounded text-sm transition-colors ${viewMode === "cards" ? "bg-teal-600 text-white" : "text-slate-400 hover:text-white"
+                                className={`px-3 py-1 rounded text-sm transition-colors ${viewMode === "cards" ? "bg-teal-600 text-white" :
+                                    "text-slate-400 hover:text-white"
                                     }`}
                             >
                                 Cards
@@ -220,30 +219,18 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
                         <table className="min-w-full divide-y divide-gray-700">
                             <thead className="bg-[#2e3238] sticky top-0 z-10">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                        Product
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                        Category
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                        Price
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                        Stock
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
-                                        Actions
-                                    </th>
+                                    {["Product", "Category", "Price", "Stock", "Status", "Actions"].map((header) => (
+                                        <th key={header} className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                                            {header}
+                                        </th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody className="bg-[#393e46] divide-y divide-gray-700">
                                 {filteredProducts.length > 0 ? (
                                     filteredProducts.map((product) => (
-                                        <tr key={product.id} className="hover:bg-[#2e3238] transition-colors">
+                                        <tr key={product.id}
+                                            className="odd:bg-[#1c2129] even:bg-[#222831] hover:bg-[#2a3038] transition-colors duration-200">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center">
                                                     <div className="w-10 h-10 bg-gray-600 rounded-lg mr-3 flex items-center justify-center flex-shrink-0">
@@ -270,15 +257,12 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center space-x-2">
-                                                    <button className="text-teal-400 hover:text-teal-300 transition-colors p-1">
-                                                        <Eye className="w-4 h-4" />
-                                                    </button>
-                                                    <button className="text-slate-400 hover:text-slate-300 transition-colors p-1">
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
-                                                    <button className="text-red-400 hover:text-red-300 transition-colors p-1">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                    <Link href={`/admin/products/${product.id}`}
+                                                        className="text-slate-400 hover:text-slate-300 transition-colors p-1 cursor-pointer">
+                                                        <button>
+                                                            <Edit className="w-5 h-5" />
+                                                        </button>
+                                                    </Link>
                                                 </div>
                                             </td>
                                         </tr>

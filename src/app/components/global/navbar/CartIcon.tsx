@@ -45,7 +45,7 @@ export default async function CartIcon() {
 
 function CartIconDisplay({ itemCount }: { itemCount: number }) {
     return (
-        <Link href="/cart" prefetch>
+        <Link title="View your cart" href="/cart" prefetch>
             <div className="flex items-center justify-center relative cursor-pointer transition-transform hover:scale-105">
                 <div className="w-14 h-14 flex items-center justify-center cursor-pointer">
                     <ShoppingCart

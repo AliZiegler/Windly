@@ -8,6 +8,7 @@ type SearchParams = {
     category?: string;
     brand?: string;
     stockStatus?: string;
+    rating?: string;
     featured?: string;
     minPrice?: string;
     maxPrice?: string;
@@ -23,6 +24,7 @@ const DEFAULT_VALUES = {
     featured: '',
     minPrice: '',
     maxPrice: '',
+    rating: '',
     sortBy: 'dateAdded',
     sortOrder: 'desc',
 };
@@ -96,6 +98,10 @@ export default function FilterForm({
                 displayKey = 'Stock';
                 displayValue = STOCK_LABELS[value] || value;
                 break;
+            case 'rating':
+                displayKey = 'Rating';
+                displayValue = `${value}`;
+                break;
             case 'featured':
                 displayKey = 'Type';
                 displayValue = value === '1' ? 'Featured' : 'Non-Featured';
@@ -116,6 +122,7 @@ export default function FilterForm({
             category: formData.get("category") as string,
             brand: formData.get("brand") as string,
             stockStatus: formData.get("stockStatus") as string,
+            rating: formData.get("rating") as string,
             featured: formData.get("featured") as string,
             minPrice: formData.get("minPrice") as string,
             maxPrice: formData.get("maxPrice") as string,
@@ -142,7 +149,6 @@ export default function FilterForm({
         const query = searchParams.toString();
         redirect(`/admin/products${query ? `?${query}` : ""}`);
     }
-
     return (
         <div className="bg-gradient-to-br from-[#1e232b] to-[#181d23] rounded-2xl border border-[#2a3038] p-8 mb-8 relative overflow-hidden">
             {/* Subtle background accent */}
@@ -178,16 +184,18 @@ export default function FilterForm({
                                 name="search"
                                 defaultValue={searchParams.search as string || ''}
                                 placeholder="Search by name, SKU, or description..."
-                                className="w-full pl-12 pr-5 py-4 bg-[#2a3038] border border-[#3a4048] rounded-xl text-white placeholder-gray-400 focus:border-[#00CAFF] focus:outline-none transition-all duration-200 text-sm font-medium hover:border-[#4a5058] focus:bg-[#2f353d]"
+                                className="w-full max-h-[54px] pl-12 pr-5 py-4 bg-[#2a3038] border border-[#3a4048] rounded-xl text-white
+                                placeholder-gray-400 focus:border-[#00CAFF] focus:outline-none transition-all duration-200 
+                                font-medium hover:border-[#4a5058] focus:bg-[#2f353d]"
                             />
                         </div>
                         <button
                             type="submit"
-                            className="px-8 py-4 bg-gradient-to-r from-[#00CAFF] to-[#0099CC] text-black font-semibold rounded-xl 
-                            hover:from-[#00B8E6] hover:to-[#0088BB] transition-all duration-200 flex items-center justify-center 
+                            className="px-8 py-4 text-xl xl:text-lg max-h-[54px] text-center bg-[#ffa000] text-black font-semibold rounded-xl 
+                            hover:bg-[#f19700] transition-all duration-200 flex items-center justify-center 
                             gap-3 min-w-[140px] xl:min-w-[160px] transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                         >
-                            <Search className="w-4 h-4" />
+                            <Search className="w-5 h-5" />
                             Search
                         </button>
                     </div>
@@ -200,7 +208,7 @@ export default function FilterForm({
                     <h3 className="text-lg font-semibold text-white">Advanced Filters</h3>
 
                     {/* Primary Filters */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                         {/* Category */}
                         <SelectInput
                             name="category"
@@ -234,6 +242,20 @@ export default function FilterForm({
                                 { value: "low", label: "Low Stock (5-9)" },
                                 { value: "in-stock", label: "In Stock (10-49)" },
                                 { value: "well-stocked", label: "Well Stocked (50+)" },
+                            ]}
+                        />
+                        {/* Rating */}
+                        <SelectInput
+                            name="rating"
+                            label="Minimum Rating"
+                            defaultValue={searchParams.rating as string || ''}
+                            options={[
+                                { value: '', label: 'All Ratings' },
+                                { value: '1', label: '1' },
+                                { value: '2', label: '2' },
+                                { value: '3', label: '3' },
+                                { value: '4', label: '4' },
+                                { value: '5', label: '5' },
                             ]}
                         />
                     </div>
@@ -340,7 +362,9 @@ export default function FilterForm({
                                 return (
                                     <div
                                         key={key}
-                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00CAFF]/10 to-[#0099CC]/10 text-[#00CAFF] rounded-xl text-sm font-medium border border-[#00CAFF]/20 backdrop-blur-sm hover:from-[#00CAFF]/15 hover:to-[#0099CC]/15 transition-all duration-200"
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00CAFF]/10 
+                                        to-[#0099CC]/10 text-[#00CAFF] rounded-xl text-sm font-medium border border-[#00CAFF]/20 
+                                        backdrop-blur-sm hover:from-[#00CAFF]/15 hover:to-[#0099CC]/15 transition-all duration-200"
                                     >
                                         <span className="text-gray-300 text-xs">{displayKey}:</span>
                                         <span className="font-semibold">{displayValue}</span>
@@ -358,7 +382,10 @@ export default function FilterForm({
                         {activeFiltersCount > 0 && (
                             <Link
                                 href="/admin/products"
-                                className="flex-1 xl:flex-none text-sm text-gray-400 hover:text-white transition-colors duration-200 flex items-center justify-center gap-2 px-6 py-3 hover:bg-[#2a3038] rounded-xl border border-[#3a4048] hover:border-[#4a5058] min-w-[140px]"
+                                className="flex-1 xl:flex-none text-sm text-gray-400 hover:text-white transition-colors 
+                                duration-200 flex items-center justify-center gap-2 px-6 py-3 hover:bg-[#2a3038] rounded-xl 
+                                border border-[#3a4048] hover:border-[#4a5058] min-w-[140px]"
+                                replace
                             >
                                 <X className="w-4 h-4" />
                                 Clear Filters

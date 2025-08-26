@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { eq, avg, count, sql, like, and, or, gte, lte, asc, desc } from "drizzle-orm";
 import { productTable, reviewTable, cartItemTable } from "@/db/schema";
 import Link from "next/link";
-import { formatPrice } from "@/app/components/global/Atoms";
+import { formatPrice, updateSearchParams } from "@/app/components/global/Atoms";
 import FilterForm from "@/app/components/admin/products/FilterForm";
 import {
     Edit, Star, Package, TrendingUp, PackageMinus,
@@ -21,6 +21,7 @@ function normalizeParams(sp: ResolvedSearchParamsType) {
         brand: toStr(sp.brand),
         featured: toStr(sp.featured),
         stockStatus: toStr(sp.stockStatus),
+        rating: toStr(sp.rating),
         minPrice: toStr(sp.minPrice),
         maxPrice: toStr(sp.maxPrice),
     };
@@ -32,7 +33,7 @@ export default async function AdminProducts({
     searchParams: SearchParamsType
 }) {
     const sp = await searchParams;
-    const { search, category, brand, featured, stockStatus, minPrice, maxPrice } =
+    const { search, category, brand, featured, stockStatus, minPrice, maxPrice, rating } =
         normalizeParams(sp);
 
     const buildWhereClause = () => {
@@ -52,6 +53,7 @@ export default async function AdminProducts({
         if (category) conditions.push(eq(productTable.category, category));
         if (brand) conditions.push(eq(productTable.brand, brand));
         if (featured) conditions.push(eq(productTable.featured, parseInt(featured)));
+        if (rating) conditions.push(gte(reviewTable.rating, parseInt(rating)));
 
         if (stockStatus) {
             switch (stockStatus) {
@@ -212,8 +214,14 @@ export default async function AdminProducts({
                     </div>
                 </td>
                 <td className="p-3 text-sm text-gray-300">
-                    <div className="font-medium">{product.category}</div>
-                    <div className="text-xs text-gray-400">{product.brand}</div>
+                    <div>
+                        <Link href={`/admin/products?${updateSearchParams(sp, 'category', product.category)}`}
+                            className="font-medium hover:text-[#00CAFF] duration-200">{product.category}</Link>
+                    </div>
+                    <div>
+                        <Link href={`/admin/products?${updateSearchParams(sp, 'brand', product.brand)}`}
+                            className="text-xs text-gray-400 hover:text-[#00CAFF] duration-200">{product.brand}</Link>
+                    </div>
                 </td>
                 <td className="p-3 text-sm text-gray-300">
                     <div className="flex flex-col">
@@ -305,7 +313,8 @@ export default async function AdminProducts({
                     <Link
                         href="/admin/products/new"
                         className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ffb100] to-[#ff9500] 
-                        text-black font-bold rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
+                        text-black font-bold rounded-lg hover:from-[#e0a000] hover:to-[#e08500] hover:scale-[1.02] active:scale-[0.98] 
+                        transition-all duration-200"
                     >
                         <Package className="w-4 h-4 mr-2" />
                         Add Product

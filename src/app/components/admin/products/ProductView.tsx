@@ -100,6 +100,7 @@ export default function ProductView({ product }: ProductViewProps) {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <Link
+                        prefetch
                         href="/admin/products"
                         className="p-2 hover:bg-[#2a3038] rounded-lg transition-colors duration-200"
                     >
@@ -116,9 +117,10 @@ export default function ProductView({ product }: ProductViewProps) {
                     </div>
                 </div>
                 <Link
+                    prefetch
                     href={`/admin/products/${product.id}?mode=edit`}
-                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ffb100] to-[#ff9500] 
-          text-black font-bold rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
+                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold 
+                    rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
                 >
                     <Edit3 className="w-4 h-4 mr-2" /> Edit Product
                 </Link>

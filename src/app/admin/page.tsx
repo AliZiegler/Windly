@@ -101,10 +101,11 @@ export default async function AdminDashboard() {
         role: user.role || "user",
         joined: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Unknown",
     }));
-    const displayRecentProducts = recentProducts.slice(0, 5).map((product) => (
+    const displayRecentProducts = recentProducts.slice(0, 4).map((product) => (
         <div
             key={product.id}
-            className="flex items-center justify-between"
+            className="w-full p-3 h-full flex items-center justify-between odd:bg-[#1c2129] even:bg-[#222831] 
+            hover:bg-[#2a3038] transition-colors duration-200"
         >
             <div>
                 <p className="text-white font-medium">
@@ -130,10 +131,11 @@ export default async function AdminDashboard() {
         </div>
     ))
 
-    const displayRecentUsers = recentUsers.slice(0, 5).map((user) => (
+    const displayRecentUsers = recentUsers.slice(0, 4).map((user) => (
         <div
             key={user.id}
-            className="flex items-center justify-between"
+            className="w-full p-3 h-full flex items-center justify-between odd:bg-[#1c2129] even:bg-[#222831] 
+            hover:bg-[#2a3038] transition-colors duration-200"
         >
             <div>
                 <p className="text-white font-medium">{user.name}</p>
@@ -191,14 +193,14 @@ export default async function AdminDashboard() {
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                            <div className="bg-[#393e46] rounded-lg border border-gray-700">
+                            <div className="bg-[#393e46] max-h-[363px] rounded-lg border border-gray-700">
                                 <div className="p-6 border-b border-gray-700">
                                     <h3 className="text-xl font-semibold text-white">
                                         Recent Products
                                     </h3>
                                 </div>
-                                <div className="p-6 bg-[#2e3238]">
-                                    <div className="space-y-4">
+                                <div className="bg-[#2e3238]">
+                                    <div className="max-h-[286px]">
                                         {recentProducts.length > 0 ? (
                                             displayRecentProducts
                                         ) : (
@@ -207,14 +209,14 @@ export default async function AdminDashboard() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-[#2e3238] rounded-lg border border-gray-700">
-                                <div className="p-6 bg-[#393e46] border-b border-gray-700">
+                            <div className="bg-[#393e46] max-h-[363px] rounded-lg border border-gray-700">
+                                <div className="p-6 border-b border-gray-700">
                                     <h3 className="text-xl font-semibold text-white">
                                         Recent Users
                                     </h3>
                                 </div>
-                                <div className="p-6 bg-[#2e3238]">
-                                    <div className="space-y-4">
+                                <div className="bg-[#2e3238]">
+                                    <div className="max-h-[286px]">
                                         {recentUsers.length > 0 ? (
                                             displayRecentUsers
                                         ) : (

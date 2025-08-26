@@ -132,6 +132,7 @@ export default function ProductEdit({ product }: ProductEditProps) {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <Link
+                        prefetch
                         href="/admin/products"
                         className="p-2 hover:bg-[#2a3038] rounded-lg transition-colors duration-200"
                     >
@@ -148,6 +149,7 @@ export default function ProductEdit({ product }: ProductEditProps) {
                 </div>
                 <div className="flex items-center gap-3">
                     <Link
+                        prefetch
                         href={`/admin/products/${product.id}`}
                         className="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200"
                     >
