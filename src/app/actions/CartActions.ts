@@ -419,3 +419,37 @@ export async function restoreCartItemsQuantities(cartId: number) {
         };
     }
 }
+export async function syncCartStatus(cartId: number) {
+    const [cart] = await db.select({ updatedAt: cartTable.updatedAt, status: cartTable.status })
+        .from(cartTable).where(and(eq(cartTable.id, cartId), eq(cartTable.status, "ordered")));
+    if (!cart) {
+        return { success: false, error: "The status of this cart cannot be synced or it doesnt exist" };
+    }
+    const orderDate = new Date(cart.updatedAt);
+    const daysSinceOrder = Math.floor((Date.now() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
+    if (daysSinceOrder >= 1) {
+        await db.update(cartTable)
+            .set({ updatedAt: nowISO(), status: "shipped" })
+            .where(eq(cartTable.id, cartId));
+        return
+    }
+    try {
+    } catch (error) {
+        console.error("Error syncing cart status:", error);
+        return { success: false, error: "Failed to sync cart status" };
+    }
+}
+export async function syncAllCartStatuses() {
+    try {
+        const carts = await db.select({ id: cartTable.id, updatedAt: cartTable.updatedAt, status: cartTable.status })
+            .from(cartTable)
+            .where(eq(cartTable.status, "ordered"));
+        for (const cart of carts) {
+            await syncCartStatus(cart.id);
+        }
+        return { success: true };
+    } catch (error) {
+        console.error("Error syncing all cart statuses:", error);
+        return { success: false, error: "Failed to sync all cart statuses" };
+    }
+}

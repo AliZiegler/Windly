@@ -14,9 +14,9 @@ const inputClass =
     "w-full px-4 py-3 bg-[#2a2f38] border border-[#4a5568] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00CAFF] focus:border-transparent transition-all duration-200";
 const labelClass = "block text-sm font-medium text-gray-300";
 const sectionClass =
-    "bg-[#393e46] border-2 border-[#1c2129] rounded-lg overflow-hidden";
+    "bg-[#252c37] border-2 border-[#1c2129] rounded-lg overflow-hidden";
 const sectionHeaderClass =
-    "bg-[#2a2f38] px-4 sm:px-6 py-4 border-b border-[#1c2129]";
+    "bg-[#1c2129] px-4 sm:px-6 py-4 border-b border-[#4a5568]";
 const optionSelectClass =
     "w-full px-4 py-3 bg-[#2a2f38] border border-[#4a5568] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00CAFF] focus:border-transparent transition-all duration-200";
 

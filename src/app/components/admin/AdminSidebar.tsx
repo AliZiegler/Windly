@@ -5,7 +5,7 @@ import {
     PackageSearch,
     Shield,
     ShoppingBasket,
-    UserRound,
+    User,
     UserSearch,
     UserStar,
     Package,
@@ -23,7 +23,7 @@ export default function AdminSidebar() {
         { name: "Reviews", href: "/admin/reviews", icon: UserStar },
         { name: "Orders", href: "/admin/orders", icon: ShoppingBasket },
         { name: "Addresses", href: "/admin/addresses", icon: MapPinPen },
-        { name: "Account Panel", href: "/account", icon: UserRound }
+        { name: "Your Account", href: "/account", icon: User }
     ];
 
     const liLinks = links.map((link) => {
