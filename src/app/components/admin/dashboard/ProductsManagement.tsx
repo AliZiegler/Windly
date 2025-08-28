@@ -103,7 +103,7 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
     return (
         <div className="bg-[#393e46] rounded-lg border border-gray-700 w-full">
             {/* Header */}
-            <div className="p-4 sm:p-6 border-b border-gray-700">
+            <div className="p-4 sm:p-6 border-b bg-[#1e232b]  border-gray-700">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                     <h2 className="text-xl font-semibold text-white">Products Management</h2>
                     <div className="flex items-center gap-2">
@@ -217,7 +217,7 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
                 <div className="overflow-x-auto">
                     <div className="max-h-[600px] overflow-y-auto">
                         <table className="min-w-full divide-y divide-gray-700">
-                            <thead className="bg-[#2e3238] sticky top-0 z-10">
+                            <thead className="bg-[#1e232b] border-b border-gray-400 sticky top-0 z-10">
                                 <tr>
                                     {["Product", "Category", "Price", "Stock", "Status", "Actions"].map((header) => (
                                         <th key={header} className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">

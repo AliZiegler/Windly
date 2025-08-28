@@ -1,29 +1,18 @@
-import { auth } from "@/auth";
 import { reviewTable, productTable, userTable } from "@/db/schema";
 import { db } from "@/lib/db";
 import { eq, and } from "drizzle-orm";
 import { reverseUrlString } from "@/app/components/global/Atoms";
 import ReviewDetails from "@/app/components/account/ReviewDetails";
-import ReviewEdit from "@/app/components/account/ReviewEdit";
 
 type PageProps = {
-    params: Promise<{ name: string }>,
-    searchParams: Promise<Record<string, string | string[] | undefined>>
+    id: string;
+    name: string
 }
 
-export default async function Page({ params, searchParams }: PageProps) {
-    const { name } = await params;
-    const isEdit = (await searchParams).edit === "true";
+export default async function Page({ id, name }: PageProps) {
     const productName = reverseUrlString(name);
-    const session = await auth();
 
-    if (!session?.user?.id) {
-        return <div>Not logged in</div>;
-    }
-
-    const userId = session.user.id;
-
-    const rawReviews = await db.select({
+    const [rawReview] = await db.select({
         id: reviewTable.id,
         userName: userTable.name,
         rating: reviewTable.rating,
@@ -34,40 +23,27 @@ export default async function Page({ params, searchParams }: PageProps) {
     }).from(reviewTable)
         .innerJoin(productTable, eq(reviewTable.productId, productTable.id))
         .innerJoin(userTable, eq(reviewTable.userId, userTable.id))
-        .where(and(eq(reviewTable.userId, session.user.id), eq(productTable.name, productName)));
+        .where(and(eq(reviewTable.userId, id), eq(productTable.name, productName)));
 
-    if (rawReviews.length === 0) {
+    if (!rawReview) {
         return <div>No review found</div>;
     }
-
-    const rawReview = rawReviews[0];
-
     const fReview = {
         id: rawReview.id,
-        userName: rawReview.userName,
         rating: rawReview.rating,
+        userName: rawReview.userName,
         review: rawReview.review,
         createdAt: new Date(rawReview.createdAt),
         updatedAt: new Date(rawReview.updatedAt),
         description: rawReview.description
     };
 
-    if (isEdit) {
-        return (
-            <ReviewEdit
-                productName={productName}
-                name={name}
-                fReview={fReview}
-                userId={userId}
-            />
-        );
-    }
-
     return (
         <ReviewDetails
             productName={productName}
             name={name}
             fReview={fReview}
+            isAdmin={true}
         />
     );
 }

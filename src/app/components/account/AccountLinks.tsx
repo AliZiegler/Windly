@@ -25,7 +25,7 @@ export default function AccountLinks() {
         const pathParts = pathname.split("/").filter(Boolean);
         if (pathParts[0] === "admin") {
             // For admin paths like /admin/users/123/wishlist, get the last part
-            return pathParts[pathParts.length - 1] || "account";
+            return pathParts[3] || "account";
         }
         // For account paths like /account/wishlist, get the second part
         return pathParts[1] || "account";

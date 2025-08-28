@@ -51,7 +51,8 @@ export default async function Page() {
     const DisplayProducts = wishlistItems.map((item) => (
         <div
             key={item.productId}
-            className="group relative bg-gradient-to-br from-[#2d3440] to-[#252a35] border border-gray-600/50 rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-400/30"
+            className="group relative bg-gradient-to-br from-midnight to-midnight/50 border border-gray-600/50 rounded-2xl p-4 sm:p-6 
+            transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-400/30"
         >
             <div className="absolute top-4 right-4 z-10">
                 <div className="p-2 bg-black/20 backdrop-blur-sm rounded-full transition-all duration-200 hover:bg-black/40">

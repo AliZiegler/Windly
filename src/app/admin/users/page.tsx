@@ -147,11 +147,6 @@ export default async function AdminUsers({
         .orderBy(buildOrderClause());
 
     // Get all users for filter options (without filters applied)
-    const allUsers = await db
-        .select({
-            name: userTable.name,
-        })
-        .from(userTable)
 
     const totalUsers = usersWithStats.length;
     const adminUsers = usersWithStats.filter(u => u.role === 'admin').length;
@@ -320,7 +315,7 @@ export default async function AdminUsers({
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-[#1e232b] rounded-xl p-4 border border-[#2a3038]">
+                <div className="bg-midnight rounded-xl p-4 border border-[#2a3038]">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-400 text-sm">Total Users</p>
@@ -374,7 +369,7 @@ export default async function AdminUsers({
                 <div className="p-4 border-b border-[#2a3038]">
                     <div className="flex items-center justify-between">
                         <h2 className="font-semibold text-lg text-white">
-                            {Object.keys(sp).length > 0 && totalUsers < allUsers.length ? 'Filtered Users' : 'All Users'}
+                            {Object.keys(sp).length > 0 ? 'Filtered Users' : 'All Users'}
                         </h2>
                         <span className="text-sm text-gray-400">
                             {totalUsers} user{totalUsers !== 1 ? 's' : ''}

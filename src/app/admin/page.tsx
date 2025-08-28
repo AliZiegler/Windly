@@ -45,41 +45,40 @@ export default async function AdminDashboard() {
             title: "Total Products",
             value: productCount.count.toString(),
             icon: Package,
-            color: "text-blue-400",
+            color: "blue",
         },
         {
             title: "Total Users",
             value: userCount.count.toString(),
             icon: Users,
-            color: "text-green-400",
+            color: "green",
         },
         {
             title: "Total Orders",
             value: orderCount.count.toString(),
             icon: ShoppingCart,
-            color: "text-purple-400",
+            color: "purple",
         },
         {
             title: "Revenue",
             value: `$${totalRevenue.toLocaleString()}`,
             icon: DollarSign,
-            color: "text-yellow-400",
+            color: "yellow",
         },
     ];
     const divStats = stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
-            <div
-                key={index}
-                className="bg-[#393e46] rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors"
-            >
-                <div className="flex items-center justify-between mb-4">
-                    <Icon className={`w-8 h-8 ${stat.color}`} />
+            <div key={index} className="bg-[#1e232b] rounded-xl p-4 border border-[#2a3038]">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-gray-400 text-sm">{stat.title}</p>
+                        <p className="text-2xl font-bold text-white">{stat.value}</p>
+                    </div>
+                    <div className={`p-3 bg-${stat.color}-500/20 rounded-lg`}>
+                        <Icon className={`w-6 h-6 text-${stat.color}-400`} />
+                    </div>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-1">
-                    {stat.value}
-                </h3>
-                <p className="text-slate-400 text-sm">{stat.title}</p>
             </div>
         );
     })
@@ -168,7 +167,7 @@ export default async function AdminDashboard() {
     const quickActionsButtons = quickActions.map((action) => {
         const ActionIcon = action.icon;
         return (
-            <button key={action.name} className="bg-[#393e46] hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
+            <button key={action.name} className="bg-midnight duration-200 hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors">
                 <Link prefetch href={action.href}>
                     <ActionIcon className={`w-8 h-8 mb-3 ${action.iconColor}`} />
                     <h4 className="text-white font-medium mb-1">{action.name}</h4>
@@ -193,13 +192,13 @@ export default async function AdminDashboard() {
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                            <div className="bg-[#393e46] max-h-[363px] rounded-lg border border-gray-700">
+                            <div className="bg-[#1e232b] max-h-[363px] rounded-lg border border-gray-700">
                                 <div className="p-6 border-b border-gray-700">
                                     <h3 className="text-xl font-semibold text-white">
                                         Recent Products
                                     </h3>
                                 </div>
-                                <div className="bg-[#2e3238]">
+                                <div>
                                     <div className="max-h-[286px]">
                                         {recentProducts.length > 0 ? (
                                             displayRecentProducts
@@ -209,13 +208,13 @@ export default async function AdminDashboard() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-[#393e46] max-h-[363px] rounded-lg border border-gray-700">
+                            <div className="bg-[#1e232b] max-h-[363px] rounded-lg border border-gray-700">
                                 <div className="p-6 border-b border-gray-700">
                                     <h3 className="text-xl font-semibold text-white">
                                         Recent Users
                                     </h3>
                                 </div>
-                                <div className="bg-[#2e3238]">
+                                <div >
                                     <div className="max-h-[286px]">
                                         {recentUsers.length > 0 ? (
                                             displayRecentUsers
