@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import UserFilterForm from "@/app/components/admin/users/UsersFilter";
 import { eq, count, sql, like, and, or, asc, desc } from "drizzle-orm";
 import {
     userTable,
@@ -28,6 +29,14 @@ function normalizeParams(sp: ResolvedSearchParamsType) {
         gender: toStr(sp.gender),
         emailVerified: toStr(sp.emailVerified),
         hasAddress: toStr(sp.hasAddress),
+        hasPhone: toStr(sp.hasPhone),
+        birthdayMonth: toStr(sp.birthdayMonth),
+        joinedAfter: toStr(sp.joinedAfter),
+        joinedBefore: toStr(sp.joinedBefore),
+        minOrders: toStr(sp.minOrders),
+        maxOrders: toStr(sp.maxOrders),
+        minSpent: toStr(sp.minSpent),
+        maxSpent: toStr(sp.maxSpent),
     };
 }
 
@@ -37,7 +46,7 @@ export default async function AdminUsers({
     searchParams: SearchParamsType
 }) {
     const sp = await searchParams;
-    const { search, role, gender, emailVerified } = normalizeParams(sp);
+    const { search, role, gender, emailVerified, hasPhone, birthdayMonth, joinedAfter, joinedBefore, minOrders, maxOrders, minSpent, maxSpent } = normalizeParams(sp);
 
     const buildWhereClause = () => {
         const conditions = [];
@@ -65,8 +74,63 @@ export default async function AdminUsers({
         } else if (emailVerified === 'unverified') {
             conditions.push(sql`${userTable.emailVerified} IS NULL`);
         }
+        if (hasPhone === '1') {
+            conditions.push(sql`${userTable.phone} IS NOT NULL AND ${userTable.phone} != ''`);
+        } else if (hasPhone === '0') {
+            conditions.push(or(
+                sql`${userTable.phone} IS NULL`,
+                eq(userTable.phone, '')
+            ));
+        }
+        if (birthdayMonth) {
+            conditions.push(sql`substr(${userTable.birthday}, 6, 2) = ${birthdayMonth}`);
+        }
+        if (joinedAfter) {
+            conditions.push(sql`${userTable.createdAt} >= ${joinedAfter}`);
+        }
+        if (joinedBefore) {
+            conditions.push(sql`${userTable.createdAt} <= ${joinedBefore}`);
+        }
+        if (minOrders && minOrders !== "0") {
+            conditions.push(sql`COALESCE((
+        SELECT COUNT(DISTINCT c.id) 
+        FROM ${cartTable} c
+        WHERE c.user_id = ${userTable.id} 
+        AND c.status IN ('delivered', 'shipped', 'ordered')
+    ), 0) >= ${parseInt(minOrders)}`);
+        }
+        if (maxOrders) {
+            conditions.push(sql`COALESCE((
+        SELECT COUNT(DISTINCT c.id) 
+        FROM ${cartTable} c
+        WHERE c.user_id = ${userTable.id} 
+        AND c.status IN ('delivered', 'shipped', 'ordered')
+    ), 0) <= ${parseInt(maxOrders)}`);
+        }
 
+        // Spending filters
+        if (minSpent) {
+            conditions.push(sql`COALESCE((
+        SELECT SUM(ci.quantity * p.price * (1 - p.discount / 100))
+        FROM ${cartTable} c
+        JOIN ${cartItemTable} ci ON c.id = ci.cart_id
+        JOIN ${productTable} p ON ci.product_id = p.id
+        WHERE c.user_id = ${userTable.id} 
+        AND c.status IN ('delivered', 'shipped', 'ordered')
+    ), 0) >= ${parseFloat(minSpent)}`);
+        }
+        if (maxSpent) {
+            conditions.push(sql`COALESCE((
+        SELECT SUM(ci.quantity * p.price * (1 - p.discount / 100))
+        FROM ${cartTable} c
+        JOIN ${cartItemTable} ci ON c.id = ci.cart_id
+        JOIN ${productTable} p ON ci.product_id = p.id
+        WHERE c.user_id = ${userTable.id} 
+        AND c.status IN ('delivered', 'shipped', 'ordered')
+    ), 0) <= ${parseFloat(maxSpent)}`);
+        }
         return conditions.length > 0 ? and(...conditions) : undefined;
+
     };
 
     const buildOrderClause = () => {
@@ -312,7 +376,7 @@ export default async function AdminUsers({
                     </p>
                 </div>
             </div>
-
+            <UserFilterForm searchParams={sp} />
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-midnight rounded-xl p-4 border border-[#2a3038]">

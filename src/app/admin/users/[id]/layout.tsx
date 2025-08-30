@@ -7,9 +7,12 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <div className="w-full flex flex-col items-center gap-10 my-5">
             <div className="w-full flex items-center">
                 <span className="ml-5">
-                    <Link href="/admin/users" className="flex items-center gap-2">
+                    <Link
+                        title="Back To Users"
+                        href="/admin/users"
+                        className="flex items-center gap-2 whitespace-nowrap">
                         <ChevronLeft size={20} />
-                        <span>Back</span>
+                        <span>Back To Users</span>
                     </Link>
                 </span>
                 <span className="w-full flex justify-center">

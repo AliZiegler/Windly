@@ -1,7 +1,10 @@
 import { db } from "@/lib/db"
 import { eq } from "drizzle-orm"
+import { redirect } from "next/navigation"
 import { userTable } from "@/db/schema";
 import Image from "next/image"
+import { makeAdmin } from "@/app/actions/AdminActions";
+import { Shield } from "lucide-react";
 import ReadOnlyUserField from "@/app/components/account/ReadOnlyUserField"
 import SignOut from "@/app/components/global/SignOut"
 
@@ -73,8 +76,25 @@ export default async function AccountInformation({ id }: { id: string }) {
                 />
             </div>
 
-            <div className="mt-4">
+            <div className="mt-4 flex gap-3">
                 <SignOut />
+                <span>
+                    <form
+                        action={async () => {
+                            "use server"
+                            await makeAdmin(id)
+                            redirect("/admin/users")
+                        }}
+                    >
+                        <button
+                            type="submit"
+                            className="cursor-pointer h-8 max-w-52 bg-blue-500 hover:bg-blue-600 duration-200 rounded-md flex items-center gap-2 p-2">
+                            <Shield size={25} color="black" />
+                            <b>Make {user.name} Admin</b>
+                        </button>
+                    </form>
+
+                </span>
             </div>
         </div>
     );

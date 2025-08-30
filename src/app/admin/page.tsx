@@ -21,20 +21,17 @@ export default async function AdminDashboard() {
 
     let orderCount = { count: 0 };
     let totalRevenue = 0;
-
     try {
         [orderCount] = await db.select({ count: sql<number>`count(*)` }).from(cartTable).
             where(inArray(cartTable.status, ['ordered', 'shipped', 'delivered', 'cancelled']));
-
         const [revenueResult] = await db
             .select({
-                total: sql<number>`sum(${cartItemTable.quantity} * ${productTable.price})`
+                total: sql<number>`sum(${cartItemTable.quantity} * ${productTable.price} * (1 - ${productTable.discount} / 100))`
             })
             .from(cartTable)
             .innerJoin(cartItemTable, sql`${cartTable.id} = ${cartItemTable.cartId}`)
             .innerJoin(productTable, sql`${cartItemTable.productId} = ${productTable.id}`)
             .where(inArray(cartTable.status, ['ordered', 'shipped', 'delivered']));
-
         totalRevenue = revenueResult?.total || 0;
     } catch (error) {
         console.log("Some tables not available yet:", error);

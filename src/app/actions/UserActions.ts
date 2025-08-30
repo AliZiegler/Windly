@@ -134,14 +134,6 @@ export async function updateWishlist(productId: number) {
         };
     }
 }
-export async function isAdmin(userId: string) {
-    const [userRole] = await db.select({ role: userTable.role }).from(userTable).where(eq(userTable.id, userId));
-    return userRole.role === 'admin';
-}
-export async function isCallerAdmin() {
-    const userId = await requireAuth();
-    return isAdmin(userId);
-}
 export async function setUserRole(role: AllowedRole) {
     const userId = await requireAuth()
     try {
@@ -149,24 +141,6 @@ export async function setUserRole(role: AllowedRole) {
             throw new Error(`Invalid role. Allowed roles: ${ALLOWED_ROLES.join(', ')}`);
         }
         await db.update(userTable).set({ role: role }).where(eq(userTable.id, userId));
-        revalidatePath("/account");
-        return { success: true };
-    } catch (error) {
-        console.error('Error updating user role:', error);
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : "Unknown error"
-        };
-    }
-}
-export async function makeAdmin(userId: string) {
-    const callerId = await requireAuth()
-    const isCallerAdmin = isAdmin(callerId)
-    if (!isCallerAdmin) {
-        return { success: false, error: "You are not an admin" };
-    }
-    try {
-        await db.update(userTable).set({ role: 'admin' }).where(eq(userTable.id, userId));
         revalidatePath("/account");
         return { success: true };
     } catch (error) {

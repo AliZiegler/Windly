@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { isAdmin } from "@/app/actions/UserActions";
+import { isAdmin } from "@/app/actions/AdminActions";
 import AdminSidebar from "@/app/components/admin/AdminSidebar";
 export default async function HomeLayout({
     children,
