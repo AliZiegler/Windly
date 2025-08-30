@@ -1,23 +1,11 @@
-import { auth } from '@/auth';
 import { db } from '@/lib/db';
 import { eq, desc, sql, and, inArray } from 'drizzle-orm';
-import { cartTable, cartItemTable, productTable } from '@/db/schema';
+import { cartTable, cartItemTable, productTable, userTable } from '@/db/schema';
 import Link from 'next/link';
 import { formatPrice } from '@/app/components/global/Atoms';
 import { Check, Clock, X, Package, Calendar, MessageSquare, PackageCheck } from 'lucide-react';
 
-export default async function OrdersPage() {
-    const session = await auth();
-    if (!session?.user?.id) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] text-center bg-[#1e232b] rounded-xl border border-[#2a3038] p-6">
-                <div className="text-4xl mb-4 opacity-50">🔒</div>
-                <h1 className="font-bold text-xl mb-2 text-white">Access Restricted</h1>
-                <p className="text-gray-400">Please log in to view your orders.</p>
-            </div>
-        );
-    }
-
+export default async function OrdersPage({ id }: { id: string }) {
     const orders = await db
         .select({
             id: cartTable.id,
@@ -37,7 +25,7 @@ export default async function OrdersPage() {
         .from(cartTable)
         .leftJoin(cartItemTable, eq(cartTable.id, cartItemTable.cartId))
         .leftJoin(productTable, eq(cartItemTable.productId, productTable.id))
-        .where(and(eq(cartTable.userId, session.user.id), inArray(cartTable.status, ['ordered', 'shipped', 'delivered', 'cancelled'])))
+        .where(and(eq(cartTable.userId, id), inArray(cartTable.status, ['ordered', 'shipped', 'delivered', 'cancelled'])))
         .groupBy(cartTable.id)
         .orderBy(desc(cartTable.id));
 
@@ -49,15 +37,17 @@ export default async function OrdersPage() {
         return orderDate >= thirtyDaysAgo;
     }).length;
     const deliveredOrders = orders.filter(o => o.status === 'delivered').length;
+    const [{ userName }] = await db.select({ userName: userTable.name }).from(userTable).where(eq(userTable.id, id));
+    const firstName = userName.split(' ')[0];
 
     if (totalOrders === 0) {
         return (
             <div className="flex flex-col w-full gap-6 p-4 lg:p-6 overflow-hidden">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
-                        <h1 className="font-bold text-2xl lg:text-3xl text-white mb-2">My Orders</h1>
+                        <h1 className="font-bold text-2xl lg:text-3xl text-white mb-2">{userName}&apos;s Orders</h1>
                         <p className="text-gray-400">
-                            Track and manage your orders here
+                            Track and manage {userName}&apos;s orders here
                         </p>
                     </div>
                 </div>
@@ -66,7 +56,7 @@ export default async function OrdersPage() {
                     <div className="text-4xl mb-4 opacity-50">📦</div>
                     <h2 className="font-bold text-xl mb-2 text-white">No Orders Yet</h2>
                     <p className="text-gray-400 mb-4">
-                        You haven&apos;t placed any orders yet. Start shopping now!
+                        {firstName} haven&apos;t placed any orders yet.
                     </p>
                     <Link
                         href="/products"
@@ -144,7 +134,7 @@ export default async function OrdersPage() {
                 <td className="p-3 text-sm text-gray-300 font-semibold">{formatPrice(order.total)}</td>
                 <td className="p-3 text-center">
                     <Link
-                        href={`/account/orders/${order.id}`}
+                        href={`/admin/users/${id}/orders/${order.id}`}
                         className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-400 
                                  hover:bg-blue-500/30 hover:text-blue-300 rounded-lg transition-all duration-200 text-sm"
                     >
@@ -161,9 +151,9 @@ export default async function OrdersPage() {
         <div className="flex flex-col w-full gap-6 p-4 lg:p-6 overflow-hidden">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
-                    <h1 className="font-bold text-2xl lg:text-3xl text-white mb-2">My Orders</h1>
+                    <h1 className="font-bold text-2xl lg:text-3xl text-white mb-2">{userName}&apos;s Orders</h1>
                     <p className="text-gray-400">
-                        Track and manage all your orders
+                        Track and manage all {userName}&apos;s orders
                         <span className="ml-2">• {totalOrders} total</span>
                     </p>
                 </div>
@@ -245,7 +235,10 @@ export default async function OrdersPage() {
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
                                         <span className="font-mono text-sm font-medium text-gray-200">#{order.id}</span>
-                                        <div className={`inline-flex items-center gap-1 px-2 py-0.5 ml-2 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
+                                        <div
+                                            className={`inline-flex items-center gap-1 px-2 py-0.5 ml-2 rounded-full text-xs font-medium border 
+                                            ${getStatusColor(order.status)}`}
+                                        >
                                             {getStatusIcon(order.status)}
                                             {order.status}
                                         </div>
@@ -259,7 +252,7 @@ export default async function OrdersPage() {
                                 <p className="text-sm text-gray-300 mb-3">{itemsText}</p>
                                 <div className="flex justify-end">
                                     <Link
-                                        href={`/account/orders/${order.id}`}
+                                        href={`/admin/users/${id}/orders/${order.id}`}
                                         className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-400 
                                                  hover:bg-blue-500/30 hover:text-blue-300 rounded-lg transition-all duration-200 text-sm"
                                     >
