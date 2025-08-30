@@ -4,8 +4,14 @@ import { cartTable, cartItemTable, productTable, userTable } from '@/db/schema';
 import Link from 'next/link';
 import { formatPrice } from '@/app/components/global/Atoms';
 import { Check, Clock, X, Package, Calendar, MessageSquare, PackageCheck } from 'lucide-react';
+import { syncAllCartStatuses } from '@/app/actions/CartActions';
 
+async function handleSync() {
+    "use server"
+    await syncAllCartStatuses();
+}
 export default async function OrdersPage({ id }: { id: string }) {
+    await handleSync();
     const orders = await db
         .select({
             id: cartTable.id,

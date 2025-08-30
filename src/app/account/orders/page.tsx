@@ -3,10 +3,16 @@ import { db } from '@/lib/db';
 import { eq, desc, sql, and, inArray } from 'drizzle-orm';
 import { cartTable, cartItemTable, productTable } from '@/db/schema';
 import Link from 'next/link';
+import { syncAllCartStatuses } from '@/app/actions/CartActions';
 import { formatPrice } from '@/app/components/global/Atoms';
 import { Check, Clock, X, Package, Calendar, MessageSquare, PackageCheck } from 'lucide-react';
+async function handleSync() {
+    "use server"
+    await syncAllCartStatuses();
+}
 
 export default async function OrdersPage() {
+    await handleSync();
     const session = await auth();
     if (!session?.user?.id) {
         return (
