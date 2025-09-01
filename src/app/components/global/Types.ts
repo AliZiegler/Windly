@@ -35,9 +35,6 @@ export type ProductType = {
     };
     about: string[];
 };
-export type searchParamsType = Promise<
-    Record<string, string | string[] | undefined>
->;
 export type SessionType = {
     user: {
         name: string;

@@ -1,11 +1,10 @@
 "use client";
 
 import { Search, X } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
-interface ReviewsFiltersProps {
-    productName: string;
+type ReviewsFiltersProps = {
     totalReviews: number;
     filteredCount: number;
     currentSort?: string;
@@ -15,7 +14,6 @@ interface ReviewsFiltersProps {
 }
 
 export default function ReviewsFilters({
-    productName,
     totalReviews,
     filteredCount,
     currentSort = 'newest',
@@ -24,6 +22,7 @@ export default function ReviewsFilters({
     currentHelpful = 'false'
 }: ReviewsFiltersProps) {
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
     const [searchInput, setSearchInput] = useState(currentSearch);
@@ -31,29 +30,35 @@ export default function ReviewsFilters({
     const updateFilters = (key: string, value: string) => {
         const params = new URLSearchParams(searchParams.toString());
 
-        if (value === '' || value === 'all' || value === 'false') {
+        const isDefault =
+            (key === 'sort' && value === 'newest') ||
+            (key === 'rating' && value === 'all') ||
+            (key === 'helpful' && value === 'false') ||
+            (key === 'search' && value === '');
+
+        if (isDefault) {
             params.delete(key);
         } else {
             params.set(key, value);
         }
 
         const queryString = params.toString();
-        const url = `/${productName}/reviews${queryString ? `?${queryString}` : ''}`;
+        const url = queryString ? `${pathname}?${queryString}` : pathname;
 
         startTransition(() => {
-            router.push(url);
+            router.push(url, { scroll: false });
         });
     };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        updateFilters('search', searchInput.trim());
+        updateFilters("search", searchInput.trim());
     };
 
     const clearFilters = () => {
         setSearchInput('');
         startTransition(() => {
-            router.push(`/${productName}/reviews`);
+            router.push(pathname, { scroll: false });
         });
     };
 
@@ -73,13 +78,16 @@ export default function ReviewsFilters({
                                 onChange={(e) => setSearchInput(e.target.value)}
                                 placeholder="Search reviews..."
                                 className="w-full h-12 pl-10 pr-4 border border-gray-600/50 rounded-lg text-gray-100 placeholder-gray-400 
-                                focus:border-blue-400 focus:outline-none transition-colors"
+                 focus:border-blue-400 focus:outline-none transition-colors"
                                 style={{ backgroundColor: "#1e252d" }}
                             />
                             {searchInput && (
                                 <button
                                     type="button"
-                                    onClick={() => setSearchInput('')}
+                                    onClick={() => {
+                                        setSearchInput("");
+                                        updateFilters("search", "");
+                                    }}
                                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                                 >
                                     <X size={20} />
@@ -93,10 +101,10 @@ export default function ReviewsFilters({
                     <div className="lg:min-w-64 max-lg:w-full">
                         <label className="block text-sm font-medium text-gray-300 mb-2">Sort by</label>
                         <select
-                            value={currentSort}
+                            value={currentSort || 'newest'}
                             onChange={(e) => updateFilters('sort', e.target.value)}
                             disabled={isPending}
-                            className="w-full h-12 px-3 border border-gray-600/50 rounded-lg text-gray-100 
+                            className="w-full h-12 px-3 border border-gray-600/50 rounded-lg text-gray-100 cursor-pointer
                             focus:border-blue-400 focus:outline-none transition-colors disabled:opacity-50"
                             style={{ backgroundColor: "#1e252d" }}
                         >
@@ -116,7 +124,7 @@ export default function ReviewsFilters({
                             onChange={(e) => updateFilters('rating', e.target.value)}
                             disabled={isPending}
                             className="w-full h-12 px-3 border border-gray-600/50 rounded-lg text-gray-100 focus:border-blue-400 
-                            focus:outline-none transition-colors disabled:opacity-50"
+                            focus:outline-none transition-colors disabled:opacity-50 cursor-pointer"
                             style={{ backgroundColor: "#1e252d" }}
                         >
                             <option value="all">All Stars</option>

@@ -1,4 +1,4 @@
-import { reverseUrlString } from "@/app/components/global/Atoms"
+import { urlString } from "@/app/components/global/Atoms"
 import { getProductReviews, getUserHelpfulReviewsIds, markReviewHelpful } from "@/app/actions/ReviewActions"
 import { auth } from "@/auth"
 import Image from "next/image"
@@ -6,14 +6,11 @@ import Stars from "@/app/components/global/ReactStars"
 import Link from "next/link"
 import ReviewsFilters from "@/app/components/productDetails/ReviewsFilters"
 import { CircleAlert, MessageSquareMore, Search, SquarePen, Star, ThumbsUp } from "lucide-react"
+import { ResolvedSearchParamsType } from "@/app/components/global/Types"
 
 type Params = {
-    params: Promise<{ name: string }>
-    searchParams: Promise<{
-        sort?: string
-        rating?: string
-        search?: string
-    }>
+    productName: string
+    searchParams: ResolvedSearchParamsType
 }
 
 async function handleHelpfulAction(formData: FormData) {
@@ -36,9 +33,27 @@ async function handleHelpfulAction(formData: FormData) {
     }
 }
 
-export default async function ReviewsPage({ params, searchParams }: Params) {
-    const { name } = await params
-    const { sort, rating, search } = await searchParams
+export default async function ReviewsPage({ productName, searchParams }: Params) {
+    const urlName = urlString(productName)
+
+    // Debug logging
+    console.log("Search params received:", searchParams);
+
+    // Better parameter extraction
+    const rawSort = searchParams?.sort
+    const rawRating = searchParams?.rating
+    const rawSearch = searchParams?.search
+
+    // Handle both array and string formats more robustly
+    const sort = Array.isArray(rawSort) ? rawSort[0] : (rawSort || "newest")
+    const rating = Array.isArray(rawRating) ? rawRating[0] : (rawRating || "all")
+    const search = Array.isArray(rawSearch) ? rawSearch[0] : (rawSearch || "")
+
+    // Debug logging
+    console.log("Processed search parameter:", search);
+    console.log("Search parameter type:", typeof search);
+    console.log("Search parameter length:", search?.length || 0);
+
     const session = await auth()
     const userId = session?.user?.id
     let userHelpfulReviewsIds = null
@@ -47,9 +62,8 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
         userHelpfulReviewsIds = await getUserHelpfulReviewsIds(userId)
         helpfulIds = userHelpfulReviewsIds.reviews?.map(review => review.reviewId)
     }
-    const productName = reverseUrlString(name)
     const raw = await getProductReviews(productName)
-    const reviews = raw.reviews
+    const { reviews } = raw
 
     if (!raw.success) {
         return (
@@ -68,7 +82,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
             <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "#222831" }}>
                 <div className="max-w-6xl mx-auto">
                     <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
-                        <Link href={`/${name}`} className="flex items-center gap-4 group">
+                        <Link href={`/${urlName}`} className="flex items-center gap-4 group">
                             <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-800">
                                 <Image
                                     src="/images/placeholder.png"
@@ -95,7 +109,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
                             Be the first to share your experience with this product
                         </p>
                         <Link
-                            href={`/${name}?review=shown`}
+                            href={`/${urlName}?review=shown`}
                             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold rounded-xl hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 transform hover:-translate-y-0.5"
                         >
                             <SquarePen className="w-5 h-5 mr-2" />
@@ -107,19 +121,36 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
         )
     }
 
+    // Start with a copy of all reviews
     let filteredReviews = [...reviews];
 
-    if (search) {
-        filteredReviews = filteredReviews.filter(review =>
-            review.review.toLowerCase().includes(search.toLowerCase()) ||
-            review.userName.toLowerCase().includes(search.toLowerCase())
-        );
+    // Apply search filter first - with more robust search logic
+    if (search && search.trim() !== "") {
+        const searchTerm = search.trim().toLowerCase();
+        console.log("Applying search filter for term:", searchTerm);
+
+        filteredReviews = filteredReviews.filter(review => {
+            const reviewText = review.review?.toLowerCase() || "";
+            const userName = review.userName?.toLowerCase() || "";
+
+            const matchesReview = reviewText.includes(searchTerm);
+            const matchesUser = userName.includes(searchTerm);
+
+            console.log(`Review ID ${review.id}: reviewText includes "${searchTerm}": ${matchesReview}, userName includes "${searchTerm}": ${matchesUser}`);
+
+            return matchesReview || matchesUser;
+        });
+
+        console.log(`Search filtered ${reviews.length} reviews down to ${filteredReviews.length}`);
     }
 
-    // Rating filter
+    // Apply rating filter
     if (rating && rating !== 'all') {
         const ratingNum = parseInt(rating);
-        filteredReviews = filteredReviews.filter(review => Math.floor(review.rating) === ratingNum);
+        if (!isNaN(ratingNum)) {
+            filteredReviews = filteredReviews.filter(review => Math.floor(review.rating) === ratingNum);
+            console.log(`Rating filter applied: ${filteredReviews.length} reviews match rating ${ratingNum}`);
+        }
     }
 
     // Sort reviews
@@ -145,8 +176,8 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
     }
 
     const overallRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
-    const currentPath = `/${name}/reviews`
-    const writeReviewPath = `/${name}?review=shown`
+    const currentPath = `/${urlName}/reviews`
+    const writeReviewPath = `/${urlName}?review=shown`
 
     const ratingCounts = [5, 4, 3, 2, 1].map(star => ({
         star,
@@ -219,7 +250,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
         <div className="min-h-screen" style={{ backgroundColor: "#222831" }}>
             <div className="mx-auto p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 gap-6">
-                    <Link href={`/${name}`} className="flex items-center gap-4 group">
+                    <Link href={`/${urlName}`} className="flex items-center gap-4 group">
                         <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-800 shadow-lg">
                             <Image
                                 src="/images/placeholder.png"
@@ -308,7 +339,7 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
                             <h3 className="text-xl font-bold text-gray-200 mb-2">No reviews match your filters</h3>
                             <p className="text-gray-400 mb-6">Try adjusting your search or filter criteria</p>
                             <Link
-                                href={`/${name}/reviews`}
+                                href={`/${urlName}/reviews`}
                                 className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-medium rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
                             >
                                 Clear Filters

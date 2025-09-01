@@ -7,23 +7,39 @@ import ReviewDetails from "@/app/components/account/ReviewDetails";
 type PageProps = {
     id: string;
     name: string
+    reviewId?: number
 }
 
-export default async function Page({ id, name }: PageProps) {
+export default async function Page({ id, name, reviewId }: PageProps) {
     const productName = reverseUrlString(name);
-
-    const [rawReview] = await db.select({
-        id: reviewTable.id,
-        userName: userTable.name,
-        rating: reviewTable.rating,
-        review: reviewTable.review,
-        createdAt: reviewTable.createdAt,
-        updatedAt: reviewTable.updatedAt,
-        description: productTable.description
-    }).from(reviewTable)
-        .innerJoin(productTable, eq(reviewTable.productId, productTable.id))
-        .innerJoin(userTable, eq(reviewTable.userId, userTable.id))
-        .where(and(eq(reviewTable.userId, id), eq(productTable.name, productName)));
+    const [rawReview] = reviewId ?
+        await db.select({
+            id: reviewTable.id,
+            userName: userTable.name,
+            rating: reviewTable.rating,
+            review: reviewTable.review,
+            createdAt: reviewTable.createdAt,
+            updatedAt: reviewTable.updatedAt,
+            description: productTable.description,
+            productName: productTable.name
+        }).from(reviewTable)
+            .innerJoin(productTable, eq(reviewTable.productId, productTable.id))
+            .innerJoin(userTable, eq(reviewTable.userId, userTable.id))
+            .where(eq(reviewTable.id, reviewId))
+        :
+        await db.select({
+            id: reviewTable.id,
+            userName: userTable.name,
+            rating: reviewTable.rating,
+            review: reviewTable.review,
+            createdAt: reviewTable.createdAt,
+            updatedAt: reviewTable.updatedAt,
+            description: productTable.description,
+            productName: productTable.name
+        }).from(reviewTable)
+            .innerJoin(productTable, eq(reviewTable.productId, productTable.id))
+            .innerJoin(userTable, eq(reviewTable.userId, userTable.id))
+            .where(and(eq(reviewTable.userId, id), eq(productTable.name, productName)));
 
     if (!rawReview) {
         return <div>No review found</div>;
@@ -40,7 +56,7 @@ export default async function Page({ id, name }: PageProps) {
 
     return (
         <ReviewDetails
-            productName={productName}
+            productName={rawReview.productName}
             name={name}
             fReview={fReview}
             isAdmin={true}

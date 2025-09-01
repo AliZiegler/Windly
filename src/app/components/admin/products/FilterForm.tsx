@@ -1,7 +1,7 @@
-import { Search, Filter, X, ChevronDown } from 'lucide-react';
-import Link from 'next/link';
+import { Search, Filter, ChevronDown } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { ResolvedSearchParamsType } from '@/app/components/global/Types';
+import ClearFilters from '@/app/components/admin/ClearFilters';
 
 type SearchParams = {
     search?: string;
@@ -380,16 +380,7 @@ export default function FilterForm({
                     {/* Action Buttons */}
                     <div className="flex gap-4 w-full xl:w-auto">
                         {activeFiltersCount > 0 && (
-                            <Link
-                                href="/admin/products"
-                                className="flex-1 xl:flex-none text-sm text-gray-400 hover:text-white transition-colors 
-                                duration-200 flex items-center justify-center gap-2 px-6 py-3 hover:bg-[#2a3038] rounded-xl 
-                                border border-[#3a4048] hover:border-[#4a5058] min-w-[140px]"
-                                replace
-                            >
-                                <X className="w-4 h-4" />
-                                Clear Filters
-                            </Link>
+                            <ClearFilters />
                         )}
                         <button
                             type="submit"

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { SearchParamsType } from "@/app/components/global/Types";
 import ProductView from "@/app/components/admin/products/ProductView";
 import ProductEdit from "@/app/components/admin/products/ProductEdit";
+import ReviewsSection from "@/app/components/admin/products/ReviewsSection";
 
 type ProductEditPageProps = {
     params: Promise<{ id: string; }>;
@@ -85,6 +86,10 @@ export default async function ProductEditPage({ params, searchParams }: ProductE
             ) : (
                 <ProductView product={product} />
             )}
+            <ReviewsSection
+                productName={product.name}
+                searchParams={sp}
+            />
         </>
     );
 }
