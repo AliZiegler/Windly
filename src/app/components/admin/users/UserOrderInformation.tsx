@@ -2,10 +2,10 @@ import { db } from '@/lib/db';
 import { eq, and, inArray } from 'drizzle-orm';
 import { cartTable, cartItemTable, productTable } from '@/db/schema';
 import Link from 'next/link';
-import { formatPrice } from '@/app/components/global/Atoms';
+import { formatPrice, urlString } from '@/app/components/global/Atoms';
 import { notFound, redirect } from 'next/navigation';
 import { cancelOrder } from '@/app/actions/CartActions';
-import { Box, Check, ChevronLeft, PackageCheck, X, AlertCircle } from 'lucide-react';
+import { Package, Check, ChevronLeft, PackageCheck, X, AlertCircle } from 'lucide-react';
 
 interface OrderItem {
     productId: number;
@@ -27,7 +27,11 @@ interface OrderDetails {
 }
 
 
-export default async function OrderDetailsPage({ userId, orderId }: { userId: string, orderId: number }) {
+export default async function OrderDetailsPage({ orderId, previousPage }: { orderId: number, previousPage?: string }) {
+    let isAdmin = false;
+    if (previousPage && previousPage.startsWith("/admin")) {
+        isAdmin = true;
+    }
     const [order] = await db
         .select({
             id: cartTable.id,
@@ -46,13 +50,6 @@ export default async function OrderDetailsPage({ userId, orderId }: { userId: st
 
     if (!order) {
         notFound();
-    }
-    if (order.userId !== userId) {
-        return (
-            <div className="flex items-center justify-center min-h-[200px]">
-                <div className="text-gray-400 text-lg">Not authorized</div>
-            </div>
-        )
     }
 
     const orderItems = await db
@@ -124,7 +121,7 @@ export default async function OrderDetailsPage({ userId, orderId }: { userId: st
             case 'delivered':
                 return <Check className="w-4 h-4" />;
             case 'shipped':
-                return <Box className="w-4 h-4" />;
+                return <Package className="w-4 h-4" />;
             case 'cancelled':
                 return <X className="w-4 h-4" />;
             default:
@@ -151,7 +148,8 @@ export default async function OrderDetailsPage({ userId, orderId }: { userId: st
             <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                     <Link
-                        href="/account/orders"
+                        href={previousPage || "/account/orders"}
+                        title="Back"
                         className="text-gray-400 hover:text-white transition-colors duration-200"
                     >
                         <ChevronLeft className="w-5 h-5" />
@@ -237,7 +235,11 @@ export default async function OrderDetailsPage({ userId, orderId }: { userId: st
                             {orderDetails.items.map((item) => (
                                 <tr key={item.productId} className="border-t border-[#2a3038] hover:bg-[#1c2129] transition-colors duration-200">
                                     <td className="p-4">
-                                        <div className="font-medium text-gray-200">{item.productName}</div>
+                                        <div className="font-medium text-gray-200 link-hover">
+                                            <Link href={isAdmin ? `/admin/products/${item.productId}` : `/${urlString(item.productName)}`}>
+                                                {item.productName}
+                                            </Link>
+                                        </div>
                                         <div className="text-xs text-gray-400">ID: {item.productId}</div>
                                     </td>
                                     <td className="p-4 text-center">
@@ -308,7 +310,7 @@ export default async function OrderDetailsPage({ userId, orderId }: { userId: st
                         ? 'border-green-500/30 bg-green-500/20 text-green-400'
                         : 'border-gray-500/30 bg-gray-500/20 text-gray-400'
                         }`}>
-                        <Box className="w-4 h-4" />
+                        <Package className="w-4 h-4" />
                         <span className="text-sm font-medium">Shipped</span>
                     </div>
 
@@ -321,6 +323,6 @@ export default async function OrderDetailsPage({ userId, orderId }: { userId: st
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

@@ -6,3 +6,7 @@
     --color-golden: #ffb100;
     --color-mainbg: #222831;
 }
+
+@utility link-hover {
+    @apply hover:text-[#00CAFF] duration-200;
+}
