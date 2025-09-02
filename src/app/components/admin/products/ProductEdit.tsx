@@ -113,12 +113,7 @@ export default function ProductEdit({ product }: ProductEditProps) {
         };
 
         try {
-            const result = await updateProduct(product.id, productData);
-
-            if ('success' in result && !result.success) {
-                throw new Error(result.error);
-            }
-
+            await updateProduct(product.id, productData);
             redirect(`/admin/products/${product.id}`);
         } catch (error) {
             console.error('Failed to update product:', error);
