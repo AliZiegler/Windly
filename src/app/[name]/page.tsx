@@ -124,7 +124,7 @@ export default async function Page(
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <span className="text-2xl font-bold text-gray-100">{averageRating.toFixed(1)}</span>
-                                    <AllReviews rating={averageRating} url={`/${name}/reviews`} size={28} />
+                                    <AllReviews rating={averageRating} url={`/${name}/reviews`} size={28} prefetch />
                                 </div>
                                 {session && (
                                     <div className="flex items-center">
