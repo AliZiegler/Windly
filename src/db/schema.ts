@@ -68,6 +68,17 @@ export const userTable = sqliteTable("user", {
     role: text("status", { enum: ["user", "seller", "admin"] }).notNull().default("user"),
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 })
+export const banTable = sqliteTable("ban", {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+        .notNull()
+        .references(() => userTable.id, { onDelete: "cascade" }),
+    bannedBy: text("banned_by").references(() => userTable.id),
+    reason: text("reason").notNull(),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    expiresAt: text("expires_at"), // null = permanent ban
+    revokedAt: text("revoked_at"), // null = still active
+});
 export const wishlistTable = sqliteTable("wishlist", {
     productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),
     userId: text("user_id").notNull().references(() => userTable.id, { onDelete: "cascade" }),

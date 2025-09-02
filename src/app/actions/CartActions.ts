@@ -3,8 +3,8 @@
 import { db } from "@/lib/db";
 import { cartTable, cartItemTable, userTable, InsertCart, productTable } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
-import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { requireAuth } from "@/app/actions/AdminActions";
 
 function nowISO(): string {
     return new Date().toISOString();
@@ -15,12 +15,6 @@ function cartItemCondition(cartId: number, productId: number) {
         eq(cartItemTable.cartId, cartId),
         eq(cartItemTable.productId, productId)
     );
-}
-
-async function requireAuth(): Promise<string> {
-    const session = await auth();
-    if (!session?.user?.id) throw new Error("Unauthorized");
-    return session.user.id;
 }
 
 export async function setUserCartId(cartId: number) {

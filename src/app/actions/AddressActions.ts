@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import type { UpdateAddress } from "@/app/components/global/Types";
-import { requireAuth } from "./UserActions";
+import { requireAuth } from "@/app/actions/AdminActions";
 import { addressTable, userTable, InsertAddress } from "@/db/schema";
 
 export async function addAddress(address: Omit<InsertAddress, "userId">) {

@@ -1,16 +1,13 @@
-import { auth } from "@/auth";
-import { isAdmin } from "@/app/actions/AdminActions";
+import { isCallerAdmin } from "@/app/actions/AdminActions";
 import AdminSidebar from "@/app/components/admin/AdminSidebar";
 export default async function HomeLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const session = await auth();
-    const userId = session?.user?.id || "null";
-    const isUserAdmin = await isAdmin(userId);
+    const isUserAdmin = await isCallerAdmin()
 
-    if (!userId || !isUserAdmin) {
+    if (!isUserAdmin) {
         return (
             <main className="text-center text-4xl mt-10 bg-[#222831] text-white min-h-screen">
                 <h1 className="text-[100px] mb-20">🫨</h1>

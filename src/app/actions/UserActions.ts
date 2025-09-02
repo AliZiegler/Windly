@@ -1,20 +1,14 @@
 "use server"
-import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { eq, and } from "drizzle-orm"
 import { userTable, productTable, wishlistTable } from "@/db/schema";
 import { revalidatePath } from "next/cache";
+import { requireAuth } from "@/app/actions/AdminActions";
 
 const ALLOWED_FIELDS = ['name', 'phone', 'birthday', 'gender'] as const;
 const ALLOWED_ROLES = ['user', 'seller'] as const;
 type AllowedField = typeof ALLOWED_FIELDS[number];
 type AllowedRole = typeof ALLOWED_ROLES[number];
-export async function requireAuth(): Promise<string> {
-    const session = await auth();
-    if (!session?.user?.id) throw new Error("Unauthorized, Signin first");
-    return session.user.id;
-}
-
 
 export async function updateUserField(field: AllowedField, value: string) {
     const userId = await requireAuth();

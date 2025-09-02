@@ -2,7 +2,7 @@
 import { db } from "@/lib/db";
 import { eq, and, sql } from "drizzle-orm";
 import { productTable, reviewTable, userTable, helpfulTable } from "@/db/schema";
-import { requireAuth } from "./UserActions";
+import { requireAuth } from "@/app/actions/AdminActions";
 import { urlString } from "@/app/components/global/Atoms";
 import { revalidatePath } from "next/cache";
 import type { UpdateReview } from "@/app/components/global/Types";
