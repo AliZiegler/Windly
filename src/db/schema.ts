@@ -73,7 +73,7 @@ export const banTable = sqliteTable("ban", {
     userId: text("user_id")
         .notNull()
         .references(() => userTable.id, { onDelete: "cascade" }),
-    bannedBy: text("banned_by").references(() => userTable.id),
+    bannedBy: text("banned_by").references(() => userTable.id, { onDelete: "cascade" }),
     reason: text("reason").notNull(),
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
     expiresAt: text("expires_at"), // null = permanent ban

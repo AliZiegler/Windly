@@ -54,7 +54,7 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
 
     // Mobile card view component
     const ProductCard = ({ product }: { product: Product }) => (
-        <div className="bg-[#2e3238] rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors">
+        <div className="bg-midnight rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors">
             <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center">
                     <div className="w-10 h-10 bg-gray-600 rounded-lg mr-3 flex items-center justify-center flex-shrink-0">
@@ -90,18 +90,20 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
                 </div>
             </div>
 
-            <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-700">
-                <Link href={`/admin/products/${product.id}`} className="text-slate-400 hover:text-slate-300 transition-colors p-1 cursor-pointer">
-                    <button>
-                        <Edit className="w-4 h-4" />
-                    </button>
+            <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-700 cursor-pointer">
+                <Link
+                    href={`/admin/products/${product.id}`}
+                    className="hover:bg-yellow-500/20 rounded-lg transition-colors duration-200 group cursor-pointer"
+                    title="Edit Product"
+                >
+                    <Edit className="w-5 h-5 text-gray-400 group-hover:text-yellow-400" />
                 </Link>
             </div>
         </div>
     );
 
     return (
-        <div className="bg-[#393e46] rounded-lg border border-gray-700 w-full">
+        <div className="bg-midnight/50 rounded-lg border border-gray-700 w-full">
             {/* Header */}
             <div className="p-4 sm:p-6 border-b bg-[#1e232b]  border-gray-700">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
@@ -111,8 +113,8 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
                         <div className="hidden sm:flex bg-[#222831] rounded-lg p-1">
                             <button
                                 onClick={() => setViewMode("table")}
-                                className={`px-3 py-1 rounded text-sm transition-colors ${viewMode === "table" ? "bg-teal-600 text-white" :
-                                    "text-slate-400 hover:text-white"
+                                className={`px-3 py-1 rounded text-sm  transition-colors ${viewMode === "table" ? "bg-teal-600 text-white" :
+                                    "text-slate-400 hover:text-white cursor-pointer"
                                     }`}
                             >
                                 Table
@@ -120,7 +122,7 @@ export default function ProductsManagement({ recentProducts = [] }: ProductsMana
                             <button
                                 onClick={() => setViewMode("cards")}
                                 className={`px-3 py-1 rounded text-sm transition-colors ${viewMode === "cards" ? "bg-teal-600 text-white" :
-                                    "text-slate-400 hover:text-white"
+                                    "text-slate-400 hover:text-white cursor-pointer"
                                     }`}
                             >
                                 Cards

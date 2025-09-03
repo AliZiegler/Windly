@@ -8,7 +8,6 @@ import {
     Users,
     ShoppingCart,
     Star,
-    Plus,
     DollarSign,
 } from "lucide-react";
 
@@ -231,10 +230,17 @@ export default async function AdminDashboard() {
                                     </h3>
                                     <p className="text-slate-400">Manage your product inventory</p>
                                 </div>
-                                <button className="mt-4 sm:mt-0 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Add Product
-                                </button>
+                                <div className="flex items-center gap-4">
+                                    <Link
+                                        href="/admin/products/new"
+                                        className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ffb100] to-[#ff9500] 
+                        text-black font-bold rounded-lg hover:from-[#e0a000] hover:to-[#e08500] hover:scale-[1.02] active:scale-[0.98] 
+                        transition-all duration-200"
+                                    >
+                                        <Package className="w-4 h-4 mr-2" />
+                                        Add Product
+                                    </Link>
+                                </div>
                             </div>
                             <ProductsManagement recentProducts={recentProducts} />
                         </div>

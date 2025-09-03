@@ -53,6 +53,19 @@ export async function updateProduct(productId: number, data: InsertProduct) {
     }
 
 }
+export async function addProduct(data: InsertProduct) {
+    await requireAdmin();
+    const insertData = { ...data, lastUpdated: nowISO() };
+    try {
+        const [product] = await db.insert(productTable).values(insertData).returning();
+        revalidatePath("/admin/products");
+        return product;
+    }
+    catch (error) {
+        console.error("Error adding product:", error);
+        throw error;
+    }
+}
 export async function getAllProductCategories() {
     try {
         const rows = await db
