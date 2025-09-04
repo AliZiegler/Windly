@@ -3,6 +3,10 @@ import Image from "next/image";
 import { ArrowLeft, Save, Star, Package, TrendingUp, Eye } from "lucide-react";
 import { redirect } from "next/navigation";
 import { updateProduct } from "@/app/actions/AdminActions";
+import ColorManager from "@/app/components/admin/products/ColorManager";
+import SizeManager from "@/app/components/admin/products/SizeManager";
+import TagManager from "@/app/components/admin/products/TagManager";
+import AboutPointsManager from "@/app/components/admin/products/AboutPointsManager";
 
 type ProductData = {
     id: number;
@@ -78,11 +82,10 @@ export default function ProductEdit({ product }: ProductEditProps) {
         const shippingCost = parseFloat(formData.get('shippingCost') as string || '0');
         const warrantyDuration = parseInt(formData.get('warrantyDuration') as string);
         const warrantyType = formData.get('warrantyType') as string;
-
-        const colorsInput = formData.get('colors') as string;
-        const sizesInput = formData.get('sizes') as string;
-        const tagsInput = formData.get('tags') as string;
-        const aboutInput = formData.get('about') as string;
+        const colors = JSON.stringify(formData.get("colors") ? JSON.parse(formData.get("colors") as string) : []);
+        const sizes = JSON.stringify(formData.get("sizes") ? JSON.parse(formData.get("sizes") as string) : []);
+        const tags = JSON.stringify(formData.get("tags") ? JSON.parse(formData.get("tags") as string) : []);
+        const about = JSON.stringify(formData.get("about") ? JSON.parse(formData.get("about") as string) : []);
 
         const productData = {
             name,
@@ -106,10 +109,10 @@ export default function ProductEdit({ product }: ProductEditProps) {
             shippingCost,
             warrantyDuration,
             warrantyType,
-            colors: colorsInput,
-            sizes: sizesInput || null,
-            tags: tagsInput,
-            about: aboutInput,
+            colors,
+            sizes,
+            tags,
+            about
         };
 
         try {
@@ -155,7 +158,7 @@ export default function ProductEdit({ product }: ProductEditProps) {
                         form="product-form"
                         type="submit"
                         className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ffb100] to-[#ff9500] 
-                        text-black font-bold rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
+                        text-black font-bold rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 cursor-pointer"
                     >
                         <Save className="w-4 h-4 mr-2" />
                         Save Changes
@@ -427,54 +430,10 @@ export default function ProductEdit({ product }: ProductEditProps) {
 
                         {/* JSON Fields */}
                         <Section title="Additional Details">
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Colors (JSON)</label>
-                                    <textarea
-                                        name="colors"
-                                        rows={3}
-                                        defaultValue={product.colors}
-                                        placeholder='[{"colorName": "Red", "colorHex": "#FF0000"}]'
-                                        className="w-full px-3 py-2 bg-[#2a3038] border border-[#3a404a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#ffb100] font-mono text-sm"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Sizes (JSON)</label>
-                                    <textarea
-                                        name="sizes"
-                                        rows={2}
-                                        defaultValue={product.sizes || ''}
-                                        placeholder='["S", "M", "L", "XL"]'
-                                        className="w-full px-3 py-2 bg-[#2a3038] border border-[#3a404a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#ffb100] font-mono text-sm"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Tags (JSON)</label>
-                                    <textarea
-                                        name="tags"
-                                        rows={2}
-                                        defaultValue={product.tags}
-                                        placeholder='["tag1", "tag2", "tag3"]'
-                                        className="w-full px-3 py-2 bg-[#2a3038] border border-[#3a404a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#ffb100] font-mono text-sm"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">About Points (JSON)</label>
-                                    <textarea
-                                        name="about"
-                                        rows={5}
-                                        defaultValue={product.about}
-                                        placeholder='["Point 1", "Point 2", "Point 3"]'
-                                        className="w-full px-3 py-2 bg-[#2a3038] border border-[#3a404a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#ffb100] font-mono text-sm"
-                                        required
-                                    />
-                                </div>
-                            </div>
+                            <ColorManager initialColors={JSON.parse(product.colors)} />
+                            <SizeManager initialSizes={JSON.parse(product.sizes || "[]")} />
+                            <TagManager initialTags={JSON.parse(product.tags || "[]")} />
+                            <AboutPointsManager initialPoints={JSON.parse(product.about || "[]")} />
                         </Section>
                     </div>
 

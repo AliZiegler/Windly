@@ -1,7 +1,7 @@
 import { isCallerAdmin } from "@/app/actions/AdminActions";
 import AdminSidebar from "@/app/components/admin/AdminSidebar";
 export default async function HomeLayout({
-    children,
+    children
 }: Readonly<{
     children: React.ReactNode;
 }>) {

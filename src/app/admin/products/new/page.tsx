@@ -2,6 +2,10 @@ import Link from "next/link";
 import { ArrowLeft, Plus, Package, Eye } from "lucide-react";
 import { redirect } from "next/navigation";
 import { addProduct } from "@/app/actions/AdminActions";
+import ColorManager from "@/app/components/admin/products/ColorManager";
+import SizeManager from "@/app/components/admin/products/SizeManager";
+import TagManager from "@/app/components/admin/products/TagManager";
+import AboutPointsManager from "@/app/components/admin/products/AboutPointsManager";
 
 const Section = ({
     title,
@@ -41,10 +45,10 @@ export default function NewProductPage() {
         const warrantyDuration = parseInt(formData.get('warrantyDuration') as string);
         const warrantyType = formData.get('warrantyType') as string;
 
-        const colorsInput = formData.get('colors') as string;
-        const sizesInput = formData.get('sizes') as string;
-        const tagsInput = formData.get('tags') as string;
-        const aboutInput = formData.get('about') as string;
+        const colors = JSON.stringify(formData.get("colors") ? JSON.parse(formData.get("colors") as string) : []);
+        const sizes = JSON.stringify(formData.get("sizes") ? JSON.parse(formData.get("sizes") as string) : []);
+        const tags = JSON.stringify(formData.get("tags") ? JSON.parse(formData.get("tags") as string) : []);
+        const about = JSON.stringify(formData.get("about") ? JSON.parse(formData.get("about") as string) : []);
 
         const productData = {
             name,
@@ -68,10 +72,10 @@ export default function NewProductPage() {
             shippingCost,
             warrantyDuration,
             warrantyType,
-            colors: colorsInput,
-            sizes: sizesInput || null,
-            tags: tagsInput,
-            about: aboutInput,
+            colors,
+            sizes,
+            tags,
+            about
         };
 
         try {
@@ -116,9 +120,8 @@ export default function NewProductPage() {
                     <button
                         form="product-form"
                         type="submit"
-                        disabled
                         className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ffb100] to-[#ff9500] 
-                        text-black font-bold rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 cursor-not-allowed"
+                        text-black font-bold rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200 cursor-pointer"
                     >
                         <Plus className="w-4 h-4 mr-2" />
                         Create Product
@@ -199,7 +202,7 @@ export default function NewProductPage() {
                         <Section title="Pricing & Inventory">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Price ($)</label>
+                                    <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-2">Price ($)</label>
                                     <input
                                         type="number"
                                         step="0.01"
@@ -214,7 +217,7 @@ export default function NewProductPage() {
                                     <label className="block text-sm font-medium text-gray-300 mb-2">Discount (%)</label>
                                     <input
                                         type="number"
-                                        step="0.01"
+                                        step="0.1"
                                         min="0"
                                         max="100"
                                         name="discount"
@@ -361,50 +364,10 @@ export default function NewProductPage() {
 
                         {/* JSON Fields */}
                         <Section title="Additional Details">
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Colors (JSON)</label>
-                                    <textarea
-                                        name="colors"
-                                        rows={3}
-                                        placeholder='[{"colorName": "Red", "colorHex": "#FF0000"}, {"colorName": "Blue", "colorHex": "#0000FF"}]'
-                                        className="w-full px-3 py-2 bg-[#2a3038] border border-[#3a404a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#ffb100] font-mono text-sm"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Sizes (JSON) - Optional</label>
-                                    <textarea
-                                        name="sizes"
-                                        rows={2}
-                                        placeholder='["S", "M", "L", "XL"]'
-                                        className="w-full px-3 py-2 bg-[#2a3038] border border-[#3a404a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#ffb100] font-mono text-sm"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Tags (JSON)</label>
-                                    <textarea
-                                        name="tags"
-                                        rows={2}
-                                        placeholder='["electronics", "smartphone", "latest"]'
-                                        className="w-full px-3 py-2 bg-[#2a3038] border border-[#3a404a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#ffb100] font-mono text-sm"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">About Points (JSON)</label>
-                                    <textarea
-                                        name="about"
-                                        rows={5}
-                                        placeholder='["High-quality materials and craftsmanship", "Advanced features for modern users", "Durable design built to last", "Easy to use and maintain", "Excellent customer support included"]'
-                                        className="w-full px-3 py-2 bg-[#2a3038] border border-[#3a404a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#ffb100] font-mono text-sm"
-                                        required
-                                    />
-                                </div>
-                            </div>
+                            <ColorManager />
+                            <SizeManager />
+                            <TagManager />
+                            <AboutPointsManager />
                         </Section>
                     </div>
 
