@@ -324,11 +324,15 @@ export default async function AdminProducts({
 
             {/* Search and Filters */}
             <Suspense fallback={<div className="h-20 bg-[#1e232b] rounded-xl animate-pulse" />}>
-                <FilterForm
-                    searchParams={sp}
-                    categories={categories}
-                    brands={brands}
-                />
+
+                <details>
+                    <summary className="text-white font-medium mb-2">Toggle Filters</summary>
+                    <FilterForm
+                        searchParams={sp}
+                        categories={categories}
+                        brands={brands}
+                    />
+                </details>
             </Suspense>
 
             {/* Stats Cards */}

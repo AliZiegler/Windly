@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import UserFilterForm from "@/app/components/admin/users/UsersFilter";
 import { eq, count, sql, like, and, or, asc, desc } from "drizzle-orm";
+import UserBanShowButton from "@/app/components/admin/users/UserBanShowButton";
+import { isBanned, unbanUser } from "@/app/actions/AdminActions";
+import BanUserPopup from "@/app/components/admin/users/UserBan";
 import {
     userTable,
     reviewTable,
@@ -12,7 +15,7 @@ import {
 } from "@/db/schema";
 import Link from "next/link";
 import {
-    Eye, Users, UserCheck, UserX, TrendingUp,
+    Eye, Users, UserCheck, UserPlus, TrendingUp,
     Mail, MapPin, Shield, User,
     Store
 } from "lucide-react";
@@ -235,12 +238,13 @@ export default async function AdminUsers({
         }).format(price);
     };
 
-    const displayUsers = usersWithStats.map((user) => {
+    const displayUsers = usersWithStats.map(async (user) => {
         const date = new Date(user.createdAt!);
         const formattedDate = date.toLocaleDateString("en-GB");
         const roleBadge = getRoleBadge(user.role);
         const RoleBadgeIcon = roleBadge.icon;
         const isVerified = !!user.emailVerified;
+        const banStatus = await isBanned(user.id);
 
         return (
             <tr key={user.id} className="odd:bg-[#1c2129] even:bg-[#222831] hover:bg-[#2a3038] transition-colors duration-200">
@@ -274,7 +278,7 @@ export default async function AdminUsers({
                                 </span>
                                 {isVerified && (
                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/20 text-green-400 
-                                        rounded-full border border-green-500/30">
+                                    rounded-full border border-green-500/30">
                                         <UserCheck className="w-3 h-3" />
                                         Verified
                                     </span>
@@ -340,12 +344,19 @@ export default async function AdminUsers({
                         >
                             <Eye className="w-5 h-5 text-gray-400 group-hover:text-blue-400" />
                         </Link>
-                        <button
-                            className="p-2 hover:bg-red-500/20 rounded-lg transition-colors duration-200 group cursor-pointer"
-                            title="Ban User"
-                        >
-                            <UserX className="w-5 h-5 text-gray-400 group-hover:text-red-400" />
-                        </button>
+                        {banStatus.banned ? (
+                            <form action={async () => {
+                                "use server"
+                                await unbanUser(user.id)
+                            }}>
+                                <button
+                                    type="submit"
+                                    className="p-2 hover:bg-green-500/20 rounded-lg transition-colors duration-200 group"
+                                    title="Revoke User Ban">
+                                    <UserPlus className="w-5 h-5 text-green-400 group-hover:text-green-400" />
+                                </button>
+                            </form>
+                        ) : <UserBanShowButton userId={user.id} />}
                     </div>
                 </td>
             </tr>
@@ -376,7 +387,10 @@ export default async function AdminUsers({
                     </p>
                 </div>
             </div>
-            <UserFilterForm searchParams={sp} />
+            <details>
+                <summary className="text-white font-medium mb-2">Toggle Filters</summary>
+                <UserFilterForm searchParams={sp} />
+            </details>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-midnight rounded-xl p-4 border border-[#2a3038]">
@@ -457,12 +471,13 @@ export default async function AdminUsers({
 
                 {/* Mobile Cards */}
                 <div className="lg:hidden">
-                    {usersWithStats.map((user) => {
+                    {usersWithStats.map(async (user) => {
                         const date = new Date(user.createdAt);
                         const formattedDate = date.toLocaleDateString('en-GB');
                         const roleBadge = getRoleBadge(user.role);
                         const RoleBadgeIcon = roleBadge.icon;
                         const isVerified = !!user.emailVerified;
+                        const banStatus = await isBanned(user.id);
 
                         return (
                             <div key={user.id} className="p-4 border-b border-[#2a3038] last:border-b-0">
@@ -540,9 +555,19 @@ export default async function AdminUsers({
                                         >
                                             <Eye className="w-5 h-5 text-blue-400" />
                                         </Link>
-                                        <button className="p-2 hover:bg-red-500/20 rounded-lg transition-colors duration-200 cursor-pointer">
-                                            <UserX className="w-5 h-5 text-red-400" />
-                                        </button>
+                                        {banStatus.banned ? (
+                                            <form action={async () => {
+                                                "use server"
+                                                await unbanUser(user.id)
+                                            }}>
+                                                <button
+                                                    type="submit"
+                                                    className="p-2 hover:bg-green-500/20 rounded-lg transition-colors duration-200 group"
+                                                    title="Revoke User Ban">
+                                                    <UserPlus className="w-5 h-5 text-green-400 group-hover:text-green-400" />
+                                                </button>
+                                            </form>
+                                        ) : <UserBanShowButton userId={user.id} />}
                                     </div>
                                 </div>
                             </div>
@@ -574,6 +599,7 @@ export default async function AdminUsers({
                     {Object.keys(sp).length > 0 && ' matching your filters'}
                 </div>
             )}
+            <BanUserPopup />
         </div>
     );
 }

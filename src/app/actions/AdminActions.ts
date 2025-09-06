@@ -16,6 +16,14 @@ export async function requireAuth(): Promise<string> {
     await requireNotBanned(userId);
     return userId;
 }
+export async function isAuth() {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) return false;
+    const banStatus = await isBanned(userId);
+    if (banStatus.banned) return false;
+    return userId;
+}
 export async function userExists(userId: string) {
     try {
         const [user] = await db.select().from(userTable).where(eq(userTable.id, userId));
@@ -136,6 +144,13 @@ export async function isBanned(userId: string) {
     }
 
     return { banned: false };
+}
+export async function isCallerBanned() {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) return { banned: false };
+    const banStatus = await isBanned(userId);
+    return banStatus;
 }
 export async function banUser(userId: string, reason: string, expiresAt: string | null) {
     await requireAdmin()

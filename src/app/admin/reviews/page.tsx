@@ -401,7 +401,10 @@ export default async function AdminReviews({
                 </div>
             </div>
 
-            <ReviewFilterForm searchParams={sp} />
+            <details>
+                <summary className="text-white font-medium mb-2">Toggle Filters</summary>
+                <ReviewFilterForm searchParams={sp} />
+            </details>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

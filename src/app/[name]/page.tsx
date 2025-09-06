@@ -81,16 +81,18 @@ export default async function Page(
                     <div className="lg:col-span-5 xl:col-span-4">
                         <div className="sticky top-6">
                             <div className="relative group">
-                                <div className="aspect-square w-full max-w-lg mx-auto lg:max-w-none bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
+                                <div className="aspect-square w-full max-w-lg mx-auto lg:max-w-none bg-gray-800/50 rounded-2xl 
+                                    overflow-hidden border border-gray-700/50 shadow-2xl">
                                     <Image
-                                        src="/images/placeholder.png"
+                                        src={p.img || "/images/placeholder.png"}
                                         alt={p.name}
                                         fill
                                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
                                         priority
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent 
+                                        opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                 </div>
 
                                 <div className="flex justify-center mt-4 space-x-2">

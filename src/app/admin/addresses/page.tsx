@@ -7,7 +7,7 @@ import {
 } from "@/db/schema";
 import Link from "next/link";
 import {
-    Eye, MapPin, Home, Building, Phone,
+    Eye, MapPin, Home, LampDesk, Phone,
     Mail, User, Trash2,
     Users
 } from "lucide-react";
@@ -158,7 +158,7 @@ export default async function AdminAddresses({
             case 'home':
                 return { text: 'Home', color: 'text-green-400 bg-green-500/20 border-green-500/30', icon: Home };
             case 'office':
-                return { text: 'Office', color: 'text-blue-400 bg-blue-500/20 border-blue-500/30', icon: Building };
+                return { text: 'Office', color: 'text-blue-400 bg-blue-500/20 border-blue-500/30', icon: LampDesk };
             default:
                 return { text: 'Unknown', color: 'text-gray-400 bg-gray-500/20 border-gray-500/30', icon: MapPin };
         }
@@ -303,7 +303,10 @@ export default async function AdminAddresses({
                 </div>
             </div>
 
-            <AddressFilterForm searchParams={sp} />
+            <details>
+                <summary className="text-white font-medium mb-2">Toggle Filters</summary>
+                <AddressFilterForm searchParams={sp} />
+            </details>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -338,7 +341,7 @@ export default async function AdminAddresses({
                             <p className="text-2xl font-bold text-blue-400">{officeAddresses}</p>
                         </div>
                         <div className="p-3 bg-blue-500/20 rounded-lg">
-                            <Building className="w-6 h-6 text-blue-400" />
+                            <LampDesk className="w-6 h-6 text-blue-400" />
                         </div>
                     </div>
                 </div>
