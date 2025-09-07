@@ -78,6 +78,7 @@ export const banTable = sqliteTable("ban", {
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
     expiresAt: text("expires_at"), // null = permanent ban
     revokedAt: text("revoked_at"), // null = still active
+    revokedBy: text("revoked_by").references(() => userTable.id, { onDelete: "cascade" }),
 });
 export const wishlistTable = sqliteTable("wishlist", {
     productId: int("product_id").notNull().references(() => productTable.id, { onDelete: "cascade" }),

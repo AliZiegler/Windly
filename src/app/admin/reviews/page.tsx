@@ -14,6 +14,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
+import SummaryFilter from "@/app/components/global/SummaryFilter";
+import { deleteReview } from "@/app/actions/ReviewActions";
+import { ReviewDeleteButton } from "@/app/components/global/SimpleComponents";
+
+async function handleDeleteReview(formData: FormData) {
+    "use server";
+    const reviewId = Number(formData.get("reviewId"));
+    await deleteReview(reviewId);
+}
 
 function normalizeParams(sp: ResolvedSearchParamsType) {
     const toStr = (val: string | string[] | undefined): string | undefined =>
@@ -364,12 +373,10 @@ export default async function AdminReviews({
                         >
                             <Eye className="w-5 h-5 text-gray-400 group-hover:text-blue-400" />
                         </Link>
-                        <button
-                            className="p-2 hover:bg-red-500/20 rounded-lg transition-colors duration-200 group cursor-pointer"
-                            title="Delete Review"
-                        >
-                            <XCircle className="w-5 h-5 text-gray-400 group-hover:text-red-400" />
-                        </button>
+                        <ReviewDeleteButton
+                            reviewId={review.id}
+                            handleDeleteReviewAction={handleDeleteReview}
+                        />
                     </div>
                 </td>
             </tr>
@@ -400,11 +407,9 @@ export default async function AdminReviews({
                     </p>
                 </div>
             </div>
-
-            <details>
-                <summary className="text-white font-medium mb-2">Toggle Filters</summary>
+            <SummaryFilter>
                 <ReviewFilterForm searchParams={sp} />
-            </details>
+            </SummaryFilter>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -600,9 +605,10 @@ export default async function AdminReviews({
                                         >
                                             <Eye className="w-5 h-5 text-blue-400" />
                                         </Link>
-                                        <button className="p-2 hover:bg-red-500/20 rounded-lg transition-colors duration-200 cursor-pointer">
-                                            <XCircle className="w-5 h-5 text-red-400" />
-                                        </button>
+                                        <ReviewDeleteButton
+                                            reviewId={review.id}
+                                            handleDeleteReviewAction={handleDeleteReview}
+                                        />
                                     </div>
                                 </div>
                             </div>

@@ -2,7 +2,7 @@
 import { db } from "@/lib/db";
 import { eq, and, sql } from "drizzle-orm";
 import { productTable, reviewTable, userTable, helpfulTable } from "@/db/schema";
-import { requireAuth } from "@/app/actions/AdminActions";
+import { isAdmin, requireAuth } from "@/app/actions/AdminActions";
 import { urlString } from "@/app/components/global/Atoms";
 import { revalidatePath } from "next/cache";
 import type { UpdateReview } from "@/app/components/global/Types";
@@ -265,5 +265,53 @@ export async function updateReview(input: UpdateReview, reviewId: number, userId
     } catch (error) {
         console.error("Error", error);
         return { success: false, error: "Failed to update review. Please try again." };
+    }
+}
+export async function deleteReview(reviewId: number) {
+    const userId = await requireAuth();
+    const isUserAdmin = await isAdmin(userId);
+
+    let doesUserOwnReview = false;
+    if (!isUserAdmin) {
+        const reviewOwner = await db
+            .select({ userId: reviewTable.userId })
+            .from(reviewTable)
+            .where(eq(reviewTable.id, reviewId))
+            .get();
+
+        doesUserOwnReview = reviewOwner?.userId === userId;
+        if (!doesUserOwnReview) {
+            return { success: false, error: "You don't have permission to delete this review" };
+        }
+    }
+
+    try {
+        const [review] = await db
+            .delete(reviewTable)
+            .where(eq(reviewTable.id, reviewId))
+            .returning();
+
+        if (!review) {
+            return { success: false, error: "Review not found" };
+        }
+
+        const product = await db
+            .select({ name: productTable.name })
+            .from(productTable)
+            .where(eq(productTable.id, review.productId))
+            .get();
+
+        if (product) {
+            const productReviewsUrl = `/${urlString(product.name)}/reviews`;
+            revalidatePath(productReviewsUrl);
+        }
+
+        revalidatePath("/account/reviews");
+        revalidatePath("/admin/reviews");
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting review:", error);
+        return { success: false, error: "Failed to delete review. Please try again." };
     }
 }

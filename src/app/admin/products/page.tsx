@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import { Suspense } from "react";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
+import SummaryFilter from "@/app/components/global/SummaryFilter";
 function normalizeParams(sp: ResolvedSearchParamsType) {
     const toStr = (val: string | string[] | undefined): string | undefined =>
         Array.isArray(val) ? val[0] : val;
@@ -324,15 +325,9 @@ export default async function AdminProducts({
 
             {/* Search and Filters */}
             <Suspense fallback={<div className="h-20 bg-[#1e232b] rounded-xl animate-pulse" />}>
-
-                <details>
-                    <summary className="text-white font-medium mb-2">Toggle Filters</summary>
-                    <FilterForm
-                        searchParams={sp}
-                        categories={categories}
-                        brands={brands}
-                    />
-                </details>
+                <SummaryFilter>
+                    <FilterForm categories={categories} brands={brands} searchParams={sp} />
+                </SummaryFilter>
             </Suspense>
 
             {/* Stats Cards */}

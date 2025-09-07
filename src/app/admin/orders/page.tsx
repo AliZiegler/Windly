@@ -8,8 +8,8 @@ import {
     Eye, Package, TrendingUp, CheckCircle,
     XCircle, Truck, ShoppingCart
 } from "lucide-react";
-import { Suspense } from "react";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
+import SummaryFilter from "@/app/components/global/SummaryFilter";
 
 function normalizeParams(sp: ResolvedSearchParamsType) {
     const toStr = (val: string | string[] | undefined): string | undefined =>
@@ -262,13 +262,9 @@ export default async function AdminOrders({
                 </div>
             </div>
 
-            {/* Search and Filters */}
-            <Suspense fallback={<div className="h-20 bg-[#1e232b] rounded-xl animate-pulse" />}>
-                <details>
-                    <summary className="text-white font-medium mb-2">Toggle Filters</summary>
-                    <FilterForm searchParams={sp} />
-                </details>
-            </Suspense>
+            <SummaryFilter>
+                <FilterForm searchParams={sp} />
+            </SummaryFilter>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

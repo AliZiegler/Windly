@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
+import SummaryFilter from "@/app/components/global/SummaryFilter";
 
 function normalizeParams(sp: ResolvedSearchParamsType) {
     const toStr = (val: string | string[] | undefined): string | undefined =>
@@ -387,10 +388,9 @@ export default async function AdminUsers({
                     </p>
                 </div>
             </div>
-            <details>
-                <summary className="text-white font-medium mb-2">Toggle Filters</summary>
+            <SummaryFilter>
                 <UserFilterForm searchParams={sp} />
-            </details>
+            </SummaryFilter>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-midnight rounded-xl p-4 border border-[#2a3038]">

@@ -231,7 +231,7 @@ export default function UserFilterForm({
     }
 
     return (
-        <div className="bg-gradient-to-br from-[#1e232b] to-[#181d23] rounded-2xl border border-[#2a3038] p-8 mb-8 relative overflow-hidden">
+        <div className="bg-midnight rounded-2xl p-8 mb-8 relative overflow-hidden">
             {/* Subtle background accent */}
             <div className="absolute inset-0 opacity-5">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#00CAFF]/10 to-transparent"></div>

@@ -8,11 +8,19 @@ import {
 import Link from "next/link";
 import {
     Eye, MapPin, Home, LampDesk, Phone,
-    Mail, User, Trash2,
+    Mail, User,
     Users
 } from "lucide-react";
 import Image from "next/image";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
+import SummaryFilter from "@/app/components/global/SummaryFilter";
+import { deleteAddress } from "@/app/actions/AddressActions";
+import { AddressDeleteButton } from "@/app/components/global/SimpleComponents";
+async function handleDeleteAddress(formData: FormData) {
+    "use server"
+    const addressId = formData.get("addressId") as string;
+    await deleteAddress(Number(addressId));
+}
 
 function normalizeParams(sp: ResolvedSearchParamsType) {
     const toStr = (val: string | string[] | undefined): string | undefined =>
@@ -266,12 +274,7 @@ export default async function AdminAddresses({
                         >
                             <Eye className="w-5 h-5 text-gray-400 group-hover:text-blue-400" />
                         </Link>
-                        <button
-                            className="p-2 hover:bg-red-500/20 rounded-lg transition-colors duration-200 group cursor-pointer"
-                            title="Delete Address"
-                        >
-                            <Trash2 className="w-5 h-5 text-gray-400 group-hover:text-red-400" />
-                        </button>
+                        <AddressDeleteButton addressId={address.id} handleDeleteAddressAction={handleDeleteAddress} />
                     </div>
                 </td>
             </tr>
@@ -302,11 +305,9 @@ export default async function AdminAddresses({
                     </p>
                 </div>
             </div>
-
-            <details>
-                <summary className="text-white font-medium mb-2">Toggle Filters</summary>
+            <SummaryFilter >
                 <AddressFilterForm searchParams={sp} />
-            </details>
+            </SummaryFilter>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -462,9 +463,7 @@ export default async function AdminAddresses({
                                         >
                                             <Eye className="w-5 h-5 text-blue-400" />
                                         </Link>
-                                        <button className="p-2 hover:bg-red-500/20 rounded-lg transition-colors duration-200 cursor-pointer">
-                                            <Trash2 className="w-5 h-5 text-red-400" />
-                                        </button>
+                                        <AddressDeleteButton addressId={address.id} handleDeleteAddressAction={handleDeleteAddress} />
                                     </div>
                                 </div>
                             </div>

@@ -27,7 +27,7 @@ export default async function Page() {
         'use server'
         const stringAddressId = formData.get('addressId')
         const addressId = Number(stringAddressId)
-        await deleteAddress(addressId, userId)
+        await deleteAddress(addressId)
     }
 
     async function handleSetDefaultAddress(formData: FormData) {

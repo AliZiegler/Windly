@@ -24,7 +24,7 @@ const DEFAULT_VALUES = {
     featured: '',
     minPrice: '',
     maxPrice: '',
-    rating: '',
+    rating: '0',
     sortBy: 'dateAdded',
     sortOrder: 'desc',
 };
@@ -150,7 +150,7 @@ export default function FilterForm({
         redirect(`/admin/products${query ? `?${query}` : ""}`);
     }
     return (
-        <div className="bg-gradient-to-br from-[#1e232b] to-[#181d23] rounded-2xl border border-[#2a3038] p-8 mb-8 relative overflow-hidden">
+        <div className="bg-midnight rounded-2xl p-8 mb-8 relative overflow-hidden">
             {/* Subtle background accent */}
             <div className="absolute inset-0 opacity-5">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#00CAFF]/10 to-transparent"></div>
@@ -245,19 +245,17 @@ export default function FilterForm({
                             ]}
                         />
                         {/* Rating */}
-                        <SelectInput
-                            name="rating"
-                            label="Minimum Rating"
-                            defaultValue={searchParams.rating as string || ''}
-                            options={[
-                                { value: '', label: 'All Ratings' },
-                                { value: '1', label: '1' },
-                                { value: '2', label: '2' },
-                                { value: '3', label: '3' },
-                                { value: '4', label: '4' },
-                                { value: '5', label: '5' },
-                            ]}
-                        />
+                        <span className='flex flex-col justify-center'>
+                            <label className="text-sm font-medium text-gray-300">Min Rating</label>
+                            <input
+                                type="range"
+                                name="rating"
+                                defaultValue={searchParams.rating as string || ''}
+                                min="0"
+                                max="5"
+                                step="0.5"
+                            />
+                        </span>
                     </div>
 
                     {/* Secondary Filters */}
