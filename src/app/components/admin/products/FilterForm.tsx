@@ -2,7 +2,7 @@ import { Search, Filter, ChevronDown } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { ResolvedSearchParamsType } from '@/app/components/global/Types';
 import ClearFilters from '@/app/components/admin/ClearFilters';
-
+import { RatingSlider } from "@/app/components/global/SimpleComponents";
 type SearchParams = {
     search?: string;
     category?: string;
@@ -24,7 +24,7 @@ const DEFAULT_VALUES = {
     featured: '',
     minPrice: '',
     maxPrice: '',
-    rating: '0',
+    rating: '',
     sortBy: 'dateAdded',
     sortOrder: 'desc',
 };
@@ -208,7 +208,7 @@ export default function FilterForm({
                     <h3 className="text-lg font-semibold text-white">Advanced Filters</h3>
 
                     {/* Primary Filters */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-center">
                         {/* Category */}
                         <SelectInput
                             name="category"
@@ -245,17 +245,7 @@ export default function FilterForm({
                             ]}
                         />
                         {/* Rating */}
-                        <span className='flex flex-col justify-center'>
-                            <label className="text-sm font-medium text-gray-300">Min Rating</label>
-                            <input
-                                type="range"
-                                name="rating"
-                                defaultValue={searchParams.rating as string || ''}
-                                min="0"
-                                max="5"
-                                step="0.5"
-                            />
-                        </span>
+                        <RatingSlider defaultValue={Number(searchParams.rating) || 0} label="Minimun Rating" inputName="rating" />
                     </div>
 
                     {/* Secondary Filters */}

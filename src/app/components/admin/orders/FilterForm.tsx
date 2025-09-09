@@ -6,7 +6,7 @@ import ClearFilters from '@/app/components/admin/ClearFilters';
 type SearchParams = {
     search?: string;
     status?: string;
-    customer?: string;
+    userId?: string;
     minTotal?: string;
     maxTotal?: string;
     dateFrom?: string;
@@ -18,7 +18,7 @@ type SearchParams = {
 const DEFAULT_VALUES = {
     search: '',
     status: '',
-    customer: '',
+    userId: '',
     minTotal: '',
     maxTotal: '',
     dateFrom: '',
@@ -100,8 +100,9 @@ export default function FilterForm({
                 displayKey = 'To';
                 displayValue = new Date(value).toLocaleDateString();
                 break;
-            case 'customer':
-                displayKey = 'Customer';
+            case 'userId':
+                displayKey = 'User ID';
+                displayValue = `User #${value}`;
                 break;
             default:
                 displayKey = key.charAt(0).toUpperCase() + key.slice(1);
@@ -118,7 +119,7 @@ export default function FilterForm({
         const params: SearchParams = {
             search: formData.get("search") as string,
             status: formData.get("status") as string,
-            customer: formData.get("customer") as string,
+            userId: formData.get("userId") as string,
             minTotal: formData.get("minTotal") as string,
             maxTotal: formData.get("maxTotal") as string,
             dateFrom: formData.get("dateFrom") as string,
@@ -235,12 +236,12 @@ export default function FilterForm({
 
                         {/* Customer Search */}
                         <div className="space-y-3 group">
-                            <label className="text-sm font-medium text-gray-300 group-focus-within:text-[#00CAFF] transition-colors">Customer Name</label>
+                            <label className="text-sm font-medium text-gray-300 group-focus-within:text-[#00CAFF] transition-colors">User ID</label>
                             <input
                                 type="text"
-                                name="customer"
-                                defaultValue={searchParams.customer as string || ''}
-                                placeholder="Customer name..."
+                                name="userId"
+                                defaultValue={searchParams.userId as string || ''}
+                                placeholder="Filter by specific user ID"
                                 className="w-full px-4 py-4 bg-[#2a3038] border border-[#3a4048] rounded-xl text-white
                                 placeholder-gray-400 focus:border-[#00CAFF] focus:outline-none transition-all duration-200 
                                 font-medium hover:border-[#4a5058] focus:bg-[#2f353d]"

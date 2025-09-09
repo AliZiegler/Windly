@@ -119,16 +119,9 @@ export default async function Page() {
                             <Field label="Building/House No." name="buildingNumber" placeholder="e.g., 123, Apt 4B" />
                             <Field label="Street Name" name="street" placeholder="Enter street name" />
                             <Field label="Postal/Zip Code" name="zipCode" placeholder="Enter postal code" />
-                            <Field label="Country" name="country" required={false}>
-                                <input type="text" name="country" id="country" value="Iraq" disabled
-                                    className="w-full px-4 py-3 bg-[#1a1f28] border 
-                                    border-[#4a5568] rounded-lg text-gray-400 cursor-not-allowed" />
-                            </Field>
-                        </div>
-
-                        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <Field label="Address Type" name="type">
-                                <select required name="type" id="type" className={optionSelectClass}>
+                            <input type="text" name="country" id="country" value="Iraq" disabled className="hidden" />
+                            <Field label="Address Type" name="addressType">
+                                <select required name="addressType" id="addressType" className={optionSelectClass}>
                                     <option value="home">🏠 Home</option>
                                     <option value="office">🏢 Office</option>
                                 </select>

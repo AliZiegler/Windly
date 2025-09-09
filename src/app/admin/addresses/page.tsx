@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
-import SummaryFilter from "@/app/components/global/SummaryFilter";
+import CollapsibleFilter from "@/app/components/global/CollapsibleFilter";
 import { deleteAddress } from "@/app/actions/AddressActions";
 import { AddressDeleteButton } from "@/app/components/global/SimpleComponents";
 async function handleDeleteAddress(formData: FormData) {
@@ -305,9 +305,9 @@ export default async function AdminAddresses({
                     </p>
                 </div>
             </div>
-            <SummaryFilter >
+            <CollapsibleFilter >
                 <AddressFilterForm searchParams={sp} />
-            </SummaryFilter>
+            </CollapsibleFilter>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -128,7 +128,7 @@ export default async function AdminDashboard() {
                     <div>
                         <div className="mb-8">
                             <h2 className="text-3xl font-bold text-white mb-2 truncate">Dashboard</h2>
-                            <p className="text-slate-400 truncate">Welcome back, Mr. Ziegler</p>
+                            <p className="text-slate-400 truncate">Welcome Back Admin!</p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -159,7 +159,7 @@ export default async function AdminDashboard() {
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 min-w-0">
                                 <div className="min-w-0">
                                     <h3 className="text-2xl font-bold text-white mb-2 truncate">Product Management</h3>
-                                    <p className="text-slate-400 truncate">Manage your product inventory</p>
+                                    <p className="text-slate-400 truncate">Manage The Product Inventory</p>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Link
@@ -174,7 +174,7 @@ export default async function AdminDashboard() {
                             <ProductsManagement recentProducts={recentProducts} />
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
                             {quickActionsButtons}
                         </div>
                     </div>

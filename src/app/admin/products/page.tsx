@@ -11,7 +11,7 @@ import {
 import Image from "next/image";
 import { Suspense } from "react";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
-import SummaryFilter from "@/app/components/global/SummaryFilter";
+import CollapsibleFilter from "@/app/components/global/CollapsibleFilter";
 function normalizeParams(sp: ResolvedSearchParamsType) {
     const toStr = (val: string | string[] | undefined): string | undefined =>
         Array.isArray(val) ? val[0] : val;
@@ -34,8 +34,8 @@ export default async function AdminProducts({
     searchParams: SearchParamsType
 }) {
     const sp = await searchParams;
-    const { search, category, brand, featured, stockStatus, minPrice, maxPrice, rating } =
-        normalizeParams(sp);
+    const normalizedParams = normalizeParams(sp);
+    const { search, category, brand, featured, stockStatus, minPrice, maxPrice, rating } = normalizedParams;
 
     const buildWhereClause = () => {
         const conditions = [];
@@ -304,7 +304,7 @@ export default async function AdminProducts({
                 <div>
                     <h1 className="font-bold text-2xl lg:text-3xl text-white mb-2">Product Management</h1>
                     <p className="text-gray-400">
-                        Manage your product inventory and details
+                        Manage the product inventory and details
                         {totalProducts > 0 && (
                             <span className="ml-2">• {totalProducts} product{totalProducts !== 1 ? 's' : ''} found</span>
                         )}
@@ -325,9 +325,9 @@ export default async function AdminProducts({
 
             {/* Search and Filters */}
             <Suspense fallback={<div className="h-20 bg-[#1e232b] rounded-xl animate-pulse" />}>
-                <SummaryFilter>
+                <CollapsibleFilter >
                     <FilterForm categories={categories} brands={brands} searchParams={sp} />
-                </SummaryFilter>
+                </CollapsibleFilter>
             </Suspense>
 
             {/* Stats Cards */}

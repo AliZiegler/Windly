@@ -2,6 +2,7 @@ import { Search, ChevronDown, MessageSquare, Calendar } from 'lucide-react';
 import ClearFilters from '@/app/components/admin/ClearFilters';
 import { redirect } from 'next/navigation';
 import { ResolvedSearchParamsType } from '@/app/components/global/Types';
+import { RatingSlider } from '@/app/components/global/SimpleComponents';
 
 type SearchParams = {
     search?: string;
@@ -21,9 +22,9 @@ type SearchParams = {
 
 const DEFAULT_VALUES = {
     search: '',
-    rating: '',
-    minRating: '',
-    maxRating: '',
+    rating: '0',
+    minRating: '0',
+    maxRating: '0',
     userId: '',
     productId: '',
     hasHelpful: '',
@@ -260,67 +261,14 @@ export default function ReviewFilterForm({
                     <h3 className="text-lg font-semibold text-white">Advanced Filters</h3>
 
                     {/* Primary Filters */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-center">
                         {/* Exact Rating */}
-                        <SelectInput
-                            name="rating"
-                            label="Exact Rating"
-                            defaultValue={searchParams.rating as string || ''}
-                            options={[
-                                { value: '', label: 'All Ratings' },
-                                { value: '5', label: '5 Stars - Excellent' },
-                                { value: '4.5', label: '4.5 Stars - Very Good' },
-                                { value: '4', label: '4 Stars - Good' },
-                                { value: '3.5', label: '3.5 Stars - Above Average' },
-                                { value: '3', label: '3 Stars - Average' },
-                                { value: '2.5', label: '2.5 Stars - Poor' },
-                                { value: '2', label: '2 Stars - Poor' },
-                                { value: '1.5', label: '1.5 Stars - Very Poor' },
-                                { value: '1', label: '1 Star - Very Poor' },
-                                { value: '0.5', label: '0.5 Stars - Terrible' }
-                            ]}
-                        />
-
+                        <RatingSlider defaultValue={Number(searchParams.rating)} label="Exact Rating" inputName="rating" />
                         {/* Min Rating */}
-                        <SelectInput
-                            name="minRating"
-                            label="Minimum Rating"
-                            defaultValue={searchParams.minRating as string || ''}
-                            options={[
-                                { value: '', label: 'Any Rating' },
-                                { value: '0.5', label: '0.5+ Stars' },
-                                { value: '1', label: '1+ Stars' },
-                                { value: '1.5', label: '1.5+ Stars' },
-                                { value: '2', label: '2+ Stars' },
-                                { value: '2.5', label: '2.5+ Stars' },
-                                { value: '3', label: '3+ Stars' },
-                                { value: '3.5', label: '3.5+ Stars' },
-                                { value: '4', label: '4+ Stars' },
-                                { value: '4.5', label: '4.5+ Stars' },
-                                { value: '5', label: '5 Stars Only' }
-                            ]}
-                        />
+                        <RatingSlider defaultValue={Number(searchParams.minRating)} label="Minimum Rating" inputName="minRating" />
 
                         {/* Max Rating */}
-                        <SelectInput
-                            name="maxRating"
-                            label="Maximum Rating"
-                            defaultValue={searchParams.maxRating as string || ''}
-                            options={[
-                                { value: '', label: 'Any Rating' },
-                                { value: '0.5', label: '0.5 Stars Only' },
-                                { value: '1', label: '≤1 Star' },
-                                { value: '1.5', label: '≤1.5 Stars' },
-                                { value: '2', label: '≤2 Stars' },
-                                { value: '2.5', label: '≤2.5 Stars' },
-                                { value: '3', label: '≤3 Stars' },
-                                { value: '3.5', label: '≤3.5 Stars' },
-                                { value: '4', label: '≤4 Stars' },
-                                { value: '4.5', label: '≤4.5 Stars' },
-                                { value: '5', label: '≤5 Stars' }
-                            ]}
-                        />
-
+                        <RatingSlider defaultValue={Number(searchParams.maxRating)} label="Maximum Rating" inputName="maxRating" />
                         {/* Has Helpful Votes */}
                         <SelectInput
                             name="hasHelpful"

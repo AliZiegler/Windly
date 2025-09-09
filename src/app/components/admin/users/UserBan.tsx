@@ -1,11 +1,17 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { banUser } from "@/app/actions/AdminActions";
-import { banUserAtom } from "@/app/components/global/Jotai";
 import { useAtom } from "jotai";
-import { CircleAlert, X, Shield, Clock, AlertTriangle } from "lucide-react";
+import { banUserAtom } from "@/app/components/global/Jotai";
+import { banUser } from "@/app/actions/AdminActions";
+import { getUserById } from "@/app/actions/UserActions";
+import { CircleAlert, X, Shield, Clock } from "lucide-react";
+import type { InferSelectModel } from "drizzle-orm";
+import { userTable } from "@/db/schema";
+import Image from "next/image";
+
+type User = InferSelectModel<typeof userTable>;
 
 export default function BanUserPopup() {
     const [banUserId, setBanUserId] = useAtom(banUserAtom);
@@ -18,12 +24,26 @@ export default function BanUserPopup() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const [user, setUser] = useState<User | null>(null);
+    const [userLoading, setUserLoading] = useState(false);
+
     const handleClose = () => {
         setReason("");
         setExpiresAt(null);
         setError(null);
+        setUser(null);
         onClose();
     };
+
+    useEffect(() => {
+        if (banUserId) {
+            setUserLoading(true);
+            getUserById(banUserId)
+                .then((u) => setUser(u))
+                .catch(() => setError("Failed to fetch user info"))
+                .finally(() => setUserLoading(false));
+        }
+    }, [banUserId]);
 
     if (!isOpen || !banUserId) return null;
 
@@ -33,10 +53,7 @@ export default function BanUserPopup() {
         setError(null);
 
         try {
-            if (!banUserId) {
-                setError("Cannot ban user: User ID is missing.");
-                return;
-            }
+            if (!banUserId) return;
             const res = await banUser(banUserId, reason, expiresAt || null);
             if (!res.success) {
                 setError(res.error || "Failed to ban user");
@@ -53,12 +70,11 @@ export default function BanUserPopup() {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4"
             onClick={(e) => e.target === e.currentTarget && handleClose()}
         >
-            <div className="relative bg-gradient-to-br from-[#1a1f28] to-[#22272f] border border-red-500/20 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
-                {/* Header with gradient */}
-                <div className="relative bg-gradient-to-r from-red-500/20 to-red-600/20 border-b border-red-500/30 p-6">
+            <div className="relative bg-midnight border border-red-500/20 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+                <div className="relative bg-red-500/20 border-b border-red-500/30 p-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-red-500/20 rounded-xl">
@@ -66,12 +82,14 @@ export default function BanUserPopup() {
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold text-white">Ban User</h2>
-                                <p className="text-sm text-red-300/80">This action requires careful consideration</p>
+                                <p className="text-sm text-red-300/80">
+                                    This action requires careful consideration
+                                </p>
                             </div>
                         </div>
                         <button
                             onClick={handleClose}
-                            className="p-2 hover:bg-white/10 rounded-xl transition-colors duration-200"
+                            className="p-2 hover:bg-white/10 rounded-xl transition-colors duration-200 cursor-pointer"
                         >
                             <X className="w-5 h-5 text-gray-400 hover:text-white" />
                         </button>
@@ -79,14 +97,25 @@ export default function BanUserPopup() {
                 </div>
 
                 <form onSubmit={handleBan} className="p-6 space-y-6">
-                    {/* Warning Banner */}
-                    <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                        <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
-                        <div className="text-sm">
-                            <p className="text-amber-300 font-medium">Warning</p>
-                            <p className="text-amber-200/80">This will restrict the user&apos;s access to the platform.</p>
+                    {userLoading ? (
+                        <p className="text-sm text-gray-400">Loading user...</p>
+                    ) : user ? (
+                        <div className="flex items-center gap-3 p-3 bg-black/20 rounded-xl border border-gray-700/40">
+                            {user.image && (
+                                <Image
+                                    src={user.image}
+                                    alt={user.name}
+                                    width={48}
+                                    height={48}
+                                    className="w-12 h-12 rounded-full object-cover"
+                                />
+                            )}
+                            <div>
+                                <p className="font-medium text-white">{user.name}</p>
+                                <p className="text-sm text-gray-400">{user.email}</p>
+                            </div>
                         </div>
-                    </div>
+                    ) : null}
 
                     {/* Reason Input */}
                     <div className="space-y-2">
@@ -140,7 +169,8 @@ export default function BanUserPopup() {
                             type="button"
                             onClick={handleClose}
                             disabled={loading}
-                            className="flex-1 px-4 py-3 bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600/50 text-gray-300 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-4 py-3 bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600/50 text-gray-300 
+                            rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                             Cancel
                         </button>
@@ -148,11 +178,13 @@ export default function BanUserPopup() {
                             type="submit"
                             disabled={loading || !reason.trim()}
                             className={`
-                                flex-1 px-4 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2
-                                ${loading || !reason.trim()
+                flex-1 px-4 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2
+                ${loading || !reason.trim()
                                     ? "bg-gray-600/50 text-gray-400 cursor-not-allowed border border-gray-600/50"
-                                    : "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 border border-red-500/50 hover:shadow-lg hover:shadow-red-500/25"}
-                            `}
+                                    :
+                                    "bg-red-500 text-white hover:bg-red-600 border border-red-500/50 cursor-pointer hover:shadow-lg hover:shadow-red-500/25"
+                                }
+              `}
                         >
                             {loading ? (
                                 <>

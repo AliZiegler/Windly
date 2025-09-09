@@ -1,6 +1,6 @@
 "use server"
 import { db } from "@/lib/db"
-import { eq, and } from "drizzle-orm"
+import { eq, and, InferSelectModel } from "drizzle-orm"
 import { userTable, productTable, wishlistTable } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/app/actions/AdminActions";
@@ -144,4 +144,14 @@ export async function setUserRole(role: AllowedRole) {
             error: error instanceof Error ? error.message : "Unknown error"
         };
     }
+}
+export type User = InferSelectModel<typeof userTable>;
+
+export async function getUserById(userId: string): Promise<User | null> {
+    const [user] = await db
+        .select()
+        .from(userTable)
+        .where(eq(userTable.id, userId));
+
+    return user ?? null;
 }

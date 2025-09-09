@@ -4,8 +4,14 @@ import { reviewTable, productTable, userTable } from '@/db/schema';
 import Link from 'next/link';
 import { urlString } from '@/app/components/global/Atoms';
 import Stars from '@/app/components/global/ReactStars';
-import { Star, MessageSquare, Calendar, Package } from 'lucide-react';
-
+import { Star, MessageSquare, Calendar, Package, Eye } from 'lucide-react';
+import { ReviewDeleteButton } from '@/app/components/global/SimpleComponents';
+import { deleteReview } from '@/app/actions/ReviewActions';
+async function handleDeleteReview(formData: FormData) {
+    "use server"
+    const reviewId = Number(formData.get('reviewId'));
+    await deleteReview(reviewId);
+}
 export default async function Reviews({ userId }: { userId: string }) {
     const [{ name }] = await db.select({
         name: userTable.name,
@@ -48,7 +54,7 @@ export default async function Reviews({ userId }: { userId: string }) {
                     </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center min-h-[400px] text-center bg-[#1e232b] rounded-xl border border-[#2a3038] p-6">
+                <div className="flex flex-col items-center justify-center min-h-[400px] text-center bg-midnight rounded-xl border border-[#2a3038] p-6">
                     <div className="text-4xl mb-4 opacity-50">⭐</div>
                     <h2 className="font-bold text-xl mb-2 text-white">No Reviews Yet</h2>
                     <p className="text-gray-400 mb-4">
@@ -105,22 +111,24 @@ export default async function Reviews({ userId }: { userId: string }) {
                         {trimmedReview}
                     </span>
                 </td>
-                <td className="p-3 text-center">
+                <td className="flex justify-center gap-2 text-center">
                     <Link
                         href={`/admin/users/${userId}/reviews/${urlString(productName)}`}
-                        className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-400 
-                                 hover:bg-blue-500/30 hover:text-blue-300 rounded-lg transition-all duration-200 text-sm"
+                        className="inline-flex text-gray-300 items-center px-3 py-1 hover:bg-blue-500/30 hover:text-blue-300 
+                        rounded-lg transition-all duration-200 text-sm"
                     >
-                        View Details
+                        <Eye className="text-gray-400 w-5 h-5" />
                     </Link>
+
+                    <ReviewDeleteButton reviewId={id} handleDeleteReviewAction={handleDeleteReview} />
                 </td>
             </tr>
         );
     });
 
-    const theadElements = ['Date', 'Product', 'Rating', 'Review', 'Action'];
+    const theadElements = ['Date', 'Product', 'Rating', 'Review', 'Actions'];
     const displayTHeadElements = theadElements.map((element) => {
-        const isCenter = ['Rating', 'Action'].includes(element);
+        const isCenter = ['Rating', 'Actions'].includes(element);
         return (
             <th key={element} className={`p-3 text-sm font-semibold text-gray-300 ${isCenter ? 'text-center' : 'text-left'}`}>
                 {element}
@@ -241,14 +249,16 @@ export default async function Reviews({ userId }: { userId: string }) {
                                     {trimmedReview}
                                 </p>
 
-                                <div className="flex justify-end">
+                                <div className="flex gap-3 justify-end">
                                     <Link
                                         href={`/admin/users/${userId}/reviews/${urlString(productName)}`}
-                                        className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-400 
-                                                 hover:bg-blue-500/30 hover:text-blue-300 rounded-lg transition-all duration-200 text-sm"
+                                        className="inline-flex text-gray-300 items-center px-3 py-1 hover:bg-blue-500/30 hover:text-blue-300 
+                        rounded-lg transition-all duration-200 text-sm"
                                     >
-                                        View Details
+                                        <Eye className="text-gray-400 w-5 h-5" />
                                     </Link>
+
+                                    <ReviewDeleteButton reviewId={id} handleDeleteReviewAction={handleDeleteReview} />
                                 </div>
                             </div>
                         );

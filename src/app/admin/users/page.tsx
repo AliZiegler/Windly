@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
-import SummaryFilter from "@/app/components/global/SummaryFilter";
+import CollapsibleFilter from "@/app/components/global/CollapsibleFilter";
 
 function normalizeParams(sp: ResolvedSearchParamsType) {
     const toStr = (val: string | string[] | undefined): string | undefined =>
@@ -50,7 +50,8 @@ export default async function AdminUsers({
     searchParams: SearchParamsType
 }) {
     const sp = await searchParams;
-    const { search, role, gender, emailVerified, hasPhone, birthdayMonth, joinedAfter, joinedBefore, minOrders, maxOrders, minSpent, maxSpent } = normalizeParams(sp);
+    const normalizedParams = normalizeParams(sp);
+    const { search, role, gender, emailVerified, hasPhone, birthdayMonth, joinedAfter, joinedBefore, minOrders, maxOrders, minSpent, maxSpent } = normalizedParams
 
     const buildWhereClause = () => {
         const conditions = [];
@@ -388,9 +389,9 @@ export default async function AdminUsers({
                     </p>
                 </div>
             </div>
-            <SummaryFilter>
+            <CollapsibleFilter >
                 <UserFilterForm searchParams={sp} />
-            </SummaryFilter>
+            </CollapsibleFilter>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-midnight rounded-xl p-4 border border-[#2a3038]">

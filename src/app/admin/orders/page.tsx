@@ -9,7 +9,7 @@ import {
     XCircle, Truck, ShoppingCart
 } from "lucide-react";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
-import SummaryFilter from "@/app/components/global/SummaryFilter";
+import CollapsibleFilter from "@/app/components/global/CollapsibleFilter";
 
 function normalizeParams(sp: ResolvedSearchParamsType) {
     const toStr = (val: string | string[] | undefined): string | undefined =>
@@ -18,7 +18,7 @@ function normalizeParams(sp: ResolvedSearchParamsType) {
     return {
         search: toStr(sp.search),
         status: toStr(sp.status),
-        customer: toStr(sp.customer),
+        userId: toStr(sp.userId),
         minTotal: toStr(sp.minTotal),
         maxTotal: toStr(sp.maxTotal),
         dateFrom: toStr(sp.dateFrom),
@@ -34,9 +34,8 @@ export default async function AdminOrders({
     searchParams: SearchParamsType
 }) {
     const sp = await searchParams;
-    const { search, status, customer, minTotal, maxTotal, dateFrom, dateTo, sortBy, sortOrder } =
-        normalizeParams(sp);
-
+    const normalizedParams = normalizeParams(sp);
+    const { search, status, userId, minTotal, maxTotal, dateFrom, dateTo, sortBy, sortOrder } = normalizedParams
     const buildWhereClause = () => {
         const conditions = [];
 
@@ -62,7 +61,9 @@ export default async function AdminOrders({
         }
 
         if (status) conditions.push(eq(cartTable.status, status as 'ordered' | 'shipped' | 'delivered' | 'cancelled'));
-        if (customer) conditions.push(like(userTable.name, `%${customer}%`));
+        if (userId) {
+            conditions.push(eq(cartTable.userId, userId));
+        }
 
         if (dateFrom) {
             conditions.push(gte(cartTable.createdAt, dateFrom));
@@ -262,9 +263,9 @@ export default async function AdminOrders({
                 </div>
             </div>
 
-            <SummaryFilter>
+            <CollapsibleFilter >
                 <FilterForm searchParams={sp} />
-            </SummaryFilter>
+            </CollapsibleFilter>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

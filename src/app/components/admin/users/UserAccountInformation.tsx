@@ -6,7 +6,8 @@ import Image from "next/image"
 import { makeAdmin } from "@/app/actions/AdminActions";
 import { Shield } from "lucide-react";
 import ReadOnlyUserField from "@/app/components/account/ReadOnlyUserField"
-import SignOut from "@/app/components/global/SignOut"
+import UserBanShowButton from "@/app/components/admin/users/UserBanShowButton";
+import BanUserPopup from "@/app/components/admin/users/UserBan";
 
 export default async function AccountInformation({ id }: { id: string }) {
     const [user] = await db.select({
@@ -76,8 +77,7 @@ export default async function AccountInformation({ id }: { id: string }) {
                 />
             </div>
 
-            <div className="mt-4 flex gap-3">
-                <SignOut />
+            <div className="mt-4 flex items-center gap-5">
                 <span>
                     <form
                         action={async () => {
@@ -89,12 +89,13 @@ export default async function AccountInformation({ id }: { id: string }) {
                         <button
                             type="submit"
                             className="cursor-pointer h-8 max-w-52 bg-blue-500 hover:bg-blue-600 duration-200 rounded-md flex items-center gap-2 p-2">
-                            <Shield size={25} color="black" />
-                            <b>Make {user.name} Admin</b>
+                            <Shield size={25} color="white" />
+                            <b>Make Admin</b>
                         </button>
                     </form>
-
                 </span>
+                <UserBanShowButton userId={id} size={26} />
+                <BanUserPopup />
             </div>
         </div>
     );

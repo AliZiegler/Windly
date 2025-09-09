@@ -78,7 +78,7 @@ export default function AccountLinks() {
                 </div>
 
                 <select
-                    className="w-full h-12 px-4 bg-[#393e46] text-white border border-gray-600 rounded-lg cursor-pointer 
+                    className="w-full h-12 px-4 bg-midnight text-white border border-gray-600 rounded-lg cursor-pointer 
                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     value={selectedValue}
                     onChange={handleChange}

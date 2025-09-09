@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { ResolvedSearchParamsType, SearchParamsType } from "@/app/components/global/Types";
-import SummaryFilter from "@/app/components/global/SummaryFilter";
+import CollapsibleFilter from "@/app/components/global/CollapsibleFilter";
 import { deleteReview } from "@/app/actions/ReviewActions";
 import { ReviewDeleteButton } from "@/app/components/global/SimpleComponents";
 
@@ -51,6 +51,7 @@ export default async function AdminReviews({
     searchParams: SearchParamsType
 }) {
     const sp = await searchParams;
+    const normalizedParams = normalizeParams(sp);
     const {
         search,
         rating,
@@ -65,7 +66,7 @@ export default async function AdminReviews({
         createdBefore,
         sortBy,
         sortOrder
-    } = normalizeParams(sp);
+    } = normalizedParams;
 
     const buildWhereClause = () => {
         const conditions = [];
@@ -407,9 +408,9 @@ export default async function AdminReviews({
                     </p>
                 </div>
             </div>
-            <SummaryFilter>
+            <CollapsibleFilter >
                 <ReviewFilterForm searchParams={sp} />
-            </SummaryFilter>
+            </CollapsibleFilter>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -620,7 +621,7 @@ export default async function AdminReviews({
             {/* No Reviews Found */}
             {reviewsWithDetails.length === 0 && (
                 <div className="flex flex-col items-center justify-center min-h-[300px] text-center bg-[#1e232b] rounded-xl border border-[#2a3038]">
-                    <div className="text-4xl mb-4 opacity-50">💬</div>
+                    <div className="text-4xl mb-4 opacity-50"><MessageSquare className="w-8 h-8" /></div>
                     <h2 className="font-bold text-xl mb-2 text-white">
                         {Object.keys(sp).length > 0 ? 'No Reviews Match Your Filters' : 'No Reviews Found'}
                     </h2>

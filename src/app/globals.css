@@ -5,8 +5,9 @@
     --color-navbar: #393e46;
     --color-golden: #ffb100;
     --color-mainbg: #222831;
+    --color-lightblue: #00CAFF;
 }
 
 @utility link-hover {
-    @apply hover:text-[#00CAFF] duration-200;
+    @apply hover:text-lightblue duration-200;
 }
