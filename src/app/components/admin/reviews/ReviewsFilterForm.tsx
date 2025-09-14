@@ -24,7 +24,7 @@ const DEFAULT_VALUES = {
     search: '',
     rating: '0',
     minRating: '0',
-    maxRating: '0',
+    maxRating: '5',
     userId: '',
     productId: '',
     hasHelpful: '',
@@ -53,6 +53,14 @@ const HELPFUL_STATUS_LABELS: { [key: string]: string } = {
     '1': 'Has Helpful Votes',
     '0': 'No Helpful Votes'
 };
+function getValue(fd: FormData, key: keyof SearchParams): string {
+    return (fd.get(key) ?? "").toString();
+}
+const num = (val: string | undefined) => (val ? Number(val) : null);
+const date = (val: string | undefined) => (val ? new Date(val) : null);
+function isDefault(key: keyof SearchParams, value: string) {
+    return value === DEFAULT_VALUES[key];
+}
 
 const SelectInput = ({ name, label, options, defaultValue }:
     { name: string; label: string; options: { value: string; label: string }[], defaultValue: string }) => {
@@ -153,52 +161,57 @@ export default function ReviewFilterForm({
         "use server";
 
         const params: SearchParams = {
-            search: formData.get("search") as string,
-            rating: formData.get("rating") as string,
-            minRating: formData.get("minRating") as string,
-            maxRating: formData.get("maxRating") as string,
-            userId: formData.get("userId") as string,
-            productId: formData.get("productId") as string,
-            hasHelpful: formData.get("hasHelpful") as string,
-            minHelpful: formData.get("minHelpful") as string,
-            maxHelpful: formData.get("maxHelpful") as string,
-            createdAfter: formData.get("createdAfter") as string,
-            createdBefore: formData.get("createdBefore") as string,
-            sortBy: formData.get("sortBy") as string,
-            sortOrder: formData.get("sortOrder") as string,
+            search: getValue(formData, "search"),
+            rating: getValue(formData, "rating"),
+            minRating: getValue(formData, "minRating"),
+            maxRating: getValue(formData, "maxRating"),
+            userId: getValue(formData, "userId"),
+            productId: getValue(formData, "productId"),
+            hasHelpful: getValue(formData, "hasHelpful"),
+            minHelpful: getValue(formData, "minHelpful"),
+            maxHelpful: getValue(formData, "maxHelpful"),
+            createdAfter: getValue(formData, "createdAfter"),
+            createdBefore: getValue(formData, "createdBefore"),
+            sortBy: getValue(formData, "sortBy"),
+            sortOrder: getValue(formData, "sortOrder"),
         };
 
         const searchParams = new URLSearchParams();
 
         Object.entries(params).forEach(([key, value]) => {
-            if (
-                value &&
-                value !== DEFAULT_VALUES[key as keyof SearchParams]
-            ) {
+            if (value && !isDefault(key as keyof SearchParams, value)) {
                 searchParams.set(key, value);
             }
         });
 
-        // Handle edge cases for numeric inputs
-        if (searchParams.get("maxHelpful") === "0" || Number(searchParams.get("maxHelpful")) < Number(searchParams.get("minHelpful"))) {
+        const minHelpful = num(params.minHelpful);
+        const maxHelpful = num(params.maxHelpful);
+        const minRating = num(params.minRating);
+        const maxRating = num(params.maxRating);
+
+        const createdAfter = date(params.createdAfter);
+        const createdBefore = date(params.createdBefore);
+
+        if (
+            maxHelpful !== null &&
+            (maxHelpful === 0 || (minHelpful !== null && maxHelpful < minHelpful))
+        ) {
             searchParams.delete("maxHelpful");
         }
-        if (searchParams.get("minHelpful") === "0") {
+        if (minHelpful === 0) {
             searchParams.delete("minHelpful");
         }
 
-        // Validate rating ranges
-        if (Number(searchParams.get("maxRating")) < Number(searchParams.get("minRating"))) {
+        if (maxRating !== null && minRating !== null && maxRating < minRating) {
             searchParams.delete("maxRating");
         }
 
-        // Validate date ranges
-        const createdAfter = searchParams.get("createdAfter");
-        const createdBefore = searchParams.get("createdBefore");
-        if (createdAfter && createdBefore && new Date(createdAfter) > new Date(createdBefore)) {
+        // Dates
+        if (createdAfter && createdBefore && createdAfter > createdBefore) {
             searchParams.delete("createdBefore");
         }
 
+        // --- Redirect with query ---
         const query = searchParams.toString();
         redirect(`/admin/reviews${query ? `?${query}` : ""}`);
     }
@@ -263,12 +276,12 @@ export default function ReviewFilterForm({
                     {/* Primary Filters */}
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-center">
                         {/* Exact Rating */}
-                        <RatingSlider defaultValue={Number(searchParams.rating)} label="Exact Rating" inputName="rating" />
+                        <RatingSlider defaultValue={Number(searchParams.rating) || 0} label="Exact Rating" inputName="rating" />
                         {/* Min Rating */}
-                        <RatingSlider defaultValue={Number(searchParams.minRating)} label="Minimum Rating" inputName="minRating" />
+                        <RatingSlider defaultValue={Number(searchParams.minRating) || 0} label="Minimum Rating" inputName="minRating" />
 
                         {/* Max Rating */}
-                        <RatingSlider defaultValue={Number(searchParams.maxRating)} label="Maximum Rating" inputName="maxRating" />
+                        <RatingSlider defaultValue={Number(searchParams.maxRating) || 5} label="Maximum Rating" inputName="maxRating" />
                         {/* Has Helpful Votes */}
                         <SelectInput
                             name="hasHelpful"
