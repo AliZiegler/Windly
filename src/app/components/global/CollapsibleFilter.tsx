@@ -35,7 +35,7 @@ export default function CollapsibleFilter({
             <button
                 onClick={toggleFilter}
                 className="w-full text-[#FCECDD] font-medium px-4 py-3 hover:bg-[#76ABAE]/10 
-                flex items-center justify-between transition-colors duration-200 group"
+                flex items-center justify-between transition-colors duration-200 group cursor-pointer"
                 aria-expanded={isOpen}
                 aria-controls="filter-content"
             >
@@ -56,7 +56,7 @@ export default function CollapsibleFilter({
             >
                 <div
                     ref={contentRef}
-                    className={`px-2 py-2 transition-opacity duration-200 ${opacityClass}`}
+                    className={`p-2 transition-opacity duration-200 ${opacityClass}`}
                 >
                     {children}
                 </div>

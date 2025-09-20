@@ -65,7 +65,7 @@ export const userTable = sqliteTable("user", {
     phone: text("phone"),
     addressId: int("address_id"), //default address id
     cartId: int("cart_id"), //default cart id
-    role: text("status", { enum: ["user", "seller", "admin"] }).notNull().default("user"),
+    role: text("role", { enum: ["user", "seller", "admin"] }).notNull().default("user"),
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 })
 export const banTable = sqliteTable("ban", {

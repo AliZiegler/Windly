@@ -2,8 +2,11 @@
 
 import { urlString, homeOnlySearchParams } from "@/app/components/global/Atoms";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { Search } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type SearchProps = {
     categories: string[];
@@ -26,107 +29,110 @@ export default function SearchBar({
     const currentCategory = searchParams.get("category") ?? "all";
 
     const [selectedCategory, setSelectedCategory] = useState(currentCategory);
-    const selectRef = useRef<HTMLSelectElement>(null);
-    const sizerRef = useRef<HTMLSpanElement>(null);
+    const [searchValue, setSearchValue] = useState(currentSearch);
 
+    // Update local state when URL params change
     useEffect(() => {
-        if (!sizerRef.current || !selectRef.current) return;
+        setSelectedCategory(currentCategory);
+        setSearchValue(currentSearch);
+    }, [currentCategory, currentSearch]);
 
-        const label = ct.find((cat) => urlString(cat) === selectedCategory) ?? selectedCategory;
-        sizerRef.current.textContent = label;
+    const handleCategoryChange = useCallback((value: string) => {
+        setSelectedCategory(value);
+    }, []);
 
-        const measured = sizerRef.current.offsetWidth;
-        selectRef.current.style.width = `${measured + 32}px`;
-    }, [selectedCategory, ct]);
+    const handleSearch = useCallback(() => {
+        if (searchValue === currentSearch && selectedCategory === currentCategory) return;
 
-    const handleSubmit = useCallback(
-        (event: React.FormEvent<HTMLFormElement>) => {
+        const newParams = new URLSearchParams(searchParams);
+        Array.from(newParams.keys()).forEach((key) => {
+            if (!homeOnlySearchParams.includes(key)) {
+                newParams.delete(key);
+            }
+        });
+
+        if (searchValue.trim() !== "") {
+            newParams.set("search", urlString(searchValue.trim()));
+        } else {
+            newParams.delete("search");
+        }
+
+        if (selectedCategory.toLowerCase() !== "all") {
+            newParams.set("category", selectedCategory);
+        } else {
+            newParams.delete("category");
+        }
+
+        onSearchChange?.(searchValue.trim(), selectedCategory);
+        router.push(`/?${newParams.toString()}`);
+    }, [router, currentSearch, currentCategory, onSearchChange, selectedCategory, searchValue, searchParams]);
+
+    const handleSubmit = useCallback((event: React.FormEvent) => {
+        event.preventDefault();
+        handleSearch();
+    }, [handleSearch]);
+
+    const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+        if (event.key === 'Enter') {
             event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const search = (formData.get("search") ?? "").toString();
-            const category = selectedCategory;
+            handleSearch();
+        }
+    }, [handleSearch]);
 
-            if (search === currentSearch && category === currentCategory) return;
-
-            const newParams = new URLSearchParams(searchParams);
-            Array.from(newParams.keys()).forEach((key) => {
-                if (!homeOnlySearchParams.includes(key)) {
-                    newParams.delete(key);
-                }
-            });
-            if (search !== "") {
-                newParams.set("search", urlString(search));
-            } else {
-                newParams.delete("search");
-            }
-
-            if (category.toLowerCase() !== "all") {
-                newParams.set("category", category);
-            } else {
-                newParams.delete("category");
-            }
-
-            onSearchChange?.(search, category);
-            router.push(`/?${newParams.toString()}`);
-        },
-        [router, currentSearch, currentCategory, onSearchChange, selectedCategory, searchParams]
-    );
+    // Get the display label for the selected category
+    const getDisplayLabel = useCallback((value: string) => {
+        return ct.find((cat) => urlString(cat) === value) ??
+            ct.find((cat) => cat.toLowerCase() === value.toLowerCase()) ??
+            value;
+    }, [ct]);
 
     return (
         <form onSubmit={handleSubmit} className={`flex items-center ${className}`} role="search" aria-label="Product search">
-            <div className="relative inline-block">
-                <span
-                    ref={sizerRef}
-                    className="invisible absolute whitespace-nowrap text-white text-center h-[50px] md:h-[60px] px-3 md:px-4 text-sm md:text-base font-sans font-normal"
-                />
-
-                <select
-                    ref={selectRef}
-                    name="category"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    aria-label="Select category"
-                    className="inline-block h-[50px] w-[60px] sm:w-[82px] md:h-[60px] px-2 md:px-4 cursor-pointer bg-[#697565]
-                    text-white text-center rounded-l-md border-r
-                    border-gray-300 font-bold focus:outline-none focus:ring-2
-                    focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-xs sm:text-sm md:text-base"
-                >
+            <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                <SelectTrigger className="min-h-[50px] w-auto min-w-[80px] md:min-h-[60px] bg-[#697565] hover:bg-[#4e5c5a] text-white font-bold 
+                    rounded-l-md rounded-r-none border-r border-gray-300 focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-xs 
+                    sm:text-sm md:text-base">
+                    <SelectValue>
+                        {getDisplayLabel(selectedCategory)}
+                    </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-[#697565] text-white border-[#697565]">
                     {ct.map((category) => (
-                        <option key={category} value={urlString(category)}>
+                        <SelectItem
+                            key={category}
+                            value={urlString(category)}
+                            className="hover:bg-[#4e5c5a] focus:bg-[#4e5c5a]"
+                        >
                             {category}
-                        </option>
+                        </SelectItem>
                     ))}
-                </select>
-            </div>
+                </SelectContent>
+            </Select>
 
-            <input
-                name="search"
-                defaultValue={currentSearch}
+            <Input
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={handleKeyDown}
                 type="text"
                 className="bg-[#F2F2F2] h-[50px] w-[200px] md:h-[60px] flex-1 md:flex-none 
                 md:2xl:w-[900px] md:xl:w-[700px] md:lg:w-[500px] md:sm:w-[400px] md:w-72 
-                text-black text-base md:text-lg px-3 md:px-4 border-y border-gray-300 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                transition-all duration-200"
+                text-black text-base md:text-lg px-3 md:px-4 border-y border-l-0 border-r-0 border-gray-300 
+                rounded-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                 placeholder={placeholder}
                 aria-label="Search products"
                 autoComplete="off"
                 spellCheck="false"
             />
 
-            <button
+            <Button
                 type="submit"
-                className="bg-[#ECDFCC] h-[50px] md:h-[60px] w-[50px] md:w-[60px] flex items-center justify-center rounded-r-md border-l
-                border-gray-300 hover:bg-[#E5D4B1] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                transition-all duration-200 group"
+                className="bg-[#ECDFCC] hover:bg-[#E5D4B1] h-[50px] md:h-[60px] w-[50px] md:w-[60px] 
+  rounded-l-none rounded-r-md border-l border-gray-300 focus:ring-2 focus:ring-blue-500 
+  transition-all duration-200"
                 aria-label="Search"
             >
-                <Search
-                    size={40}
-                    color="black"
-                    className="absolute cursor-pointer group-hover:scale-110 transition-transform duration-200 w-[25px] h-[25px] md:w-[40px] md:h-[40px]"
-                />
-            </button>
+                <Search className="w-2/3 h-2/3 text-black transition-transform duration-200 hover:scale-110" />
+            </Button>
         </form>
     );
 }

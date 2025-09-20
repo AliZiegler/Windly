@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react";
 import { updateUserField, setUserRole } from "@/app/actions/UserActions";
+import { Button } from "@/components/ui/button";
 
 type EditableFieldProps = {
     label: string;
@@ -133,13 +134,12 @@ export default function EditableField({
 
             {!isEditing && showEditButton && (
                 <div className="flex-shrink-0 mt-4 sm:mt-0">
-                    <button
+                    <Button
                         onClick={handleEdit}
-                        className="bg-golden/80 hover:bg-golden w-full sm:w-20 h-9 rounded-md font-bold 
-                        cursor-pointer transition-colors text-midnight"
+                        className="bg-golden/80 text-md hover:bg-golden w-full sm:w-20 h-9 font-bold text-midnight"
                     >
                         Edit
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>
