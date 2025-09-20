@@ -1,32 +1,47 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { updateSearchParams, ORIGINAL_MAX_PRICE } from "@/app/components/global/Atoms";
+import { ORIGINAL_MAX_PRICE } from "@/app/components/global/Atoms";
 import { BadgeDollarSign } from "lucide-react";
+import RangeSlider from 'react-range-slider-input';
+import 'react-range-slider-input/dist/style.css';
 
 export default function PriceFilter() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const paramsPrice: number = Number(
-        searchParams.get("price") || ORIGINAL_MAX_PRICE,
-    );
-    const [maxPrice, setMaxPrice] = useState(paramsPrice);
+    const paramsMinPrice: number = Number(searchParams.get("minPrice") || 0);
+    const paramsMaxPrice: number = Number(searchParams.get("maxPrice") || ORIGINAL_MAX_PRICE);
+    const [priceRange, setPriceRange] = useState<[number, number]>([paramsMinPrice / 25, paramsMaxPrice / 25]);
 
-    function handlePriceChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const newPrice = e.target.valueAsNumber * 25;
-        setMaxPrice(newPrice);
+    function handlePriceChange(value: [number, number]) {
+        setPriceRange(value);
     }
 
     function handleMouseUp() {
-        const newParams = maxPrice >= ORIGINAL_MAX_PRICE
-            ? updateSearchParams(searchParams, "price", null)
-            : updateSearchParams(searchParams, "price", maxPrice.toString());
+        const minPrice = priceRange[0] * 25;
+        const maxPrice = priceRange[1] * 25;
 
-        router.push(`?${newParams.toString()}`);
+        const params = new URLSearchParams(searchParams);
+
+        if (minPrice <= 0) {
+            params.delete("minPrice");
+        } else {
+            params.set("minPrice", minPrice.toString());
+        }
+
+        // Handle max price
+        if (maxPrice >= ORIGINAL_MAX_PRICE) {
+            params.delete("maxPrice");
+        } else {
+            params.set("maxPrice", maxPrice.toString());
+        }
+
+        router.push(`?${params.toString()}`);
     }
+
     useEffect(() => {
-        setMaxPrice(paramsPrice);
-    }, [paramsPrice]);
+        setPriceRange([paramsMinPrice / 25, paramsMaxPrice / 25]);
+    }, [paramsMinPrice, paramsMaxPrice]);
 
     return (
         <section className="flex flex-col gap-2.5">
@@ -35,17 +50,16 @@ export default function PriceFilter() {
                 <BadgeDollarSign className="size-6 md:size-[20px]" strokeWidth={1.5} />
             </span>
             <p>
-                $0 - ${!maxPrice || maxPrice >= ORIGINAL_MAX_PRICE
+                ${priceRange[0] * 25} - ${priceRange[1] * 25 >= ORIGINAL_MAX_PRICE
                     ? `${ORIGINAL_MAX_PRICE}+`
-                    : maxPrice}
+                    : priceRange[1] * 25}
             </p>
-            <input
-                type="range"
-                className="w-full h-3 cursor-pointer"
-                value={maxPrice / 25}
-                onChange={handlePriceChange}
-                onPointerUp={handleMouseUp}
-                min={1}
+            <RangeSlider
+                className="w-full h-2 cursor-pointer"
+                value={priceRange}
+                onInput={handlePriceChange}
+                onThumbDragEnd={handleMouseUp}
+                min={0}
                 max={ORIGINAL_MAX_PRICE / 25}
             />
         </section>

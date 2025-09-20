@@ -13,7 +13,8 @@ type PageProps = {
         reverse?: string;
         discount?: string;
         rating?: string;
-        price?: string;
+        minPrice?: string;
+        maxPrice?: string;
         search?: string;
         category?: string;
     }>;
@@ -74,13 +75,17 @@ export default async function Page({ searchParams }: PageProps) {
     const reverse = params.reverse === "true";
     const minDiscount = Number(params.discount) || 0;
     const minRating = Number(params.rating) || 0;
-    const maxPrice = Number(params.price) || 12000;
+    const maxPrice = Number(params.maxPrice) || 12000;
+    const minPrice = Number(params.minPrice) || 0;
     const search = params.search || "";
     const category = params.category || "all";
 
     const conditions = [];
     if (maxPrice < 12000) {
         conditions.push(lte(productTable.price, maxPrice));
+    }
+    if (minPrice > 0) {
+        conditions.push(gte(productTable.price, minPrice));
     }
     if (minDiscount > 0) {
         conditions.push(gte(productTable.discount, minDiscount));
