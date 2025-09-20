@@ -11,7 +11,8 @@ type Params = {
     params: Promise<{ name: string }>
     searchParams: Promise<{
         sort?: string
-        rating?: string
+        minRating?: string
+        maxRating?: string
         search?: string
     }>
 }
@@ -38,7 +39,7 @@ async function handleHelpfulAction(formData: FormData) {
 
 export default async function ReviewsPage({ params, searchParams }: Params) {
     const { name } = await params
-    const { sort, rating, search } = await searchParams
+    const { sort, minRating, maxRating, search } = await searchParams
     const session = await auth()
     const userId = session?.user?.id
     let userHelpfulReviewsIds = null
@@ -117,9 +118,18 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
     }
 
     // Rating filter
-    if (rating && rating !== 'all') {
-        const ratingNum = parseInt(rating);
-        filteredReviews = filteredReviews.filter(review => Math.floor(review.rating) === ratingNum);
+    if (maxRating) {
+        const maxRatingNum = Number(maxRating);
+        if (!isNaN(maxRatingNum)) {
+            filteredReviews = filteredReviews.filter(review => review.rating <= maxRatingNum);
+        }
+    }
+
+    if (minRating) {
+        const minRatingNum = Number(minRating);
+        if (!isNaN(minRatingNum)) {
+            filteredReviews = filteredReviews.filter(review => review.rating >= minRatingNum);
+        }
     }
 
     // Sort reviews
@@ -286,7 +296,6 @@ export default async function ReviewsPage({ params, searchParams }: Params) {
                     totalReviews={reviews.length}
                     filteredCount={filteredReviews.length}
                     currentSort={sort}
-                    currentRating={rating}
                     currentSearch={search}
                 />
 

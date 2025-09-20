@@ -3,6 +3,7 @@
 import { Search, X } from 'lucide-react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { RatingSlider } from "@/app/components/global/SimpleComponents";
 
 type ReviewsFiltersProps = {
     totalReviews: number;
@@ -17,7 +18,6 @@ export default function ReviewsFilters({
     totalReviews,
     filteredCount,
     currentSort = 'newest',
-    currentRating = 'all',
     currentSearch = '',
     currentHelpful = 'false'
 }: ReviewsFiltersProps) {
@@ -27,19 +27,34 @@ export default function ReviewsFilters({
     const [isPending, startTransition] = useTransition();
     const [searchInput, setSearchInput] = useState(currentSearch);
 
-    const updateFilters = (key: string, value: string) => {
+    const updateFilters = (key: string, value: string | [number, number]) => {
         const params = new URLSearchParams(searchParams.toString());
 
-        const isDefault =
-            (key === 'sort' && value === 'newest') ||
-            (key === 'rating' && value === 'all') ||
-            (key === 'helpful' && value === 'false') ||
-            (key === 'search' && value === '');
+        if (key === 'rating' && Array.isArray(value)) {
+            // Handle range slider values
+            const [min, max] = value;
 
-        if (isDefault) {
-            params.delete(key);
+            if (min === 0) {
+                params.delete('minRating');
+            } else {
+                params.set('minRating', min.toString());
+            }
+
+            if (max === 5) {
+                params.delete('maxRating');
+            } else {
+                params.set('maxRating', max.toString());
+            }
         } else {
-            params.set(key, value);
+            const isDefault =
+                (key === 'sort' && value === 'newest') ||
+                (key === 'search' && value === '');
+
+            if (isDefault) {
+                params.delete(key);
+            } else {
+                params.set(key, value as string);
+            }
         }
 
         const queryString = params.toString();
@@ -62,7 +77,11 @@ export default function ReviewsFilters({
         });
     };
 
-    const hasActiveFilters = currentRating !== 'all' || currentSearch !== '' || currentHelpful === 'true';
+    const hasActiveFilters =
+        searchParams.get('minRating') !== null ||
+        searchParams.get('maxRating') !== null ||
+        currentSearch !== '' ||
+        currentHelpful === 'true';
 
     return (
         <div className="border border-gray-700/50 rounded-2xl p-6 mb-8" style={{ backgroundColor: "#2a313c" }}>
@@ -118,22 +137,18 @@ export default function ReviewsFilters({
 
                     {/* Rating Filter */}
                     <div className="lg:min-w-64 max-lg:w-full">
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Rating</label>
-                        <select
-                            value={currentRating}
-                            onChange={(e) => updateFilters('rating', e.target.value)}
-                            disabled={isPending}
-                            className="w-full h-12 px-3 border border-gray-600/50 rounded-lg text-gray-100 focus:border-blue-400 
-                            focus:outline-none transition-colors disabled:opacity-50 cursor-pointer"
-                            style={{ backgroundColor: "#1e252d" }}
-                        >
-                            <option value="all">All Stars</option>
-                            <option value="5">5 Stars</option>
-                            <option value="4">4 Stars</option>
-                            <option value="3">3 Stars</option>
-                            <option value="2">2 Stars</option>
-                            <option value="1">1 Star</option>
-                        </select>
+                        {/* Rating Filter */}
+                        <div className="lg:min-w-64 max-lg:w-full mt-5">
+                            <RatingSlider
+                                defaultValue={[
+                                    Number(searchParams.get("minRating")) || 0,
+                                    Number(searchParams.get("maxRating")) || 5
+                                ]}
+                                label="Rating Range"
+                                inputName="rating"
+                                onChange={(values) => updateFilters('rating', values)}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -183,11 +198,17 @@ export default function ReviewsFilters({
                             </button>
                         </span>
                     )}
-                    {currentRating !== 'all' && (
+                    {(searchParams.get('minRating') || searchParams.get('maxRating')) && (
                         <span className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-500/20 text-yellow-300 border border-yellow-400/30 rounded-lg text-sm">
-                            {currentRating} Stars
+                            Rating: {searchParams.get('minRating') || 0} - {searchParams.get('maxRating') || 5} Stars
                             <button
-                                onClick={() => updateFilters('rating', 'all')}
+                                onClick={() => {
+                                    const params = new URLSearchParams(searchParams.toString());
+                                    params.delete('minRating');
+                                    params.delete('maxRating');
+                                    const url = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+                                    startTransition(() => router.push(url, { scroll: false }));
+                                }}
                                 className="hover:text-yellow-200"
                             >
                                 <X size={16} />

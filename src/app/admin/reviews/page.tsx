@@ -30,7 +30,6 @@ function normalizeParams(sp: ResolvedSearchParamsType) {
 
     return {
         search: toStr(sp.search),
-        rating: toStr(sp.rating),
         minRating: toStr(sp.minRating),
         maxRating: toStr(sp.maxRating),
         userId: toStr(sp.userId),
@@ -54,7 +53,6 @@ export default async function AdminReviews({
     const normalizedParams = normalizeParams(sp);
     const {
         search,
-        rating,
         minRating,
         maxRating,
         userId,
@@ -81,10 +79,6 @@ export default async function AdminReviews({
                     like(productTable.name, searchTerm)
                 )
             );
-        }
-
-        if (rating) {
-            conditions.push(eq(reviewTable.rating, parseFloat(rating)));
         }
 
         if (minRating) {

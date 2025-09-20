@@ -1,4 +1,6 @@
 "use client";
+import RangeSlider from 'react-range-slider-input';
+import 'react-range-slider-input/dist/style.css';
 import { XCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from 'react'
@@ -80,23 +82,33 @@ export function AddressDeleteButton({
 }
 
 type RatingSliderProps = {
-    defaultValue?: number;
+    defaultValue?: [number, number];
     label: string;
     inputName: string;
     min?: number;
     max?: number;
     step?: number;
+    onChange?: (values: [number, number]) => void; // Add this
 };
 
 export function RatingSlider({
-    defaultValue = 0,
+    defaultValue = [0, 5],
     label,
     inputName,
     min = 0,
     max = 5,
     step = 0.5,
+    onChange, // Add this
 }: RatingSliderProps) {
-    const [value, setValue] = useState<number>(defaultValue);
+    const [value, setValue] = useState<[number, number]>(defaultValue);
+
+    const handleChange = (newValue: number[]) => {
+        const newValues = [newValue[0], newValue[1]] as [number, number];
+        setValue(newValues);
+        if (onChange) {
+            onChange(newValues); // Call the passed onChange function
+        }
+    };
 
     return (
         <div className="space-y-3 group">
@@ -108,27 +120,21 @@ export function RatingSlider({
                     {label}
                 </label>
                 <span className="text-gray-300 text-sm font-semibold">
-                    {value}
+                    {value[0]} - {value[1]}
                 </span>
             </div>
-
-            <input
+            <RangeSlider
                 id={inputName}
-                type="range"
-                name={inputName}
                 min={min}
                 max={max}
                 step={step}
                 value={value}
-                onChange={(e) => setValue(Number(e.target.value))}
-                className="w-full accent-[#00CAFF] cursor-pointer"
-                aria-valuemin={min}
-                aria-valuemax={max}
-                aria-valuenow={value}
+                onInput={handleChange}
+                className="w-full cursor-pointer"
             />
-
-            {/* hidden input ensures the current value is included when submitting the form */}
-            <input type="hidden" name={inputName} value={value} />
+            {/* hidden inputs ensure the current values are included when submitting the form */}
+            <input type="hidden" name={`${inputName}_min`} value={value[0]} />
+            <input type="hidden" name={`${inputName}_max`} value={value[1]} />
         </div>
     );
 }

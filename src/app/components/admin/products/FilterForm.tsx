@@ -8,7 +8,8 @@ type SearchParams = {
     category?: string;
     brand?: string;
     stockStatus?: string;
-    rating?: string;
+    minRating?: string;
+    maxRating?: string;
     featured?: string;
     minPrice?: string;
     maxPrice?: string;
@@ -24,7 +25,8 @@ const DEFAULT_VALUES = {
     featured: '',
     minPrice: '',
     maxPrice: '',
-    rating: '',
+    minRating: '',
+    maxRating: '',
     sortBy: 'dateAdded',
     sortOrder: 'desc',
 };
@@ -98,9 +100,13 @@ export default function FilterForm({
                 displayKey = 'Stock';
                 displayValue = STOCK_LABELS[value] || value;
                 break;
-            case 'rating':
-                displayKey = 'Rating';
-                displayValue = `${value}`;
+            case 'minRating':
+                displayKey = 'Min Rating';
+                displayValue = `${value}⭐`;
+                break;
+            case 'maxRating':
+                displayKey = 'Max Rating';
+                displayValue = `${value}⭐`;
                 break;
             case 'featured':
                 displayKey = 'Type';
@@ -122,7 +128,8 @@ export default function FilterForm({
             category: formData.get("category") as string,
             brand: formData.get("brand") as string,
             stockStatus: formData.get("stockStatus") as string,
-            rating: formData.get("rating") as string,
+            minRating: formData.get("rating_min") as string,
+            maxRating: formData.get("rating_max") as string,
             featured: formData.get("featured") as string,
             minPrice: formData.get("minPrice") as string,
             maxPrice: formData.get("maxPrice") as string,
@@ -145,6 +152,14 @@ export default function FilterForm({
         }
         if (searchParams.get("minPrice") === "0") {
             searchParams.delete("minPrice");
+        }
+        if (
+            ["0", "5"].includes(searchParams.get("maxRating") as string)
+            || Number(searchParams.get("maxRating")) < Number(searchParams.get("minRating"))) {
+            searchParams.delete("maxRating");
+        }
+        if (searchParams.get("minRating") === "0") {
+            searchParams.delete("minRating");
         }
         const query = searchParams.toString();
         redirect(`/admin/products${query ? `?${query}` : ""}`);
@@ -245,7 +260,11 @@ export default function FilterForm({
                             ]}
                         />
                         {/* Rating */}
-                        <RatingSlider defaultValue={Number(searchParams.rating) || 0} label="Minimun Rating" inputName="rating" />
+                        <RatingSlider
+                            defaultValue={[Number(searchParams.minRating) || 0, Number(searchParams.maxRating) || 5]}
+                            label="Rating Range"
+                            inputName="rating"
+                        />
                     </div>
 
                     {/* Secondary Filters */}

@@ -6,7 +6,6 @@ import { RatingSlider } from '@/app/components/global/SimpleComponents';
 
 type SearchParams = {
     search?: string;
-    rating?: string;
     minRating?: string;
     maxRating?: string;
     userId?: string;
@@ -22,7 +21,6 @@ type SearchParams = {
 
 const DEFAULT_VALUES = {
     search: '',
-    rating: '0',
     minRating: '0',
     maxRating: '5',
     userId: '',
@@ -34,19 +32,6 @@ const DEFAULT_VALUES = {
     createdBefore: '',
     sortBy: 'createdAt',
     sortOrder: 'desc',
-};
-
-const RATING_LABELS: { [key: string]: string } = {
-    '0.5': '0.5 Stars - Terrible',
-    '1': '1 Star - Very Poor',
-    '1.5': '1.5 Stars - Very Poor',
-    '2': '2 Stars - Poor',
-    '2.5': '2.5 Stars - Poor',
-    '3': '3 Stars - Average',
-    '3.5': '3.5 Stars - Above Average',
-    '4': '4 Stars - Good',
-    '4.5': '4.5 Stars - Very Good',
-    '5': '5 Stars - Excellent'
 };
 
 const HELPFUL_STATUS_LABELS: { [key: string]: string } = {
@@ -108,10 +93,6 @@ export default function ReviewFilterForm({
         let displayValue = value;
 
         switch (key) {
-            case 'rating':
-                displayKey = 'Rating';
-                displayValue = RATING_LABELS[value] || `${value} Stars`;
-                break;
             case 'minRating':
                 displayKey = 'Min Rating';
                 displayValue = `${value}+ Stars`;
@@ -162,9 +143,8 @@ export default function ReviewFilterForm({
 
         const params: SearchParams = {
             search: getValue(formData, "search"),
-            rating: getValue(formData, "rating"),
-            minRating: getValue(formData, "minRating"),
-            maxRating: getValue(formData, "maxRating"),
+            minRating: (formData.get("rating_min") ?? "").toString(),
+            maxRating: (formData.get("rating_max") ?? "").toString(),
             userId: getValue(formData, "userId"),
             productId: getValue(formData, "productId"),
             hasHelpful: getValue(formData, "hasHelpful"),
@@ -206,14 +186,12 @@ export default function ReviewFilterForm({
             searchParams.delete("maxRating");
         }
 
-        // Dates
         if (createdAfter && createdBefore && createdAfter > createdBefore) {
             searchParams.delete("createdBefore");
         }
 
-        // --- Redirect with query ---
         const query = searchParams.toString();
-        redirect(`/admin/reviews${query ? `?${query}` : ""}`);
+        redirect(`/admin/reviews${query && `?${query}`}`);
     }
 
     return (
@@ -274,14 +252,16 @@ export default function ReviewFilterForm({
                     <h3 className="text-lg font-semibold text-white">Advanced Filters</h3>
 
                     {/* Primary Filters */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-center">
                         {/* Exact Rating */}
-                        <RatingSlider defaultValue={Number(searchParams.rating) || 0} label="Exact Rating" inputName="rating" />
-                        {/* Min Rating */}
-                        <RatingSlider defaultValue={Number(searchParams.minRating) || 0} label="Minimum Rating" inputName="minRating" />
-
-                        {/* Max Rating */}
-                        <RatingSlider defaultValue={Number(searchParams.maxRating) || 5} label="Maximum Rating" inputName="maxRating" />
+                        <RatingSlider
+                            defaultValue={[
+                                Number(searchParams.minRating) || 0,
+                                Number(searchParams.maxRating) || 5
+                            ]}
+                            label="Rating Range"
+                            inputName="rating"
+                        />
                         {/* Has Helpful Votes */}
                         <SelectInput
                             name="hasHelpful"
@@ -293,10 +273,23 @@ export default function ReviewFilterForm({
                                 { value: '0', label: 'No Helpful Votes' }
                             ]}
                         />
+
+                        {/* User ID */}
+                        <div className="space-y-3 group">
+                            <label className="text-sm font-medium text-gray-300 group-focus-within:text-[#00CAFF] transition-colors">User ID</label>
+                            <input
+                                type="text"
+                                name="userId"
+                                defaultValue={searchParams.userId as string || ''}
+                                placeholder="Filter by specific user ID"
+                                className="w-full px-4 py-4 bg-[#2a3038] border border-[#3a4048] rounded-xl text-white placeholder-gray-400 
+                                focus:border-[#00CAFF] focus:outline-none transition-all duration-200 text-sm font-medium hover:border-[#4a5058] focus:bg-[#2f353d]"
+                            />
+                        </div>
                     </div>
 
                     {/* Secondary Filters */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {/* Min Helpful Votes */}
                         <div className="space-y-3 group">
                             <label className="text-sm font-medium text-gray-300 group-focus-within:text-[#00CAFF] transition-colors">Min Helpful Votes</label>
@@ -327,18 +320,6 @@ export default function ReviewFilterForm({
                             />
                         </div>
 
-                        {/* User ID */}
-                        <div className="space-y-3 group">
-                            <label className="text-sm font-medium text-gray-300 group-focus-within:text-[#00CAFF] transition-colors">User ID</label>
-                            <input
-                                type="text"
-                                name="userId"
-                                defaultValue={searchParams.userId as string || ''}
-                                placeholder="Filter by specific user ID"
-                                className="w-full px-4 py-4 bg-[#2a3038] border border-[#3a4048] rounded-xl text-white placeholder-gray-400 
-                                focus:border-[#00CAFF] focus:outline-none transition-all duration-200 text-sm font-medium hover:border-[#4a5058] focus:bg-[#2f353d]"
-                            />
-                        </div>
 
                         {/* Product ID */}
                         <div className="space-y-3 group">

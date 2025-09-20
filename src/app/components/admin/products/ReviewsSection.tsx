@@ -41,12 +41,14 @@ export default async function ReviewsPage({ productName, searchParams }: Params)
 
     // Better parameter extraction
     const rawSort = searchParams?.sort
-    const rawRating = searchParams?.rating
+    const rawMinRating = searchParams?.minRating
+    const rawMaxRating = searchParams?.maxRating
     const rawSearch = searchParams?.search
 
     // Handle both array and string formats more robustly
     const sort = Array.isArray(rawSort) ? rawSort[0] : (rawSort || "newest")
-    const rating = Array.isArray(rawRating) ? rawRating[0] : (rawRating || "all")
+    const minRating = Array.isArray(rawMinRating) ? rawMinRating[0] : (rawMinRating || "0")
+    const maxRating = Array.isArray(rawMaxRating) ? rawMaxRating[0] : (rawMaxRating || "5")
     const search = Array.isArray(rawSearch) ? rawSearch[0] : (rawSearch || "")
 
     // Debug logging
@@ -145,11 +147,17 @@ export default async function ReviewsPage({ productName, searchParams }: Params)
     }
 
     // Apply rating filter
-    if (rating && rating !== 'all') {
-        const ratingNum = parseInt(rating);
-        if (!isNaN(ratingNum)) {
-            filteredReviews = filteredReviews.filter(review => Math.floor(review.rating) === ratingNum);
-            console.log(`Rating filter applied: ${filteredReviews.length} reviews match rating ${ratingNum}`);
+    if (maxRating) {
+        const maxRatingNum = Number(maxRating);
+        if (!isNaN(maxRatingNum)) {
+            filteredReviews = filteredReviews.filter(review => review.rating <= maxRatingNum);
+        }
+    }
+
+    if (minRating) {
+        const minRatingNum = Number(minRating);
+        if (!isNaN(minRatingNum)) {
+            filteredReviews = filteredReviews.filter(review => review.rating >= minRatingNum);
         }
     }
 
@@ -317,7 +325,6 @@ export default async function ReviewsPage({ productName, searchParams }: Params)
                     totalReviews={reviews.length}
                     filteredCount={filteredReviews.length}
                     currentSort={sort}
-                    currentRating={rating}
                     currentSearch={search}
                 />
 

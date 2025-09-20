@@ -22,7 +22,8 @@ function normalizeParams(sp: ResolvedSearchParamsType) {
         brand: toStr(sp.brand),
         featured: toStr(sp.featured),
         stockStatus: toStr(sp.stockStatus),
-        rating: toStr(sp.rating),
+        minRating: toStr(sp.minRating),
+        maxRating: toStr(sp.maxRating),
         minPrice: toStr(sp.minPrice),
         maxPrice: toStr(sp.maxPrice),
     };
@@ -35,7 +36,7 @@ export default async function AdminProducts({
 }) {
     const sp = await searchParams;
     const normalizedParams = normalizeParams(sp);
-    const { search, category, brand, featured, stockStatus, minPrice, maxPrice, rating } = normalizedParams;
+    const { search, category, brand, featured, stockStatus, minPrice, maxPrice, minRating, maxRating } = normalizedParams;
 
     const buildWhereClause = () => {
         const conditions = [];
@@ -54,7 +55,8 @@ export default async function AdminProducts({
         if (category) conditions.push(eq(productTable.category, category));
         if (brand) conditions.push(eq(productTable.brand, brand));
         if (featured) conditions.push(eq(productTable.featured, parseInt(featured)));
-        if (rating) conditions.push(gte(reviewTable.rating, parseInt(rating)));
+        if (minRating) conditions.push(gte(reviewTable.rating, parseFloat(minRating)));
+        if (maxRating) conditions.push(lte(reviewTable.rating, parseFloat(maxRating)));
 
         if (stockStatus) {
             switch (stockStatus) {

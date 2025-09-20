@@ -96,7 +96,7 @@ export default function SearchBar({
                         {getDisplayLabel(selectedCategory)}
                     </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-[#697565] text-white border-[#697565]">
+                <SelectContent className="bg-midnight/80 text-white border-[#697565]">
                     {ct.map((category) => (
                         <SelectItem
                             key={category}
