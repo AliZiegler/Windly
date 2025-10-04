@@ -35,7 +35,7 @@ type ProductData = {
     salesCount: number;
 };
 
-type ProductViewProps = { product: ProductData };
+type ProductViewProps = { product: ProductData, sellerPage?: boolean };
 
 const Section = ({
     title,
@@ -57,7 +57,7 @@ const Field = ({ label, value }: { label: string; value: React.ReactNode }) => (
     </div>
 );
 
-export default function ProductView({ product }: ProductViewProps) {
+export default function ProductView({ product, sellerPage = false }: ProductViewProps) {
     const colors = JSON.parse(product.colors || "[]");
     const sizes = product.sizes ? JSON.parse(product.sizes) : [];
     const tags = JSON.parse(product.tags || "[]");
@@ -101,7 +101,7 @@ export default function ProductView({ product }: ProductViewProps) {
                 <div className="flex items-center gap-4">
                     <Link
                         prefetch
-                        href="/admin/products"
+                        href={`/${sellerPage ? "account" : "admin"}/products`}
                         className="p-2 hover:bg-[#2a3038] rounded-lg transition-colors duration-200"
                     >
                         <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -118,7 +118,7 @@ export default function ProductView({ product }: ProductViewProps) {
                 </div>
                 <Link
                     prefetch
-                    href={`/admin/products/${product.id}?mode=edit`}
+                    href={`/${sellerPage ? "account" : "admin"}/products/${product.id}?mode=edit`}
                     className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ffb100] to-[#ff9500] text-black font-bold 
                     rounded-lg hover:from-[#e0a000] hover:to-[#e08500] transition-all duration-200"
                 >

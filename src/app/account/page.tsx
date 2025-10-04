@@ -8,13 +8,16 @@ import EditableUserField from "@/app/components/account/EditableUserField"
 import SignOut from "@/app/components/global/SignOut"
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, User } from "lucide-react";
+import { redirect } from "next/navigation";
 async function handleMakeSeller() {
     "use server";
     await setUserRole("seller");
+    redirect("/account")
 }
 async function handleMakeUser() {
     "use server";
     await setUserRole("user");
+    redirect("/account")
 }
 
 export default async function Page() {

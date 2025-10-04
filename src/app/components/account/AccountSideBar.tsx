@@ -1,15 +1,27 @@
 import SignOut from "@/app/components/global/SignOut";
 import Link from "next/link";
+import { auth } from "@/auth";
+import db from "@/lib/db";
+import { eq } from "drizzle-orm";
+import { userTable } from "@/db/schema";
 import {
     User,
     Heart,
     MapPin,
     UserStar,
     ShoppingBag,
-    Shield
+    Shield,
+    Package
 } from "lucide-react";
 
-export default function AccountSideBar() {
+export default async function AccountSideBar() {
+    const session = await auth();
+    const userId = session?.user?.id;
+    let isSeller
+    if (userId) {
+        const [user] = await db.select({ role: userTable.role }).from(userTable).where(eq(userTable.id, userId));
+        isSeller = user.role === "seller";
+    }
     const links = [
         { name: "Account Information", href: "/account", icon: User },
         { name: "Wishlist", href: "/account/wishlist", icon: Heart },
@@ -18,6 +30,9 @@ export default function AccountSideBar() {
         { name: "Orders", href: "/account/orders", icon: ShoppingBag },
         { name: "Admin Panel", href: "/admin", icon: Shield }
     ];
+    if (isSeller) {
+        links.push({ name: "Your Products", href: "/account/products", icon: Package });
+    }
 
     const liLinks = links.map((link) => {
         const IconComponent = link.icon;

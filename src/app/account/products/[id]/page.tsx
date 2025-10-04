@@ -1,25 +1,32 @@
 import { db } from "@/lib/db";
 import { eq, avg, count } from "drizzle-orm";
-import { productTable, reviewTable, cartItemTable } from "@/db/schema";
+import { productTable, reviewTable, cartItemTable, userTable } from "@/db/schema";
 import { notFound } from "next/navigation";
 import { SearchParamsType } from "@/app/components/global/Types";
 import ProductView from "@/app/components/admin/products/ProductView";
 import ProductEdit from "@/app/components/admin/products/ProductEdit";
 import ReviewsSection from "@/app/components/admin/products/ReviewsSection";
-
+import { auth } from "@/auth";
 type ProductEditPageProps = {
     params: Promise<{ id: string; }>;
     searchParams: SearchParamsType;
 }
 
 export default async function ProductEditPage({ params, searchParams }: ProductEditPageProps) {
+    const session = await auth();
+    const userId = session?.user?.id
     const resolvedParams = await params;
     const sp = await searchParams;
     const productId = parseInt(resolvedParams.id);
     const mode = sp.mode || 'view';
     const isEditing = mode === 'edit';
 
-    if (isNaN(productId)) {
+    if (isNaN(productId) || !userId) {
+        notFound();
+    }
+    const [user] = await db.select({ role: userTable.role }).from(userTable).where(eq(userTable.id, userId));
+
+    if (user.role === "user") {
         notFound();
     }
 
@@ -80,16 +87,16 @@ export default async function ProductEditPage({ params, searchParams }: ProductE
     };
 
     return (
-        <>
+        <div className="flex flex-col gap-6">
             {isEditing ? (
-                <ProductEdit product={product} sellerPage={true} />
+                <ProductEdit product={product} />
             ) : (
-                <ProductView product={product} sellerPage={true} />
+                <ProductView product={product} />
             )}
             <ReviewsSection
                 productName={product.name}
                 searchParams={sp}
             />
-        </>
+        </div>
     );
 }

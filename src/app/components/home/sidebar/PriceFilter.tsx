@@ -28,8 +28,6 @@ export default function PriceFilter() {
         } else {
             params.set("minPrice", minPrice.toString());
         }
-
-        // Handle max price
         if (maxPrice >= ORIGINAL_MAX_PRICE) {
             params.delete("maxPrice");
         } else {

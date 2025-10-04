@@ -40,6 +40,7 @@ export const productTable = sqliteTable("product", {
     warrantyType: text().notNull(),
 
     about: text().notNull(), // JSON string of about array around 5 points and each one considerably long
+    sellerId: text().references(() => userTable.id, { onDelete: "cascade" }),
 });
 
 
