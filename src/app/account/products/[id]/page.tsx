@@ -89,9 +89,9 @@ export default async function ProductEditPage({ params, searchParams }: ProductE
     return (
         <div className="flex flex-col gap-6">
             {isEditing ? (
-                <ProductEdit product={product} />
+                <ProductEdit product={product} sellerPage />
             ) : (
-                <ProductView product={product} />
+                <ProductView product={product} sellerPage />
             )}
             <ReviewsSection
                 productName={product.name}

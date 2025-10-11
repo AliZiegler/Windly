@@ -93,7 +93,7 @@ export default async function Page() {
                     value={user.gender}
                     options={['Male', 'Female']}
                     className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 w-full p-4 
-                   border-b border-gray-600 hover:bg-gray-400 transition-colors"
+                   border-b border-gray-600 hover:bg-[#404752] transition-colors"
                 />
 
                 <EditableUserField

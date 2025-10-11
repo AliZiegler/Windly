@@ -118,7 +118,7 @@ export default function ProductEdit({ product, sellerPage = false }: ProductEdit
 
         try {
             await updateProduct(product.id, productData);
-            redirect(`/admin/products/${product.id}`);
+            redirect(`/${sellerPage ? "account" : "admin"}/products/${product.id}`);
         } catch (error) {
             console.error('Failed to update product:', error);
             throw error;

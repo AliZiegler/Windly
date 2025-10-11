@@ -33,6 +33,18 @@ export async function userExists(userId: string) {
         throw error;
     }
 }
+export async function doesUserHasAuthOverProduct(userId: string, productId: number) {
+    try {
+        const [user] = await db.select().from(userTable).where(eq(userTable.id, userId));
+        const [product] = await db.select().from(productTable).where(eq(productTable.id, productId));
+        const doesUserOwnProduct = user.id === product.sellerId;
+        const isUserAdmin = user.role === 'admin';
+        return doesUserOwnProduct || isUserAdmin;
+    } catch (error) {
+        console.error("Error checking user existence:", error);
+        throw error;
+    }
+}
 export async function productExists(productId: number) {
     try {
         const [product] = await db.select().from(productTable).where(eq(productTable.id, productId));
@@ -43,7 +55,9 @@ export async function productExists(productId: number) {
     }
 }
 export async function updateProduct(productId: number, data: InsertProduct) {
-    await requireAdmin();
+    if (!await doesUserHasAuthOverProduct(await requireAuth(), productId)) {
+        console.error("You are not authorized")
+    }
     const insertData = { ...data, lastUpdated: nowISO() };
     try {
         const product = await db
