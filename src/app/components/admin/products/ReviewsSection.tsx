@@ -36,8 +36,6 @@ async function handleHelpfulAction(formData: FormData) {
 export default async function ReviewsPage({ productName, searchParams }: Params) {
     const urlName = urlString(productName)
 
-    // Debug logging
-    console.log("Search params received:", searchParams);
 
     // Better parameter extraction
     const rawSort = searchParams?.sort
@@ -50,11 +48,6 @@ export default async function ReviewsPage({ productName, searchParams }: Params)
     const minRating = Array.isArray(rawMinRating) ? rawMinRating[0] : (rawMinRating || "0")
     const maxRating = Array.isArray(rawMaxRating) ? rawMaxRating[0] : (rawMaxRating || "5")
     const search = Array.isArray(rawSearch) ? rawSearch[0] : (rawSearch || "")
-
-    // Debug logging
-    console.log("Processed search parameter:", search);
-    console.log("Search parameter type:", typeof search);
-    console.log("Search parameter length:", search?.length || 0);
 
     const session = await auth()
     const userId = session?.user?.id
@@ -129,7 +122,6 @@ export default async function ReviewsPage({ productName, searchParams }: Params)
     // Apply search filter first - with more robust search logic
     if (search && search.trim() !== "") {
         const searchTerm = search.trim().toLowerCase();
-        console.log("Applying search filter for term:", searchTerm);
 
         filteredReviews = filteredReviews.filter(review => {
             const reviewText = review.review?.toLowerCase() || "";
@@ -138,12 +130,8 @@ export default async function ReviewsPage({ productName, searchParams }: Params)
             const matchesReview = reviewText.includes(searchTerm);
             const matchesUser = userName.includes(searchTerm);
 
-            console.log(`Review ID ${review.id}: reviewText includes "${searchTerm}": ${matchesReview}, userName includes "${searchTerm}": ${matchesUser}`);
-
             return matchesReview || matchesUser;
         });
-
-        console.log(`Search filtered ${reviews.length} reviews down to ${filteredReviews.length}`);
     }
 
     // Apply rating filter
